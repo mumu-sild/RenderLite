@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>798</width>
+    <height>634</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>3D渲染</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTabWidget" name="tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>0</y>
+      <width>281</width>
+      <height>571</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="object">
+     <attribute name="title">
+      <string>物体</string>
+     </attribute>
+     <widget class="QLabel" name="position_label">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>20</y>
+        <width>41</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>位置</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="position_x_label">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>50</y>
+        <width>31</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>X:</string>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="position_x_spinbox">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>45</y>
+        <width>121</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="position_y_label">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>80</y>
+        <width>31</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Y:</string>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="position_y_spinbox">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>75</y>
+        <width>121</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="position_z_label">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>110</y>
+        <width>31</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Z:</string>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="position_z_spinbox">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>105</y>
+        <width>121</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="camera">
+     <attribute name="title">
+      <string>摄像机</string>
+     </attribute>
+    </widget>
+    <widget class="QWidget" name="light">
+     <attribute name="title">
+      <string>页</string>
+     </attribute>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>798</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="file_menu">
+    <property name="geometry">
+     <rect>
+      <x>329</x>
+      <y>129</y>
+      <width>161</width>
+      <height>163</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>10</width>
+      <height>8</height>
+     </size>
+    </property>
+    <property name="title">
+     <string>文件</string>
+    </property>
+    <addaction name="new_file"/>
+    <addaction name="open_file"/>
+    <addaction name="import_file"/>
+   </widget>
+   <widget class="QMenu" name="edit_menu">
+    <property name="geometry">
+     <rect>
+      <x>381</x>
+      <y>129</y>
+      <width>161</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>10</width>
+      <height>8</height>
+     </size>
+    </property>
+    <property name="title">
+     <string>编辑</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="render_menu">
+    <property name="geometry">
+     <rect>
+      <x>433</x>
+      <y>129</y>
+      <width>161</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>10</width>
+      <height>8</height>
+     </size>
+    </property>
+    <property name="title">
+     <string>渲染</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="window_menu">
+    <property name="geometry">
+     <rect>
+      <x>485</x>
+      <y>129</y>
+      <width>161</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>10</width>
+      <height>8</height>
+     </size>
+    </property>
+    <property name="title">
+     <string>窗口</string>
+    </property>
+   </widget>
+   <addaction name="file_menu"/>
+   <addaction name="edit_menu"/>
+   <addaction name="render_menu"/>
+   <addaction name="window_menu"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="new_file">
+   <property name="text">
+    <string>新建</string>
+   </property>
+  </action>
+  <action name="open_file">
+   <property name="text">
+    <string>打开</string>
+   </property>
+  </action>
+  <action name="import_file">
+   <property name="text">
+    <string>导入</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
