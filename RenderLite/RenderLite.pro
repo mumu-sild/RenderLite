@@ -18,7 +18,9 @@ SOURCES += \
     vec.cpp
 
 HEADERS += \
+    Bounds3.h \
     Global.h \
+    Object.h \
     QShader.h \
     glwidget.h \
     logo.h \

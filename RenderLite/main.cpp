@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     initGlobal();
 
     MainWindow w;
-    w.resize(w.sizeHint());
+    w.resize(w.sizeHint());//sizeHint属性保存了部件的建议大小
     int desktopArea = QApplication::desktop()->width() *
                      QApplication::desktop()->height();
     int widgetArea = w.width() * w.height();
