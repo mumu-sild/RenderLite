@@ -29,11 +29,12 @@ public:
         e[2] = z;
     };
     //返回成员数值函数
-    double x() { return e[0]; }
-    double y() { return e[1]; }
-    double z() { return e[2]; }
-    //返回成员引用函数
+    double x() const { return e[0]; }
+    double y() const { return e[1]; }
+    double z() const { return e[2]; }
+    //返回成员函数
     double& operator[](int i) { return e[i]; }
+    double operator[](int i) const {return e[i];}
     //运算函数+ - * /
     vec3 operator-() const;//末尾const表示不改变内部成员
     vec3& operator+=(const vec3&);
@@ -51,6 +52,17 @@ public:
         // Return true if the vector is close to zero in all dimensions.
         const auto s = 1e-8;
         return (fabs(e[0]) < s) && (fabs(e[1]) < s) && (fabs(e[2]) < s);
+    }
+
+    //类内静态函数
+    static vec3 Min(const vec3 &p1, const vec3 &p2) {
+            return vec3(std::min(p1.x(), p2.x()), std::min(p1.y(), p2.y()),
+                           std::min(p1.z(), p2.z()));
+        }
+
+    static vec3 Max(const vec3 &p1, const vec3 &p2) {
+        return vec3(std::max(p1.x(), p2.x()), std::max(p1.y(), p2.y()),
+                       std::max(p1.z(), p2.z()));
     }
 };
 
@@ -98,6 +110,7 @@ inline ostream& operator<<(ostream& out, vec3& v)
     out << "[" << v.e[0] << " " << v.e[1] << " " << v.e[2] << "]" << endl;
     return out;
 }
+
 
 
 inline vec3 normalize(vec3 v) {

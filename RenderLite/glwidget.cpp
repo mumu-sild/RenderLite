@@ -158,15 +158,20 @@ void GLWidget::initializeGL()
     glClearColor(0, 0, 0, m_transparent ? 0 : 1);
 
     QOpenGLFunctions *f1 = QOpenGLContext::currentContext()->functions();
+
+//--放在Shader中，传参只传shader名称---------------------------------//
     qDebug()<<"path="<<path;
     QString vertexpath = path + "/vertexShaderSourceCore.vsh";
     QString fragmentpath = path +"/fragmentShaderSourceCore.fsh";
     const char* vertexPath = vertexpath.toStdString().c_str();
     const char* fragmentPath = fragmentpath.toStdString().c_str();
     qDebug()<<vertexPath;
+//-----------------------------------------------------------------
+
     m_shader = new QShader(vertexPath,fragmentPath,nullptr,f1);
     m_shader->use();
 
+//--将VBO，VAO,VEO作为一个整体，存储数据结构----------------------------------------
     // Create a vertex array object. In OpenGL ES 2.0 and OpenGL 2.x
     // implementations this is optional and support may not be present
     // at all. Nonetheless the below code works in all cases and makes
@@ -177,15 +182,19 @@ void GLWidget::initializeGL()
     // Setup our vertex buffer object.
     m_logoVbo.create();
     m_logoVbo.bind();
+            //allocate(float*,int count); 通过传入物体类，将数据转为<QVector>
     m_logoVbo.allocate(m_logo.constData(), m_logo.count() * sizeof(GLfloat));
 
     // Store the vertex attribute bindings for the program.
     setupVertexAttribs();
 
+
+//----摄像机类------------------------------------------------------------
     // Our camera never changes in this example.
     m_camera.setToIdentity();
     m_camera.translate(0, 0, -1);
 
+//----以光源物体组成点为点光源计算
     // Light position is fixed.
     m_shader->setVec3("lightPos", QVector3D(0, 0, 70));
     m_shader->release();
@@ -193,6 +202,14 @@ void GLWidget::initializeGL()
 
 void GLWidget::setupVertexAttribs()
 {
+    //vbo存储方式：
+    //无论是顶点 还是法线 还是纹理贴图坐标 都放成整体，以选项形式确定数据的绑定类型
+    //如确定：该BVO存储 顶点和 纹理贴图坐标 ，则
+    // 0号位置为顶点， 偏移量为0，步长为0，
+    //f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat),nullptr);
+    //1 号位置为纹理贴图坐标，偏移量为顶点长度，步长为0
+    //f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat),reinterpret_cast<void *>(3 * sizeof(GLfloat)));
+    //
     m_logoVbo.bind();
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
     f->glEnableVertexAttribArray(0);
@@ -206,6 +223,8 @@ void GLWidget::setupVertexAttribs()
 
 void GLWidget::paintGL()
 {
+    //Render类，来做渲染
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
