@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     QShader.cpp \
+    QVBO.cpp \
     glwidget.cpp \
     logo.cpp \
     main.cpp \
@@ -22,6 +23,7 @@ HEADERS += \
     Global.h \
     Object.h \
     QShader.h \
+    QVBO.h \
     glwidget.h \
     logo.h \
     mainwindow.h \
@@ -40,3 +42,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES += \
     fragmentShaderSourceCore.fsh \
     vertexShaderSourceCore.vsh
+
+RESOURCES += \
+    shader.qrc

@@ -23,11 +23,10 @@ public:
     }
     void setZero();
     void setIdentity();
-    //返回成员引用函数
+    //杩斿洖鎴愬憳寮曠敤鍑芥暟
     double& operator()(int i,int j) { return e[i][j]; }
-    friend ostream& operator<<(ostream& out, vec3& v);//只能使用友元函数
+    friend ostream& operator<<(ostream& out, vec3& v);//鍙兘浣跨敤鍙嬪厓鍑芥暟
     mat4 transpose(mat4 &m);
-
 
 };
 

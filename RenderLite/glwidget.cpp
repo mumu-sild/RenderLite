@@ -58,8 +58,8 @@
 #include <QString>
 #include <iostream>
 #include <QDebug>
-
 #include "glwidget.h"
+#include "QVBO.h"
 
 
 
@@ -136,9 +136,10 @@ void GLWidget::cleanup()
     if (m_shader == nullptr)
         return;
     makeCurrent();
-    m_logoVbo.destroy();
     delete m_shader;
     m_shader = nullptr;
+    delete dataVBO;
+    dataVBO = nullptr;
     doneCurrent();
 }
 
@@ -157,73 +158,42 @@ void GLWidget::initializeGL()
     initializeOpenGLFunctions();
     glClearColor(0, 0, 0, m_transparent ? 0 : 1);
 
-    QOpenGLFunctions *f1 = QOpenGLContext::currentContext()->functions();
+//--æ”¾åœ¨Shaderä¸­ï¼Œä¼ å‚åªä¼ shaderåç§°---------------------------------//
 
-//--·ÅÔÚShaderÖĞ£¬´«²ÎÖ»´«shaderÃû³Æ---------------------------------//
-    qDebug()<<"path="<<path;
-    QString vertexpath = path + "/vertexShaderSourceCore.vsh";
-    QString fragmentpath = path +"/fragmentShaderSourceCore.fsh";
-    const char* vertexPath = vertexpath.toStdString().c_str();
-    const char* fragmentPath = fragmentpath.toStdString().c_str();
+    QString vertexPath(":/vertexShaderSourceCore.vsh");
+    QString fragmentPath(":/fragmentShaderSourceCore.fsh");
+    QString geometryPath("");
     qDebug()<<vertexPath;
 //-----------------------------------------------------------------
 
-    m_shader = new QShader(vertexPath,fragmentPath,nullptr,f1);
+    m_shader = new QShader(vertexPath,fragmentPath,geometryPath);
     m_shader->use();
 
-//--½«VBO£¬VAO,VEO×÷ÎªÒ»¸öÕûÌå£¬´æ´¢Êı¾İ½á¹¹----------------------------------------
-    // Create a vertex array object. In OpenGL ES 2.0 and OpenGL 2.x
-    // implementations this is optional and support may not be present
-    // at all. Nonetheless the below code works in all cases and makes
-    // sure there is a VAO when one is needed.
-    m_vao.create();
-    QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
+//--å°†VBOï¼ŒVAO,VEOä½œä¸ºä¸€ä¸ªæ•´ä½“ï¼Œå­˜å‚¨æ•°æ®ç»“æ„----------------------------------------
+    dataVBO = new QVBO(m_logo);
 
-    // Setup our vertex buffer object.
-    m_logoVbo.create();
-    m_logoVbo.bind();
-            //allocate(float*,int count); Í¨¹ı´«ÈëÎïÌåÀà£¬½«Êı¾İ×ªÎª<QVector>
-    m_logoVbo.allocate(m_logo.constData(), m_logo.count() * sizeof(GLfloat));
-
-    // Store the vertex attribute bindings for the program.
-    setupVertexAttribs();
-
-
-//----ÉãÏñ»úÀà------------------------------------------------------------
+//----æ‘„åƒæœºç±»------------------------------------------------------------
     // Our camera never changes in this example.
     m_camera.setToIdentity();
     m_camera.translate(0, 0, -1);
 
-//----ÒÔ¹âÔ´ÎïÌå×é³ÉµãÎªµã¹âÔ´¼ÆËã
+//----ä»¥å…‰æºç‰©ä½“ç»„æˆç‚¹ä¸ºç‚¹å…‰æºè®¡ç®—
     // Light position is fixed.
-    m_shader->setVec3("lightPos", QVector3D(0, 0, 70));
+    m_shader->setVec3("lightPos", vec3(0, 0, 70));
     m_shader->release();
 }
 
-void GLWidget::setupVertexAttribs()
-{
-    //vbo´æ´¢·½Ê½£º
-    //ÎŞÂÛÊÇ¶¥µã »¹ÊÇ·¨Ïß »¹ÊÇÎÆÀíÌùÍ¼×ø±ê ¶¼·Å³ÉÕûÌå£¬ÒÔÑ¡ÏîĞÎÊ½È·¶¨Êı¾İµÄ°ó¶¨ÀàĞÍ
-    //ÈçÈ·¶¨£º¸ÃBVO´æ´¢ ¶¥µãºÍ ÎÆÀíÌùÍ¼×ø±ê £¬Ôò
-    // 0ºÅÎ»ÖÃÎª¶¥µã£¬ Æ«ÒÆÁ¿Îª0£¬²½³¤Îª0£¬
-    //f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat),nullptr);
-    //1 ºÅÎ»ÖÃÎªÎÆÀíÌùÍ¼×ø±ê£¬Æ«ÒÆÁ¿Îª¶¥µã³¤¶È£¬²½³¤Îª0
-    //f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat),reinterpret_cast<void *>(3 * sizeof(GLfloat)));
-    //
-    m_logoVbo.bind();
-    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-    f->glEnableVertexAttribArray(0);
-    f->glEnableVertexAttribArray(1);
-    f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat),
-                             nullptr);
-    f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat),
-                             reinterpret_cast<void *>(3 * sizeof(GLfloat)));
-    m_logoVbo.release();
-}
+//void GLWidget::setupVertexAttribs()
+//{
+//    //vboå­˜å‚¨æ–¹å¼ï¼š
+//    //æ— è®ºæ˜¯é¡¶ç‚¹ è¿˜æ˜¯æ³•çº¿ è¿˜æ˜¯çº¹ç†è´´å›¾åæ ‡ éƒ½æ”¾æˆæ•´ä½“ï¼Œä»¥é€‰é¡¹å½¢å¼ç¡®å®šæ•°æ®çš„ç»‘å®šç±»å‹
+//    //å¦‚ç¡®å®šï¼šè¯¥BVOå­˜å‚¨ é¡¶ç‚¹å’Œ çº¹ç†è´´å›¾åæ ‡ ï¼Œåˆ™
+//    // 0å·ä½ç½®ä¸ºé¡¶ç‚¹ï¼Œ åç§»é‡ä¸º0ï¼Œæ­¥é•¿ä¸º0ï¼Œ
+//}
 
 void GLWidget::paintGL()
 {
-    //RenderÀà£¬À´×öäÖÈ¾
+    //Renderç±»ï¼Œæ¥åšæ¸²æŸ“
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
@@ -234,15 +204,13 @@ void GLWidget::paintGL()
     m_world.rotate(m_yRot / 16.0f, 0, 1, 0);
     m_world.rotate(m_zRot / 16.0f, 0, 0, 1);
 
-    QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
     m_shader->use();
     m_shader->setMat4("projMatrix", m_proj);
     m_shader->setMat4("mvMatrix", m_camera * m_world);
     QMatrix3x3 normalMatrix = m_world.normalMatrix();
     m_shader->setMat3("normalMatrix", normalMatrix);
 
-    glDrawArrays(GL_TRIANGLES, 0, m_logo.vertexCount());
-
+    dataVBO->render();
     m_shader->release();
 }
 
