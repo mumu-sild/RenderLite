@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     initGlobal();
 
     MainWindow w;
-    w.resize(w.sizeHint());//sizeHintÊôÐÔ±£´æÁË²¿¼þµÄ½¨Òé´óÐ¡
+    w.resize(w.sizeHint());//sizeHintå±žæ€§ä¿å­˜äº†éƒ¨ä»¶çš„å»ºè®®å¤§å°
     int desktopArea = QApplication::desktop()->width() *
                      QApplication::desktop()->height();
     int widgetArea = w.width() * w.height();

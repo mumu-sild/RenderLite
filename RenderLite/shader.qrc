@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>vertexShaderSourceCore.vsh</file>
+        <file>fragmentShaderSourceCore.fsh</file>
+    </qresource>
+</RCC>

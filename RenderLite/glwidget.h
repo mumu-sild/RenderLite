@@ -58,6 +58,7 @@
 #include <QMatrix4x4>
 #include "logo.h"
 #include "QShader.h"
+#include "QVBO.h"
 
 extern QString path;
 
@@ -104,9 +105,8 @@ private:
     int m_zRot = 0;
     QPoint m_lastPos;
     Logo m_logo;
-    QOpenGLVertexArrayObject m_vao;
-    QOpenGLBuffer m_logoVbo;
-    QShader *m_shader = nullptr;
+    QShader* m_shader = nullptr;
+    QVBO* dataVBO = nullptr;
     int m_projMatrixLoc = 0;
     int m_mvMatrixLoc = 0;
     int m_normalMatrixLoc = 0;
