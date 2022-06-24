@@ -4,14 +4,18 @@
 #include <QDesktopWidget>
 #include <QDir>
 #include "Global.h"
+#include "include/assimp/Importer.hpp"
 
-extern QString path;
+
+QString path;
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
     initGlobal();
+
+    Assimp::Importer importer;
 
     MainWindow w;
     w.resize(w.sizeHint());//sizeHint属性保存了部件的建议大小
