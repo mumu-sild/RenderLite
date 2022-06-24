@@ -23,6 +23,7 @@ HEADERS += \
     Bounds3.h \
     Global.h \
     Intersection.h \
+    Mesh.h \
     Object.h \
     QShader.h \
     glwidget.h \
