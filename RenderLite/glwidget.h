@@ -57,8 +57,13 @@
 #include <QOpenGLBuffer>
 #include <QMatrix4x4>
 #include "logo.h"
+//--------------------
 #include "QShader.h"
 #include "QVBO.h"
+//-------------------
+
+#include "Model.h"//模型载入类
+#include "camera.h"
 
 extern QString path;
 
@@ -95,6 +100,7 @@ protected:
     void resizeGL(int width, int height) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
 
 private:
     void setupVertexAttribs();
@@ -115,6 +121,10 @@ private:
     QMatrix4x4 m_camera;
     QMatrix4x4 m_world;
     static bool m_transparent;
+
+    Model* model;
+    QOpenGLShaderProgram shaderProgram;
+    camera maincamera;
 };
 
 #endif

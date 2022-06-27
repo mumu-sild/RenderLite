@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
 **
 ** Copyright (C) 2016 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
@@ -48,8 +48,6 @@
 **
 ****************************************************************************/
 
-
-
 #include <QMouseEvent>
 #include <QOpenGLShaderProgram>
 #include <QCoreApplication>
@@ -58,8 +56,13 @@
 #include <QString>
 #include <iostream>
 #include <QDebug>
+
+#include "Model.h"
 #include "glwidget.h"
 #include "QVBO.h"
+#include "Global.h"
+#include "camera.h"
+
 
 
 
@@ -156,30 +159,63 @@ void GLWidget::initializeGL()
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLWidget::cleanup);
 
     initializeOpenGLFunctions();
-    glClearColor(0, 0, 0, m_transparent ? 0 : 1);
+    glClearColor(1, 1, 1, m_transparent ? 0 : 1);
 
 //--放在Shader中，传参只传shader名称---------------------------------//
 
-    QString vertexPath(":/vertexShaderSourceCore.vsh");
-    QString fragmentPath(":/fragmentShaderSourceCore.fsh");
+    QString QTVertexShader(":/vertexShaderSourceCore.vsh");
+    QString QTFragShader(":/fragmentShaderSourceCore.fsh");
+    QString vertexPath(":/nanosuit.vert");
+    QString fragmentPath(":/nanosuit.frag");
     QString geometryPath("");
-    qDebug()<<vertexPath;
+    qDebug()<<QTVertexShader;
 //-----------------------------------------------------------------
 
-    m_shader = new QShader(vertexPath,fragmentPath,geometryPath);
+    //m_shader = new QShader(vertexPath,fragmentPath,geometryPath);
+    m_shader = new QShader(QTVertexShader,QTFragShader,geometryPath);
     m_shader->use();
+    shaderProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,":/model.vert");
+    shaderProgram.addShaderFromSourceFile(QOpenGLShader::Fragment,":/model.frag");
+    shaderProgram.link();
 
 //--将VBO，VAO,VEO作为一个整体，存储数据结构----------------------------------------
     dataVBO = new QVBO(m_logo);
+    //Model ourModel("C:/Users/mumu/Desktop/graphics/practicalTraining_2/RenderLite/RenderLite/Picture_source/nanosuit/nanosuit.obj");
+    model = new Model("C:/Users/mumu/Desktop/graphics/practicalTraining_2/"
+                    "RenderLite/RenderLite/Picture_source/nanosuit_reflection/nanosuit.obj");
 
 //----摄像机类------------------------------------------------------------
     // Our camera never changes in this example.
+
+
     m_camera.setToIdentity();
     m_camera.translate(0, 0, -1);
 
 //----以光源物体组成点为点光源计算
     // Light position is fixed.
     m_shader->setVec3("lightPos", vec3(0, 0, 70));
+//    //    //传入光线参数
+//    m_shader->setVec3("light.color", 1.0f, 1.0f, 1.0f);
+//    m_shader->setVec4("light.position",6.0f, 5.0f, 10.0f, 1.0f);
+//    m_shader->setVec3("light.direction", -6.0f, -5.0f, -10.0f);//聚焦（0.0）点
+//    m_shader->setFloat("light.cutOff", cos(degree_to_radians(180.0f)));//内光圈角度12.5°
+//    m_shader->setFloat("light.outerCutOff", cos(degree_to_radians(180.0f)));//外光圈角度15.5°
+//    m_shader->setVec3("viewPos", 0,0,10);
+
+//        // material properties
+//    m_shader->setFloat("ambientStrength", 0.2f);//环境光照系数
+//    m_shader->setFloat("diffuseStrength", 1.0f);//漫反射光照系数
+//    m_shader->setFloat("specularStrength", 0.2f);//镜面反射光照系数
+//    m_shader->setFloat("shininess", 32.0f);//镜面反射光照范围
+
+//        //光线衰减系数
+//    m_shader->setFloat("light.constant", 1.0f);
+//    m_shader->setFloat("light.linear", 0.005f);
+//    m_shader->setFloat("light.quadratic", 0.0032f);
+
+//        //爆破
+//    m_shader->setFloat("time", 0);
+
     m_shader->release();
 }
 
@@ -193,36 +229,86 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
-    //Render类，来做渲染
 
+
+    //Render类，来做渲染
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+
+
 
     m_world.setToIdentity();
     m_world.rotate(180.0f - (m_xRot / 16.0f), 1, 0, 0);
     m_world.rotate(m_yRot / 16.0f, 0, 1, 0);
     m_world.rotate(m_zRot / 16.0f, 0, 0, 1);
+    //m_world.scale(0.3,0.3,0.3);
+
+
+    shaderProgram.bind();
+    shaderProgram.setUniformValue("projection",m_proj);
+    shaderProgram.setUniformValue("view",maincamera.getViewMetrix());
+    shaderProgram.setUniformValue("model",m_world);
+
+    //Model ourModel("C:/Users/mumu/Desktop/graphics/practicalTraining_2/RenderLite/RenderLite/Picture_source/nanosuit_reflection/nanosuit.obj");
+    model->Draw(shaderProgram);
 
     m_shader->use();
-    m_shader->setMat4("projMatrix", m_proj);
-    m_shader->setMat4("mvMatrix", m_camera * m_world);
-    QMatrix3x3 normalMatrix = m_world.normalMatrix();
-    m_shader->setMat3("normalMatrix", normalMatrix);
-
+    m_shader->setMat4("projection", m_proj);
+    m_shader->setMat4("view", m_camera);
+    m_shader->setMat4("model", m_world);
+    //m_shader->setMat4("projMatrix", m_proj);
+    //m_shader->setMat4("mvMatrix", m_camera * m_world);
+    //QMatrix3x3 normalMatrix = m_world.normalMatrix();
+    //m_shader->setMat3("normalMatrix", normalMatrix);
     dataVBO->render();
+
+
     m_shader->release();
 }
 
 void GLWidget::resizeGL(int w, int h)
 {
     m_proj.setToIdentity();
-    m_proj.perspective(45.0f, GLfloat(w) / h, 0.01f, 100.0f);
+    m_proj.perspective(45.0f, GLfloat(w) / h, 0.001f, 1000.0f);
+    qDebug()<<"resizeGL";
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
     m_lastPos = event->pos();
+
+    //鼠标左键按下事件
+    if(event->button()==Qt::LeftButton)
+    {
+        qDebug()<<"左键按下"<<event->pos();
+    }
+    //鼠标右键按下事件
+    if(event->button()==Qt::RightButton)
+    {
+        qDebug()<<"右键按下";
+    }
+    //鼠标中键按下事件
+    if(event->button()==Qt::MidButton)
+    {
+        qDebug()<<"滚轮按下了";
+    }
+    //鼠标左键按下和按下alt键
+    if(QApplication::keyboardModifiers()==Qt::AltModifier
+            &&event->button() == Qt::LeftButton)
+    {
+        qDebug()<<"Alt键和鼠标左键按下";
+        m_camera.translate(0, 0.2, 0);
+        update();
+    }
+    //鼠标右键按下和按下alt键
+    if(QApplication::keyboardModifiers()==Qt::AltModifier
+            &&event->button() == Qt::RightButton)
+    {
+        qDebug()<<"Alt键和鼠标右键按下";
+        m_camera.translate(0, -0.2, 0);
+        update();
+    }
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
@@ -238,4 +324,22 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         setZRotation(m_zRot + 8 * dx);
     }
     m_lastPos = event->pos();
+}
+
+//鼠标滚轮滚动事件
+void GLWidget::wheelEvent(QWheelEvent *event)
+{
+    if(event->delta()>0)
+    {
+        qDebug()<<"滚轮往前滚";
+        maincamera.moveForBackward(1);
+        update();
+    }
+    if(event->delta()<0)
+    {
+        qDebug()<<"滚轮往后滚";
+        maincamera.moveForBackward(-1);
+        m_camera.translate(0, 0, -1);
+        update();
+    }
 }

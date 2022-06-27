@@ -2,5 +2,10 @@
     <qresource prefix="/">
         <file>vertexShaderSourceCore.vsh</file>
         <file>fragmentShaderSourceCore.fsh</file>
+        <file>nanosuit.frag</file>
+        <file>nanosuit.geom</file>
+        <file>nanosuit.vert</file>
+        <file>model.vert</file>
+        <file>model.frag</file>
     </qresource>
 </RCC>

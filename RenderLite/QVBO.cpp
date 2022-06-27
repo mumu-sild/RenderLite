@@ -2,14 +2,16 @@
 
 QVBO::QVBO(Logo& logo):logo(logo){
     initializeOpenGLFunctions();
+
     GLunit VBO;
     glGenBuffers(1,&VBO);
 
+    vao.create();
+    vao.bind();
     glBindBuffer(GL_ARRAY_BUFFER,VBO);
     glBufferData(GL_ARRAY_BUFFER,logo.count()*sizeof(GLfloat),logo.constData(),GL_STATIC_DRAW);
 
-    vao.create();
-    vao.bind();
+
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);

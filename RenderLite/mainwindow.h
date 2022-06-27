@@ -33,5 +33,28 @@ private:
 
 signals:
     void widgetSizeChanged();
+
+private slots:
+    void on_object_position_x_spinbox_valueChanged(double arg1);
+    void on_object_position_y_spinbox_valueChanged(double arg1);
+    void on_object_position_z_spinbox_valueChanged(double arg1);
+    void on_object_rotation_x_spinbox_valueChanged(double arg1);
+    void on_object_rotation_y_spinbox_valueChanged(double arg1);
+    void on_object_rotation_z_spinbox_valueChanged(double arg1);
+    void on_object_scale_x_spinbox_valueChanged(double arg1);
+    void on_object_scale_y_spinbox_valueChanged(double arg1);
+    void on_object_scale_z_spinbox_valueChanged(double arg1);
+    void on_object_color_red_spinbox_valueChanged(int arg1);
+    void on_object_color_green_spinbox_valueChanged(int arg1);
+    void on_object_color_blue_spinbox_valueChanged(int arg1);
+    void on_camera_position_x_spinbox_valueChanged(double arg1);
+    void on_camera_position_y_spinbox_valueChanged(double arg1);
+    void on_camera_position_z_spinbox_valueChanged(double arg1);
+    void on_camera_focus_x_spinbox_valueChanged(double arg1);
+    void on_camera_focus_y_spinbox_valueChanged(double arg1);
+    void on_camera_focus_z_spinbox_valueChanged(double arg1);
+    void on_camera_cameraup_front_spinbox_valueChanged(double arg1);
+    void on_camera_cameraup_up_spinbox_valueChanged(double arg1);
+    void on_camera_cameraup_right_spinbox_valueChanged(double arg1);
 };
 #endif // MAINWINDOW_H

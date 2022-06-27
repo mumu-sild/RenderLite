@@ -90,6 +90,9 @@ void QShader::setVec3(const std::string& name, float x,float y,float z){
 void QShader::setVec3(const std::string& name, vec3 value) {
     glUniform3f(glGetUniformLocation(ID,name.c_str()),value.x(),value.y(),value.z());
 }
+void QShader::setVec4(const std::string& name,float x,float y,float z,float w){
+    glUniform4f(glGetUniformLocation(ID,name.c_str()),x,y,z,w);
+}
 void QShader::setMat4(const std::string& name, QMatrix4x4 value) {
     glUniformMatrix4fv(glGetUniformLocation(ID,name.c_str()),1,GL_FALSE,value.data());
 }

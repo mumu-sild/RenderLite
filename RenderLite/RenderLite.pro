@@ -10,8 +10,11 @@ CONFIG += c++17
 
 SOURCES += \
     BVH.cpp \
+    Mesh.cpp \
+    Model.cpp \
     QShader.cpp \
     QVBO.cpp \
+    camera.cpp \
     glwidget.cpp \
     logo.cpp \
     main.cpp \
@@ -25,9 +28,11 @@ HEADERS += \
     Global.h \
     Intersection.h \
     Mesh.h \
+    Model.h \
     Object.h \
     QShader.h \
     QVBO.h \
+    camera.h \
     glwidget.h \
     logo.h \
     mainwindow.h \

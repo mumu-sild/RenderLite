@@ -8,6 +8,8 @@
 #include <QWidget>
 #include <QTabWidget>
 #include <QDebug>
+#include <QFileDialog>
+#include <QDesktopServices>
 
 
 
@@ -19,6 +21,18 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     setUiStyle();
+
+    //点击“导入”的动作打开文件
+    connect(ui->import_file,&QAction::triggered,[=](){
+        QFileDialog selectFile(this);
+        if(selectFile.exec()==0)
+            return;
+        QStringList filePaths = selectFile.selectedFiles();
+        //theFilePath为所要的路径
+        QString theFilePath = filePaths[0];
+        qDebug()<<theFilePath;
+
+    });
 }
 
 void MainWindow::setUiStyle()
@@ -29,33 +43,26 @@ void MainWindow::setUiStyle()
                  QApplication::desktop()->height()*0.9);
     this->move(QApplication::desktop()->width()*0.05,
                QApplication::desktop()->height()*0.02);
-
+    //设置整个界面的tabwidget和glwidget
     mainWidget = new QWidget;
     setCentralWidget(mainWidget);
-
-    QHBoxLayout *mainLayout = new QHBoxLayout;
-
-
     glWidget = new GLWidget;
-
-    //ui->tabWidget->setTabText(0,tr("物体"));
-    //ui->tabWidget->setTabText(1,tr("摄像机"));
-    //ui->tabWidget->setTabText(2,tr("灯光"));
     ui->tabWidget->setMaximumSize(this->width()*0.18,this->height());
+    QHBoxLayout *mainLayout = new QHBoxLayout;
     mainLayout->addWidget(glWidget);
     mainLayout->addWidget(ui->tabWidget);
 
     mainWidget->setLayout(mainLayout);
 
-    ui->position_x_spinbox->setRange(-100,100);
-    ui->position_y_spinbox->setRange(-100,100);
-    ui->position_z_spinbox->setRange(-100,100);
 
-   // ui->tabWidget->setMaximumWidth(mainWidget->width()*0.15);
-//    connect(this,&MainWindow::widgetSizeChanged,[=](){
-//        tabwidget->setMaximumWidth(mainWidget->width()*0.15);
-//    });
-
+    /*设置tabwidget中的物体widget*/
+    //设置布局使得物体widget随窗口大小改变
+    QVBoxLayout *objectLayout = new QVBoxLayout;
+    objectLayout->addWidget(ui->scrollArea1);
+    ui->object->setLayout(objectLayout);
+    QVBoxLayout *cameraLayout = new QVBoxLayout;
+    cameraLayout->addWidget(ui->scrollArea2);
+    ui->camera->setLayout(cameraLayout);
 }
 
 void MainWindow::mouseDoubleClickEvent(QMouseEvent *e)
@@ -80,4 +87,132 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+/*以下是tabwidget里面spinbox改变后自动调用的函数*/
+//参数arg1是改变后的值
+void MainWindow::on_object_position_x_spinbox_valueChanged(double arg1)
+{
+   qDebug()<<arg1;
+}
+
+
+void MainWindow::on_object_position_y_spinbox_valueChanged(double arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_object_position_z_spinbox_valueChanged(double arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_object_rotation_x_spinbox_valueChanged(double arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_object_rotation_y_spinbox_valueChanged(double arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_object_rotation_z_spinbox_valueChanged(double arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_object_scale_x_spinbox_valueChanged(double arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_object_scale_y_spinbox_valueChanged(double arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_object_scale_z_spinbox_valueChanged(double arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_object_color_red_spinbox_valueChanged(int arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_object_color_green_spinbox_valueChanged(int arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_object_color_blue_spinbox_valueChanged(int arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_camera_position_x_spinbox_valueChanged(double arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_camera_position_y_spinbox_valueChanged(double arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_camera_position_z_spinbox_valueChanged(double arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_camera_focus_x_spinbox_valueChanged(double arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_camera_focus_y_spinbox_valueChanged(double arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_camera_focus_z_spinbox_valueChanged(double arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_camera_cameraup_front_spinbox_valueChanged(double arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_camera_cameraup_up_spinbox_valueChanged(double arg1)
+{
+    qDebug()<<arg1;
+}
+
+
+void MainWindow::on_camera_cameraup_right_spinbox_valueChanged(double arg1)
+{
+    qDebug()<<arg1;
+}
+
 

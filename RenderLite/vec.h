@@ -117,6 +117,10 @@ inline vec3 normalize(vec3 v) {
     return v / v.length();
 }
 
+inline float distance(const vec3 &a,const vec3 &b){
+    return (a-b).length();
+}
+
 /****************************************************************************
 **
 **                                  vec2
@@ -164,7 +168,7 @@ public:
 **
 *****************************************************************************/
 class vec4 {
-private:
+public:
     //参数
     double e[4];
 
@@ -190,6 +194,7 @@ public:
     double w() { return e[3]; }
     //返回成员引用函数
     double& operator[](int i) { return e[i]; }
+    double operator[](int i)const{return e[i];}
     //运算函数+ - * /
     vec4 operator-() const;//末尾const表示不改变内部成员
     vec4& operator+=(const vec4&);
@@ -200,6 +205,18 @@ public:
     friend ostream& operator<<(ostream& out, vec4& v);//只能使用友元函数
 
 };
+
+inline vec4 operator*(double t, const vec4& v) {
+    return vec4(t * v.e[0], t * v.e[1], t * v.e[2],t*v.e[3]);
+}
+
+inline vec4 operator*(const vec4& v, double t) {
+    return t * v;
+}
+
+inline vec4 operator+(const vec4& v1,const vec4& v2){
+    return vec4(v1.e[0]+v2.e[0],v1.e[1]+v2.e[1],v1.e[2]+v2.e[2],v1.e[3]+v2.e[3]);
+}
 
 using quaternions = vec4;    // 四元数
 
