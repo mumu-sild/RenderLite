@@ -31,6 +31,7 @@ HEADERS += \
     Mesh.h \
     Model.h \
     Object.h \
+    Objectmodel.h \
     Texture.h \
     Vertex.h \
     camera.h \

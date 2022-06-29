@@ -216,10 +216,10 @@ void GLWidget::paintGL()
 
 
 
-    m_world.setToIdentity();
-    m_world.rotate(180.0f - (m_xRot / 16.0f), 1, 0, 0);
-    m_world.rotate(m_yRot / 16.0f, 0, 1, 0);
-    m_world.rotate(m_zRot / 16.0f, 0, 0, 1);
+//    m_world.setToIdentity();
+//    m_world.rotate(180.0f - (m_xRot / 16.0f), 1, 0, 0);
+//    m_world.rotate(m_yRot / 16.0f, 0, 1, 0);
+//    m_world.rotate(m_zRot / 16.0f, 0, 0, 1);
     //m_world.scale(0.3,0.3,0.3);
 
 
@@ -251,6 +251,8 @@ void GLWidget::paintGL()
     qDebug()<<"scene.size:"<<scene.objects.size();
     //Object Draw
     for(int i=0;i<scene.objects.size();i++){
+        m_world = scene.objects[i]->model.getmodel();
+        shaderProgram.setUniformValue("model",m_world);
         qDebug()<<"DRAW:"<<i;
         scene.objects.at(i)->Draw(shaderProgram);
         //qDebug()<<"Draw Finish"<<i;

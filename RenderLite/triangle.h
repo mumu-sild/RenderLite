@@ -16,7 +16,6 @@
 #include "Texture.h"
 #include "Vertex.h"
 
-const float EPSILON = 0.00001;
 
 class Triangle:public Object,QOpenGLFunctions
 {
