@@ -34,10 +34,12 @@ private:
     Ui::MainWindow *ui;
     GLWidget *glWidget;
     QWidget *mainWidget;
-    //static camera maincamera;
+
+    int objectNumSize=1;
 
 signals:
     void widgetSizeChanged();
+    void objectSizeChanged(int theObjectSize);
 
 private slots:
     void on_object_position_x_spinbox_valueChanged(double arg1);
@@ -65,5 +67,6 @@ private slots:
     void on_object_rotation_y_radioButton_clicked();
     void on_object_rotation_z_radioButton_clicked();
     void on_tabWidget_currentChanged(int index);
+    void on_object_number_comboBox_currentIndexChanged(int index);
 };
 #endif // MAINWINDOW_H

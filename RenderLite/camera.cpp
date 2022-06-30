@@ -86,6 +86,7 @@ QVector3D camera::getCameraFocus()
     return cameraFocus;
 }
 
+
 void camera::setXCameraPosi(double meters)
 {
     cameraPosi.setX(meters);
@@ -114,6 +115,15 @@ void camera::setYCameraFocus(double meters)
 void camera::setZCameraFocus(double meters)
 {
     cameraFocus.setZ(meters);
+}
+
+QVector3D camera::getcameraX()
+{
+    return dirX;
+}
+
+QVector3D camera::getcameraY(){
+    return dirY;
 }
 
 

@@ -17,7 +17,7 @@
 #include "Vertex.h"
 
 
-class Triangle:public Object,QOpenGLFunctions
+class Triangle:public Object,public QOpenGLFunctions
 {
 private:
     QVector<Vertex> v;

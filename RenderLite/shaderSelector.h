@@ -4,7 +4,10 @@
 #include <QVector>
 #include <QString>
 #include <QOpenGLShaderProgram>
+#include <QOpenGLFunctions>
 #include <QDebug>
+
+class GLWidget;
 
 class ShaderSelector
 {
@@ -20,8 +23,8 @@ public:
         ":color.frag"
     };
     ShaderSelector();
-    QOpenGLShaderProgram* getShader(int objNum);
-    void compileShader(int shaderType = 2);
+    QOpenGLShaderProgram* getShader(int objNum=2);
+    void compileShader(int i);
 private:
     QVector<QOpenGLShaderProgram*> shaderProgram;
 

@@ -14,6 +14,8 @@ private:
     QVector3D dirX;//右向
     QVector3D dirY;//上方
 public:
+    QMatrix4x4 projection;
+public:
     //构造函数
     camera();
 
@@ -26,7 +28,6 @@ public:
 
     //以交点为中心对摄像机位置进行旋转
     void rotateCamera(float xRotate, float yRotate);
-    //以摄像机为中心对焦点进行旋转
 
     //设置摄像机的位置
     void setXCameraPosi(double meters);
@@ -44,6 +45,10 @@ public:
     QVector3D getCameraPos();
     //获取摄像机焦点
     QVector3D getCameraFocus();
+
+    QVector3D getcameraX();
+    QVector3D getcameraY();
+
 
     //重设xyz轴
     void resetDirXYZ();

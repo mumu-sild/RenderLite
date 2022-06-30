@@ -73,15 +73,91 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
 
+private:
+    //
+    Scene scene;
+    ShaderSelector shaderSelector;
+    camera maincamera;
+
+    //交互参数
+    QPoint m_lastPos;
+    bool xrotation = true;
+    bool yrotation = false;
+    bool zrotation = false;
+    int currentIndex = 1;
+    int objectNumber = 0;
+    int pixX=0,pixY=0;
+
+    enum shaderTypes{
+        SHADER_TEXTURE = 0,
+        SHADER_LIGHT = 1,
+        SHADER_COLOR = 2
+    };
+
+
+//应该单独做一个类----------------------------------------------------------
+    QVector<QVector3D> pointLightPosition;
+    QVector<QVector3D> pointLightColor;
+//    QVector3D pointLightAmbientColor;
+//    QVector3D pointLightDiffuseColor;
+//    QVector3D pointLightSpecularColor;
+    float pointAmbient;
+    float pointDiffuse;
+    float pointSpecular;
+    float constant;
+    float linear;
+    float quadratic;
+
+    QVector3D dirLightDirection;
+    QVector3D dirLightColor;
+//    QVector3D dirLightAmbientColor;
+//    QVector3D dirLightDiffuseColor;
+//    QVector3D dirLightSpecularColor;
+
+    float dirAmbient;
+    float dirDiffuse;
+    float dirSpecular;
+    LightData* lightData;
+//----------------------------------------------
+
+
+
 public:
     GLWidget(QWidget *parent = nullptr);
     ~GLWidget();
 
-    static bool isTransparent() { return m_transparent; }
-    static void setTransparent(bool t) { m_transparent = t; }
-
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
+
+protected:
+    void initializeGL() override;
+    void paintGL() override;
+    void resizeGL(int width, int height) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
+public:
+    //导入模型
+    void importModel(QString modelPath);
+    bool getXrotation() const;
+
+    void setXObjRotationSelected(bool booler);
+    void setYObjRotationSelected(bool booler);
+    void setZObjRotationSelected(bool booler);
+
+
+    //shader参数设置
+    void setDirLight(bool activate,int objNum);
+    void setPointLight(bool activate,int objNum);
+
+
+    void setCurrentIndex(int tabIndex);
+    void setPixObjectNumber(int x,int y);
+    int getObjectSize();
+    void setObjectNumber(int newObjectNumber);
 
 public slots:
     void cleanup();
@@ -106,90 +182,15 @@ signals:
     void yCameraFocusChanged(double meters);
     void zCameraFocusChanged(double meters);
 
-protected:
-    void initializeGL() override;
-    void paintGL() override;
-    void resizeGL(int width, int height) override;
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-    void wheelEvent(QWheelEvent *event) override;
-    void keyPressEvent(QKeyEvent *event) override;
-    void keyReleaseEvent(QKeyEvent *event) override;
+    void objectPosiChanged(QVector3D position);
+    void objectNumberChanged(int objectNumber);
 
 
-//----------------------------需取代部分
-private:
-
-    bool m_core;
-    int m_xRot = 0;
-    int m_yRot = 0;
-    int m_zRot = 0;
-    QPoint m_lastPos;
-    int m_projMatrixLoc = 0;
-    int m_mvMatrixLoc = 0;
-    int m_normalMatrixLoc = 0;
-    //int m_lightPosLoc = 0;
-    QMatrix4x4 m_proj;
-    QMatrix4x4 m_camera;
-    QMatrix4x4 m_world;
-    static bool m_transparent;
-//-----------------------------------
-    Scene scene;
-    enum shaderTypes{
-        SHADER_TEXTURE = 0,
-        SHADER_LIGHT = 1,
-        SHADER_COLOR = 2
-    };
-    ShaderSelector shaderSelector;
-//    QOpenGLShaderProgram shaderProgram;
-    camera maincamera;
-
-    QVector<QVector3D> pointLightPosition;
-    QVector<QVector3D> pointLightColor;
-//    QVector3D pointLightAmbientColor;
-//    QVector3D pointLightDiffuseColor;
-//    QVector3D pointLightSpecularColor;
-    float pointAmbient;
-    float pointDiffuse;
-    float pointSpecular;
-    float constant;
-    float linear;
-    float quadratic;
-
-    QVector3D dirLightDirection;
-    QVector3D dirLightColor;
-//    QVector3D dirLightAmbientColor;
-//    QVector3D dirLightDiffuseColor;
-//    QVector3D dirLightSpecularColor;
-
-    float dirAmbient;
-    float dirDiffuse;
-    float dirSpecular;
-    LightData* lightData;
-
-    bool xrotation = true;
-    bool yrotation = false;
-    bool zrotation = false;
-
-    int currentIndex = 0;
-
-public:
-    //导入模型
-    void importModel(QString modelPath);
-    bool getXrotation() const;
-
-    void setXObjRotationSelected(bool booler);
-    void setYObjRotationSelected(bool booler);
-    void setZObjRotationSelected(bool booler);
 
 
-    //shader参数设置  
-    void setDirLight(bool activate,int objNum);
-    void setPointLight(bool activate,int objNum);
 
 
-    void setCurrentIndex(int tabIndex);
-    int getPixObjectNumber(int x,int y);
+
 };
 
 #endif

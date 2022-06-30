@@ -22,6 +22,14 @@ MainWindow::MainWindow(QWidget *parent)
     setUiStyle();
     this->showMaximized();
 
+    ui->tabWidget->setCurrentIndex(1);
+    ui->object_number_comboBox->addItem("无");
+    for(;objectNumSize<=glWidget->getObjectSize();objectNumSize++)
+    {
+        ui->object_number_comboBox->addItem(tr("%1").arg(objectNumSize));
+    }
+
+
     //点击“导入”的动作打开文件
     connect(ui->import_file,&QAction::triggered,[=](){
         QFileDialog selectFile(this);
@@ -30,14 +38,16 @@ MainWindow::MainWindow(QWidget *parent)
         QStringList filePaths = selectFile.selectedFiles();
         //theFilePath为所要的路径
         QString theFilePath = filePaths[0];
-        qDebug()<<theFilePath;
         glWidget->importModel(theFilePath);
+        qDebug()<<"打开的模型路径"<<theFilePath;
 
+        emit objectSizeChanged(glWidget->getObjectSize());
     });
 
     //导出文件为jpg格式
     connect(ui->outport_file,&QAction::triggered,[=](){
         QFileDialog outportFile(this);
+        outportFile.setLabelText(QFileDialog::Accept,"保存");
         if(outportFile.exec()==0)
             return;
 
@@ -69,6 +79,33 @@ MainWindow::MainWindow(QWidget *parent)
         ui->camera_focus_z_spinbox->setValue(meters);
     });
 
+    //根据鼠标点击的物体改变tabwidget
+    connect(glWidget,&GLWidget::objectNumberChanged,[=](int objectNumber){
+       if(objectNumber==0)
+       {
+           ui->tabWidget->setCurrentIndex(1);
+       }
+       else{
+           ui->tabWidget->setCurrentIndex(0);
+           ui->object_number_comboBox->setCurrentIndex(objectNumber);
+       }
+    });
+
+    //根据导入模型个数新增下拉框项数
+    connect(this,&MainWindow::objectSizeChanged,[=](int theObjectSize){
+        for(;objectNumSize<=glWidget->getObjectSize();objectNumSize++)
+        {
+            ui->object_number_comboBox->addItem(tr("%1").arg(objectNumSize));
+        }
+    });
+
+    //物体位置改变设置ui
+    connect(glWidget,&GLWidget::objectPosiChanged,[=](QVector3D posi){
+        ui->object_position_x_spinbox->setValue(posi.x());
+        ui->object_position_y_spinbox->setValue(posi.y());
+        ui->object_position_z_spinbox->setValue(posi.z());
+    });
+
 }
 
 void MainWindow::setUiStyle()
@@ -83,7 +120,7 @@ void MainWindow::setUiStyle()
     mainWidget = new QWidget;
     setCentralWidget(mainWidget);
 
-    ui->tabWidget->setMaximumSize(this->width()*0.18,this->height());
+    ui->tabWidget->setMaximumSize(this->width()*0.2,this->height());
     QHBoxLayout *mainLayout = new QHBoxLayout;
     mainLayout->addWidget(glWidget);
     mainLayout->addWidget(ui->tabWidget);
@@ -290,4 +327,15 @@ void MainWindow::on_tabWidget_currentChanged(int index)
     glWidget->setCurrentIndex(index);
 }
 
+
+
+void MainWindow::on_object_number_comboBox_currentIndexChanged(int index)
+{
+    if(index>0)
+    {
+        glWidget->setObjectNumber(index);
+    }
+
+
+}
 

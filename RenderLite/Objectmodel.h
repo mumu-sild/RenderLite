@@ -90,6 +90,7 @@ inline void Objectmodel::updateModel()
     model.rotate(mrotate.x(),QVector3D(1,0,0));
     model.rotate(mrotate.y(),QVector3D(0,1,0));
     model.rotate(mrotate.z(),QVector3D(0,0,1));
+    model.translate(mposition);
 }
 
 #endif // OBJECTMODEL_H
