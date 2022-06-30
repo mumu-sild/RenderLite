@@ -170,7 +170,7 @@ void GLWidget::initializeGL()
     Model* model = new Model(path+"/Picture_source/keqing/keqing.pmx");
     scene.Add(model);
     //TODO：获取当前模型渲染的shader类型-------------
-    shaderSelector.compileShader(1);
+    shaderSelector.compileShader(0);
     //-------------------------------------------
     scene.shaderProgram.push_back(shaderSelector.getShader(0));
     //model = new Model(path+"/Picture_source/ganyu/ganyu.pmx");
@@ -251,8 +251,8 @@ void GLWidget::paintGL()
     shaderSelector.getShader(0)->setUniformValue("projection",m_proj);
     shaderSelector.getShader(0)->setUniformValue("view",maincamera.getViewMetrix());
     shaderSelector.getShader(0)->setUniformValue("model",m_world);
-    setDirLight(true,0);
-    setPointLight(true,0);
+    setDirLight(false,0);
+    setPointLight(false,0);
 
 
     qDebug()<<"scene.size:"<<scene.objects.size();
