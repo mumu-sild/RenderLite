@@ -211,6 +211,7 @@ void GLWidget::paintGL()
 {
     //Render类，来做渲染
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+    qDebug()<<"GLClear";
     glEnable(GL_DEPTH_TEST);//开启深度测试
     glEnable(GL_CULL_FACE);//开启面剔除
     glEnable(GL_STENCIL_TEST);//开启模板测试
@@ -274,14 +275,17 @@ void GLWidget::resizeGL(int w, int h)
 
 void GLWidget::importModel(QString modelPath)
 {
+    makeCurrent();
     scene.Add(new Model(modelPath));
     update();
+    doneCurrent();
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
     m_lastPos = event->pos();
-
+    update();
+    this->getPixObjectNumber(1,1);
     //鼠标左键按下事件
     if(event->button()==Qt::LeftButton)
     {
@@ -313,6 +317,16 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
         m_camera.translate(0, -0.2, 0);
         update();
     }
+}
+
+int GLWidget::getPixObjectNumber(int x, int y)
+{
+    makeCurrent();
+    int number;
+    this->glReadPixels(width()/2,height()/2,1,1,GL_STENCIL_INDEX,GL_INT,&number);
+    qDebug()<<"number="<<number;
+    return number;
+    doneCurrent();
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
@@ -531,13 +545,6 @@ void GLWidget::setCurrentIndex(int tabIndex)
     currentIndex = tabIndex;
 }
 
-int GLWidget::getPixObjectNumber(int x, int y)
-{
-    int number;
-    glReadPixels(width()/2,height()/2,1,1,GL_STENCIL_INDEX,GL_INT,&number);
-    qDebug()<<"number="<<number;
-    return number;
-}
 
 void GLWidget::setXCameraPosi(double meters)
 {

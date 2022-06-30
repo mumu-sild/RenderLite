@@ -170,7 +170,7 @@ public:
     void setZObjRotationSelected(bool booler);
 
     void setCurrentIndex(int tabIndex);
-    int getpixObjectNumber(int x,int y);
+    int getPixObjectNumber(int x,int y);
 };
 
 #endif
