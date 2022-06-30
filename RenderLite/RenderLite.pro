@@ -21,6 +21,7 @@ SOURCES += \
     glwidget.cpp \
     lightData.cpp \
     main.cpp \
+    mainWindowsInter.cpp \
     mainwindow.cpp \
     matrix.cpp \
     scene.cpp \

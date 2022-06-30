@@ -72,7 +72,6 @@ QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
-
 private:
     //
     Scene scene;
@@ -81,6 +80,7 @@ private:
 
     //交互参数
     QPoint m_lastPos;
+
     bool xrotation = true;
     bool yrotation = false;
     bool zrotation = false;
@@ -95,12 +95,10 @@ private:
     };
 
 
+    bool pointLightActivated = false;
 //应该单独做一个类----------------------------------------------------------
     QVector<QVector3D> pointLightPosition;
     QVector<QVector3D> pointLightColor;
-//    QVector3D pointLightAmbientColor;
-//    QVector3D pointLightDiffuseColor;
-//    QVector3D pointLightSpecularColor;
     float pointAmbient;
     float pointDiffuse;
     float pointSpecular;
@@ -108,11 +106,9 @@ private:
     float linear;
     float quadratic;
 
+    bool dirLightActivated = true;
     QVector3D dirLightDirection;
     QVector3D dirLightColor;
-//    QVector3D dirLightAmbientColor;
-//    QVector3D dirLightDiffuseColor;
-//    QVector3D dirLightSpecularColor;
 
     float dirAmbient;
     float dirDiffuse;
@@ -153,8 +149,8 @@ public:
     void setDirLight(bool activate,int objNum);
     void setPointLight(bool activate,int objNum);
 
-
     void setCurrentIndex(int tabIndex);
+
     void setPixObjectNumber(int x,int y);
     int getObjectSize();
     void setObjectNumber(int newObjectNumber);
@@ -182,14 +178,38 @@ signals:
     void yCameraFocusChanged(double meters);
     void zCameraFocusChanged(double meters);
 
+public:
     void objectPosiChanged(QVector3D position);
-    void objectNumberChanged(int objectNumber);
+    void objectNumberChanged(int objectNumber);    //light参数的get和set函数
+    //pointLight
+    float getPointAmbient() const;
+    void setPointAmbient(float newPointAmbient);
+    float getPointDiffuse() const;
+    void setPointDiffuse(float newPointDiffuse);
+    float getPointSpecular() const;
+    void setPointSpecular(float newPointSpecular);
+    float getLinear() const;
+    void setLinear(float newLinear);
+    float getQuadratic() const;
+    void setQuadratic(float newQuadratic);
 
-
-
-
-
-
+    //dirLight
+    const QVector3D &getDirLightDirection() const;
+    void setDirLightDirectionX(const float x);
+    void setDirLightDirectionY(const float y);
+    void setDirLightDirectionZ(const float z);
+    const QVector3D &getDirLightColor() const;
+    void setDirLightColorR(const int r);
+    void setDirLightColorG(const int g);
+    void setDirLightColorB(const int b);
+    float getDirAmbient() const;
+    void setDirAmbient(float newDirAmbient);
+    float getDirDiffuse() const;
+    void setDirDiffuse(float newDirDiffuse);
+    float getDirSpecular() const;
+    void setDirSpecular(float newDirSpecular);
+    void setPointLightActivated(int newPointLightActivated);
+    void setDirLightActivated(int newDirLightActivated);
 
 };
 

@@ -67,8 +67,8 @@
 
 
 
-GLWidget::GLWidget(QWidget *parent):shaderSelector()
-    ,QOpenGLWidget(parent)
+GLWidget::GLWidget(QWidget *parent)
+    : QOpenGLWidget(parent)
 {
     this->setFocusPolicy(Qt::StrongFocus);
 }
@@ -100,6 +100,8 @@ void GLWidget::initializeGL()
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLWidget::cleanup);
 
     initializeOpenGLFunctions();
+	glClearColor(0.1, 0.1, 0.1, 1);
+
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_CULL_FACE);
     glEnable(GL_STENCIL_TEST);
@@ -117,10 +119,11 @@ void GLWidget::initializeGL()
     //model = new Model("D:/RenderLite-TMS/RenderLite/RenderLite/Picture_source/ganyu/ganyu.pmx");
     //model = new Model("D:/RenderLite-TMS/RenderLite/RenderLite/Picture_source/keqing/keqing.pmx");
     //"/Picture_source/paimeng/paimeng.pmx"
+
     scene.Add(new Model(path+"/Picture_source/keqing/keqing.pmx"));
     scene.shaderProgram.push_back(shaderSelector.getShader(1));
-//TODO：获取当前模型渲染的shader类型-------------
     //-------------------------------------------
+
 
     //triangle test
     for(int i=0;i<1;i++){//>5850个三角形面片，报错
@@ -133,6 +136,7 @@ void GLWidget::initializeGL()
         scene.Add(tri);
         scene.shaderProgram.push_back(shaderSelector.getShader(2));
     }
+
 //-----------------光源位置/方向/强度---------------------
     pointLightPosition.push_back(QVector3D(0.7f,  0.2f,  2.0f));
     pointLightPosition.push_back(QVector3D(2.3f, -3.3f, -4.0f));
@@ -165,12 +169,14 @@ void GLWidget::paintGL()
     QMatrix4x4 m_world;
 
 
+
     //Object Draw
     for(int i=0;i<scene.objects.size();i++){
         glStencilFunc(GL_ALWAYS, i+1, 0xFF);//模板测试始终通过，ref为当前物体编号
 
         scene.shaderProgram[i]->bind();
         m_world = scene.objects[i]->model.getmodel();
+       
         scene.shaderProgram[i]->setUniformValue("model",m_world);
         scene.shaderProgram[i]->setUniformValue("view",maincamera.getViewMetrix());
         scene.shaderProgram[i]->setUniformValue("projection",projection);
@@ -183,6 +189,7 @@ void GLWidget::paintGL()
 
         scene.objects.at(i)->Draw(*scene.shaderProgram[i]);
     }
+
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -191,18 +198,154 @@ void GLWidget::resizeGL(int w, int h)
     maincamera.projection.perspective(45.0f, GLfloat(w) / h, 0.001f, 1000.0f);
 }
 
-
-
-
-
-
-
-
-
 void GLWidget::setObjectNumber(int newObjectNumber)
 {
+
     if (objectNumber == newObjectNumber)return;
     objectNumber = newObjectNumber;
+}
+
+
+void GLWidget::setDirLightActivated(int newDirLightActivated)
+{
+    dirLightActivated = newDirLightActivated == 0?false:true;
+    update();
+}
+
+void GLWidget::setPointLightActivated(int newPointLightActivated)
+{
+    pointLightActivated = newPointLightActivated == 0?false:true;
+    update();
+}
+
+float GLWidget::getDirSpecular() const
+{
+    return dirSpecular;
+}
+
+void GLWidget::setDirSpecular(float newDirSpecular)
+{
+    dirSpecular = newDirSpecular;
+    update();
+}
+
+float GLWidget::getDirDiffuse() const
+{
+    return dirDiffuse;
+}
+
+void GLWidget::setDirDiffuse(float newDirDiffuse)
+{
+    dirDiffuse = newDirDiffuse;
+    update();
+}
+
+float GLWidget::getDirAmbient() const
+{
+    return dirAmbient;
+}
+
+void GLWidget::setDirAmbient(float newDirAmbient)
+{
+    dirAmbient = newDirAmbient;
+    update();
+}
+
+const QVector3D &GLWidget::getDirLightColor() const
+{
+    return dirLightColor;
+}
+
+void GLWidget::setDirLightColorR(const int r)
+{
+    dirLightColor.setX(r/255.0f);
+    update();
+}
+void GLWidget::setDirLightColorG(const int g)
+{
+    dirLightColor.setY(g/255.0f);
+    update();
+}
+void GLWidget::setDirLightColorB(const int b)
+{
+    dirLightColor.setZ(b/255.0f);
+    update();
+}
+
+const QVector3D &GLWidget::getDirLightDirection() const
+{
+    return dirLightDirection;
+}
+
+void GLWidget::setDirLightDirectionX(const float x)
+{
+    dirLightDirection.setX(x);
+    update();
+}
+void GLWidget::setDirLightDirectionY(const float y)
+{
+    dirLightDirection.setY(y);
+    update();
+}
+void GLWidget::setDirLightDirectionZ(const float z)
+{
+    dirLightDirection.setZ(z);
+    update();
+}
+
+float GLWidget::getQuadratic() const
+{
+    return quadratic;
+}
+
+void GLWidget::setQuadratic(float newQuadratic)
+{
+    quadratic = newQuadratic;
+    update();
+}
+
+float GLWidget::getLinear() const
+{
+    return linear;
+}
+
+void GLWidget::setLinear(float newLinear)
+{
+    linear = newLinear;
+    update();
+}
+
+float GLWidget::getPointSpecular() const
+{
+    return pointSpecular;
+}
+
+void GLWidget::setPointSpecular(float newPointSpecular)
+{
+    pointSpecular = newPointSpecular;
+    update();
+}
+
+float GLWidget::getPointDiffuse() const
+{
+    return pointDiffuse;
+}
+
+void GLWidget::setPointDiffuse(float newPointDiffuse)
+{
+    pointDiffuse = newPointDiffuse;
+    update();
+}
+
+float GLWidget::getPointAmbient() const
+{
+    return pointAmbient;
+}
+
+void GLWidget::setPointAmbient(float newPointAmbient)
+{
+    pointAmbient = newPointAmbient;
+    update();
 }
 
 bool GLWidget::getXrotation() const
@@ -237,10 +380,10 @@ void GLWidget::setPixObjectNumber(int x, int y)
     glReadPixels(x,yy,1,1,GL_STENCIL_INDEX,GL_INT,&objectNumber);
     qDebug()<<"objectNumber="<<objectNumber;
     doneCurrent();
-
     emit objectNumberChanged(objectNumber);
-
 }
+
+
 
 
 
