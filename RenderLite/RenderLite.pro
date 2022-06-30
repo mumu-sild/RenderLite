@@ -19,9 +19,11 @@ SOURCES += \
     glwidget.cpp \
     lightData.cpp \
     main.cpp \
+    mainWindowsInter.cpp \
     mainwindow.cpp \
     matrix.cpp \
     scene.cpp \
+    shaderSelector.cpp \
     triangle.cpp
 
 HEADERS += \
@@ -40,6 +42,7 @@ HEADERS += \
     mainwindow.h \
     ray.h \
     scene.h \
+    shaderSelector.h \
     triangle.h
 
 FORMS += \

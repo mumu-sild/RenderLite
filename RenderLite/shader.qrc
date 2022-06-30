@@ -1,15 +1,12 @@
 <RCC>
     <qresource prefix="/">
-        <file>vertexShaderSourceCore.vsh</file>
-        <file>fragmentShaderSourceCore.fsh</file>
-        <file>nanosuit.frag</file>
-        <file>nanosuit.geom</file>
-        <file>nanosuit.vert</file>
-        <file>model.vert</file>
-        <file>model.frag</file>
-        <file>lightCube.vsh</file>
-        <file>lightCube.fsh</file>
-        <file>lightObject.vsh</file>
-        <file>lightObject.fsh</file>
+        <file>texture.vert</file>
+        <file>texture.frag</file>
+        <file>lightCube.vert</file>
+        <file>lightCube.frag</file>
+        <file>lightObject.vert</file>
+        <file>lightObject.frag</file>
+        <file>color.frag</file>
+        <file>color.vert</file>
     </qresource>
 </RCC>

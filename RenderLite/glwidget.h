@@ -62,6 +62,7 @@
 #include "camera.h"
 #include "lightData.h"
 #include "scene.h"
+#include "shaderSelector.h"
 
 extern QString path;
 #define numPointLight 4
@@ -81,6 +82,8 @@ public:
 
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
+
+
 
 public slots:
     void setXRotation(int angle);
@@ -137,31 +140,87 @@ private:
     static bool m_transparent;
 //-----------------------------------
     Scene scene;
-
-    QOpenGLShaderProgram shaderProgram;
+    enum shaderTypes{
+        SHADER_TEXTURE = 0,
+        SHADER_LIGHT = 1,
+        SHADER_COLOR = 2
+    };
+    ShaderSelector shaderSelector;
+//    QOpenGLShaderProgram shaderProgram;
     camera maincamera;
 
-    QVector3D* pointLightPosition;
-    QVector3D pointLightAmbient;
-    QVector3D pointLightDiffuse;
-    QVector3D pointLightSpecular;
-    QVector3D dirLightDirection;
-    QVector3D dirLightAmbient;
-    QVector3D dirLightDiffuse;
-    QVector3D dirLightSpecular;
+    bool pointLightActivated = false;
+    QVector<QVector3D> pointLightPosition;
+    QVector<QVector3D> pointLightColor;
+    float pointAmbient;
+    float pointDiffuse;
+    float pointSpecular;
     float constant;
     float linear;
     float quadratic;
+
+    bool dirLightActivated = true;
+    QVector3D dirLightDirection;
+    QVector3D dirLightColor;
+    float dirAmbient;
+    float dirDiffuse;
+    float dirSpecular;
     LightData* lightData;
+
+    bool xrotation = true;
+    bool yrotation = false;
+    bool zrotation = false;
+
+    int currentIndex = 0;
 
 public:
     //导入模型
     void importModel(QString modelPath);
+    bool getXrotation() const;
 
-//--test
-    //Model* model;
-    //Model* model1;
+    void setXObjRotationSelected(bool booler);
+    void setYObjRotationSelected(bool booler);
+    void setZObjRotationSelected(bool booler);
 
+
+    //shader参数设置  
+    void setDirLight(bool activate,int objNum);
+    void setPointLight(bool activate,int objNum);
+
+
+    void setCurrentIndex(int tabIndex);
+    int getPixObjectNumber(int x,int y);
+
+    //light参数的get和set函数
+    //pointLight
+    float getPointAmbient() const;
+    void setPointAmbient(float newPointAmbient);
+    float getPointDiffuse() const;
+    void setPointDiffuse(float newPointDiffuse);
+    float getPointSpecular() const;
+    void setPointSpecular(float newPointSpecular);
+    float getLinear() const;
+    void setLinear(float newLinear);
+    float getQuadratic() const;
+    void setQuadratic(float newQuadratic);
+
+    //dirLight
+    const QVector3D &getDirLightDirection() const;
+    void setDirLightDirectionX(const float x);
+    void setDirLightDirectionY(const float y);
+    void setDirLightDirectionZ(const float z);
+    const QVector3D &getDirLightColor() const;
+    void setDirLightColorR(const int r);
+    void setDirLightColorG(const int g);
+    void setDirLightColorB(const int b);
+    float getDirAmbient() const;
+    void setDirAmbient(float newDirAmbient);
+    float getDirDiffuse() const;
+    void setDirDiffuse(float newDirDiffuse);
+    float getDirSpecular() const;
+    void setDirSpecular(float newDirSpecular);
+    void setPointLightActivated(int newPointLightActivated);
+    void setDirLightActivated(int newDirLightActivated);
 };
 
 #endif
