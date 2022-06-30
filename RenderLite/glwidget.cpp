@@ -273,8 +273,6 @@ void GLWidget::paintGL()
         scene.shaderProgram[i]->bind();
         scene.objects.at(i)->Draw(*scene.shaderProgram[i]);
         //scene.objects.at(i)->Draw(shaderProgram);
-
-        //qDebug()<<"Draw Finish"<<i;
     }
     //model->Draw(shaderProgram);
     //model1->Draw(shaderProgram);
@@ -587,7 +585,7 @@ void GLWidget::setCurrentIndex(int tabIndex)
 int GLWidget::getPixObjectNumber(int x, int y)
 {
     int number;
-    glReadPixels(width()/2,height()/2,1,1,GL_STENCIL_INDEX,GL_INT,&number);
+    glReadPixels(x,height()-y,1,1,GL_STENCIL_INDEX,GL_INT,&number);
     qDebug()<<"number="<<number;
     return number;
 }
