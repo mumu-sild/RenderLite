@@ -149,7 +149,11 @@ void GLWidget::initializeGL()
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLWidget::cleanup);
 
     initializeOpenGLFunctions();
-    glClearColor(0.1, 0.1, 0.1, m_transparent ? 0 : 1);
+    glClearColor(0.1, 0.1, 0.1, 1);
+    glEnable(GL_DEPTH_TEST);//开启深度测试
+    glEnable(GL_CULL_FACE);//开启面剔除
+    glEnable(GL_STENCIL_TEST);//开启模板测试
+    glStencilOp(GL_KEEP,GL_KEEP,GL_REPLACE);
 
     shaderSelector = ShaderSelector();
 
@@ -161,7 +165,7 @@ void GLWidget::initializeGL()
 
 //    shaderProgram.bind();
 
-//--将VBO，VAO,VEO作为一个整体，存储数据结构----------------------------------------
+//--模型导入----------------------------------------
     //Model ourModel("C:/Users/mumu/Desktop/graphics/practicalTraining_2/RenderLite/RenderLite/Picture_source/nanosuit/nanosuit.obj");
     //model = new Model("D:/RenderLite-TMS/RenderLite/RenderLite/Picture_source/iPadScan/2022_06_28_19_38_53/textured_output.obj");
     //model = new Model("D:/RenderLite-TMS/RenderLite/RenderLite/Picture_source/ganyu/ganyu.pmx");
@@ -224,6 +228,7 @@ void GLWidget::paintGL()
 {
     //Render类，来做渲染
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+
     glEnable(GL_DEPTH_TEST);//开启深度测试
     glEnable(GL_CULL_FACE);//开启面剔除
     glEnable(GL_STENCIL_TEST);//开启模板测试
@@ -256,6 +261,8 @@ void GLWidget::paintGL()
 
 
     qDebug()<<"scene.size:"<<scene.objects.size();
+
+
     //Object Draw
     for(int i=0;i<scene.objects.size();i++){
         glStencilFunc(GL_ALWAYS, i+1, 0xFF);//模板测试始终通过，ref为当前物体编号
@@ -266,10 +273,12 @@ void GLWidget::paintGL()
         scene.shaderProgram[i]->bind();
         scene.objects.at(i)->Draw(*scene.shaderProgram[i]);
         //scene.objects.at(i)->Draw(shaderProgram);
+
         //qDebug()<<"Draw Finish"<<i;
     }
     //model->Draw(shaderProgram);
     //model1->Draw(shaderProgram);
+
 }
 
 void GLWidget::resizeGL(int w, int h)
