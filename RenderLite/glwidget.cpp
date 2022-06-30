@@ -155,13 +155,15 @@ void GLWidget::initializeGL()
     glEnable(GL_STENCIL_TEST);//开启模板测试
     glStencilOp(GL_KEEP,GL_KEEP,GL_REPLACE);
 
+    shaderSelector = ShaderSelector();
 
-    shaderProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,":/lightObject.vsh");
-    shaderProgram.addShaderFromSourceFile(QOpenGLShader::Fragment,":/lightObject.fsh");
-    shaderProgram.link();
-    qDebug()<<"log:"<<shaderProgram.log();
 
-    shaderProgram.bind();
+//    shaderProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,":/lightObject.vert");
+//    shaderProgram.addShaderFromSourceFile(QOpenGLShader::Fragment,":/lightObject.frag");
+//    shaderProgram.link();
+//    qDebug()<<"log:"<<shaderProgram.log();
+
+//    shaderProgram.bind();
 
 //--模型导入----------------------------------------
     //Model ourModel("C:/Users/mumu/Desktop/graphics/practicalTraining_2/RenderLite/RenderLite/Picture_source/nanosuit/nanosuit.obj");
@@ -171,6 +173,10 @@ void GLWidget::initializeGL()
     //"/Picture_source/paimeng/paimeng.pmx"
     Model* model = new Model(path+"/Picture_source/keqing/keqing.pmx");
     scene.Add(model);
+    //TODO：获取当前模型渲染的shader类型-------------
+    shaderSelector.compileShader(0);
+    //-------------------------------------------
+    scene.shaderProgram.push_back(shaderSelector.getShader(0));
     //model = new Model(path+"/Picture_source/ganyu/ganyu.pmx");
     //scene.Add(model);
     //triangle test
@@ -182,6 +188,10 @@ void GLWidget::initializeGL()
         QVector3D color(0.2,0.3,0.2);
         Triangle* tri = new Triangle(v,color);
         scene.Add(tri);
+        //TODO：获取当前模型渲染的shader类型-------------
+        shaderSelector.compileShader();
+        //-------------------------------------------
+        scene.shaderProgram.push_back(shaderSelector.getShader(i+1));
     }
 
 //----摄像机类------------------------------------------------------------
@@ -190,24 +200,27 @@ void GLWidget::initializeGL()
     m_camera.setToIdentity();
     m_camera.translate(0, 0, -1);
 
-    //-----------------------光源位置/方向/强度---------------------
-    pointLightPosition = new QVector3D[numPointLight]{
-                QVector3D(0.7f,  0.2f,  2.0f),
-                QVector3D(2.3f, -3.3f, -4.0f),
-                QVector3D(-4.0f,  2.0f, -12.0f),
-                QVector3D(0.0f,  0.0f, -3.0f)
-    };
-    pointLightAmbient = QVector3D(0.05f,0.05f,0.05f);
-    pointLightDiffuse = QVector3D(0.8f, 0.8f, 0.8f);
-    pointLightSpecular = QVector3D(1.0f,1.0f,1.0f);
-    dirLightDirection  = QVector3D(-0.2f, -1.0f, -0.3f);
-    dirLightAmbient = QVector3D(0.4f, 0.4f, 0.4f);
-    dirLightDiffuse = QVector3D(0.4f, 0.4f, 0.4f);
-    dirLightSpecular = QVector3D(0.5f, 0.5f, 0.5f);
+    //-----------------光源位置/方向/强度---------------------
+    pointLightPosition.push_back(QVector3D(0.7f,  0.2f,  2.0f));
+    pointLightPosition.push_back(QVector3D(2.3f, -3.3f, -4.0f));
+    pointLightPosition.push_back(QVector3D(-4.0f,  2.0f, -12.0f));
+    pointLightPosition.push_back(QVector3D(0.0f,  0.0f, -3.0f));
+    pointAmbient = 0.05f;
+    pointDiffuse = 0.8f;
+    pointSpecular = 1.0f;
+    pointLightColor.push_back(QVector3D(1.0f,1.0f,1.0f));
+    pointLightColor.push_back(QVector3D(1.0f,1.0f,1.0f));
+    pointLightColor.push_back(QVector3D(1.0f,1.0f,1.0f));
+    pointLightColor.push_back(QVector3D(1.0f,1.0f,1.0f));
     constant = 1.0f;
     linear = 0.09f;
     quadratic = 0.032f;
-    lightData = new LightData(&shaderProgram);
+
+    dirLightDirection = QVector3D(-0.2f, -1.0f, -0.3f);
+    dirLightColor = QVector3D(1.0f,1.0f,1.0f);
+    dirAmbient = 0.4f;
+    dirDiffuse = 0.5f;
+    dirSpecular = 0.5f;
 
 }
 
@@ -216,54 +229,56 @@ void GLWidget::paintGL()
     //Render类，来做渲染
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 
-    shaderProgram.bind();
-    shaderProgram.setUniformValue("viewPos",maincamera.getCameraPos());
-    shaderProgram.setUniformValue("material.shiness",64.0f);
+    glEnable(GL_DEPTH_TEST);//开启深度测试
+    glEnable(GL_CULL_FACE);//开启面剔除
+    glEnable(GL_STENCIL_TEST);//开启模板测试
+    glStencilOp(GL_KEEP,GL_KEEP,GL_REPLACE);
 
 
-    shaderProgram.setUniformValue("projection",m_proj);
-    shaderProgram.setUniformValue("view",maincamera.getViewMetrix());
-    shaderProgram.setUniformValue("model",m_world);
+//--------------------------------------------
 
-    lightData->activateDirLight();
-    lightData->setDirLightDirection(dirLightDirection);
-    lightData->setDirLightAmbient(dirLightAmbient);
-    lightData->setDirLightDiffuse(dirLightDiffuse);
-    lightData->setDirLightSpecular(dirLightSpecular);
 
-    lightData->activatePointLight();
-    lightData->setPointLightPosition(pointLightPosition);
-    lightData->setPointLightAmbient(pointLightAmbient);
-    lightData->setPointLightDiffuse(pointLightDiffuse);
-    lightData->setPointLightSpecular(pointLightSpecular);
-    lightData->setConstant(constant);
-    lightData->setLinear(linear);
-    lightData->setQuadratic(quadratic);
+    shaderSelector.getShader(1)->bind();
+//    shaderSelector.getShader()->setUniformValue("viewPos",maincamera.getCameraPos());
+//    shaderSelector.getShader()->setUniformValue("material.shiness",64.0f);
+
+
+    shaderSelector.getShader(1)->setUniformValue("projection",m_proj);
+    shaderSelector.getShader(1)->setUniformValue("view",maincamera.getViewMetrix());
+    shaderSelector.getShader(1)->setUniformValue("model",m_world);
+
+
+    shaderSelector.getShader(0)->bind();
+    shaderSelector.getShader(0)->setUniformValue("viewPos",maincamera.getCameraPos());
+    shaderSelector.getShader(0)->setUniformValue("material.shiness",64.0f);
+
+
+    shaderSelector.getShader(0)->setUniformValue("projection",m_proj);
+    shaderSelector.getShader(0)->setUniformValue("view",maincamera.getViewMetrix());
+    shaderSelector.getShader(0)->setUniformValue("model",m_world);
+    setDirLight(false,0);
+    setPointLight(false,0);
+
 
     qDebug()<<"scene.size:"<<scene.objects.size();
 
 
     //Object Draw
     for(int i=0;i<scene.objects.size();i++){
-
         glStencilFunc(GL_ALWAYS, i+1, 0xFF);//模板测试始终通过，ref为当前物体编号
 
-        //模板测试失败：不会测试失败
-        //模板通过，深度测试失败：最表面模板对应的物体编号不变
-        //模板通过，深度测试通过：最表面模板对应的编号应该更新为该物体编号
-
         m_world = scene.objects[i]->model.getmodel();
-        shaderProgram.setUniformValue("model",m_world);
-        //qDebug()<<"DRAW:"<<i;
-        scene.objects.at(i)->Draw(shaderProgram);
+        shaderSelector.getShader(i)->setUniformValue("model",m_world);
+        qDebug()<<"DRAW:"<<i;
+        scene.shaderProgram[i]->bind();
+        scene.objects.at(i)->Draw(*scene.shaderProgram[i]);
+        //scene.objects.at(i)->Draw(shaderProgram);
+
         //qDebug()<<"Draw Finish"<<i;
     }
     //model->Draw(shaderProgram);
     //model1->Draw(shaderProgram);
 
-    int number;
-    glReadPixels(width()/2,height()/2,1,1,GL_STENCIL_INDEX,GL_INT,&number);
-    qDebug()<<"number="<<number;
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -278,6 +293,43 @@ void GLWidget::importModel(QString modelPath)
     scene.Add(new Model(modelPath));
     update();
 }
+
+
+void GLWidget::setDirLight(bool activate, int objNum)
+{
+    lightData = new LightData(shaderSelector.getShader(objNum));
+    if(!activate){
+        lightData->disableDirLight();
+        return;
+    }  
+        lightData->activateDirLight();
+        lightData->setDirLightDirection(dirLightDirection);
+        lightData->setDirLightAmbientColor(dirLightColor,dirAmbient);
+        lightData->setDirLightDiffuseColor(dirLightColor,dirDiffuse);
+        lightData->setDirLightSpecularColor(dirLightColor,dirSpecular);
+        delete lightData;
+        return;
+}
+
+void GLWidget::setPointLight(bool activate, int objNum)
+{
+    lightData = new LightData(shaderSelector.getShader(objNum));
+    if(!activate){
+        lightData->disablepointLight();
+        return;
+    }
+    lightData->activatePointLight();
+    lightData->setPointLightPosition(pointLightPosition);
+    lightData->setPointLightAmbientColor(pointLightColor,pointAmbient);
+    lightData->setPointLightDiffuseColor(pointLightColor,pointDiffuse);
+    lightData->setPointLightSpecularColor(pointLightColor,pointSpecular);
+    lightData->setConstant(constant);
+    lightData->setLinear(linear);
+    lightData->setQuadratic(quadratic);
+    delete lightData;
+    return;
+}
+
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
@@ -328,12 +380,44 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 //        setXRotation(m_xRot + 8 * dy);
 //        setZRotation(m_zRot + 8 * dx);
 //    }
-    if(QApplication::keyboardModifiers()==Qt::AltModifier
-            &&event->buttons() == Qt::LeftButton)
+
+    //摄像机旋转
+    if(currentIndex==1)
     {
-        maincamera.rotateCamera(dx,dy);
-        update();
+        if(QApplication::keyboardModifiers()==Qt::AltModifier
+                &&event->buttons() == Qt::LeftButton)
+        {
+            maincamera.rotateCamera(dx,dy);
+            update();
+        }
     }
+
+    //物体旋转
+    if(currentIndex==0)
+    {
+        if(xrotation&&QApplication::keyboardModifiers()==Qt::AltModifier
+                &&event->buttons() == Qt::LeftButton)
+        {
+            qDebug()<<"物体的x轴旋转";
+            scene.objects.at(0)->model.rotate(0,dx*0.5);
+            update();
+        }
+        if(yrotation&&QApplication::keyboardModifiers()==Qt::AltModifier
+                &&event->buttons() == Qt::LeftButton)
+        {
+            qDebug()<<"物体的y轴旋转";
+            scene.objects.at(0)->model.rotate(1,dx*0.5);
+            update();
+        }
+        if(zrotation&&QApplication::keyboardModifiers()==Qt::AltModifier
+                &&event->buttons() == Qt::LeftButton)
+        {
+            qDebug()<<"物体的z轴旋转";
+            scene.objects.at(0)->model.rotate(2,dx*0.5);
+            update();
+        }
+    }
+
     m_lastPos = event->pos();
 }
 
@@ -475,6 +559,39 @@ void GLWidget::keyReleaseEvent(QKeyEvent *event)
     }
 }
 
+bool GLWidget::getXrotation() const
+{
+    return xrotation;
+}
+
+void GLWidget::setXObjRotationSelected(bool booler)
+{
+    xrotation = booler;
+}
+
+void GLWidget::setYObjRotationSelected(bool booler)
+{
+    yrotation = booler;
+}
+
+void GLWidget::setZObjRotationSelected(bool booler)
+{
+    zrotation = booler;
+}
+
+void GLWidget::setCurrentIndex(int tabIndex)
+{
+    currentIndex = tabIndex;
+}
+
+int GLWidget::getPixObjectNumber(int x, int y)
+{
+    int number;
+    glReadPixels(width()/2,height()/2,1,1,GL_STENCIL_INDEX,GL_INT,&number);
+    qDebug()<<"number="<<number;
+    return number;
+}
+
 void GLWidget::setXCameraPosi(double meters)
 {
     maincamera.setXCameraPosi(meters);
@@ -510,3 +627,5 @@ void GLWidget::setZCameraFocus(double meters)
     maincamera.setZCameraFocus(meters);
     update();
 }
+
+

@@ -35,6 +35,20 @@ MainWindow::MainWindow(QWidget *parent)
 
     });
 
+    //导出文件为jpg格式
+    connect(ui->outport_file,&QAction::triggered,[=](){
+        QFileDialog outportFile(this);
+        if(outportFile.exec()==0)
+            return;
+
+        QStringList outFilePaths = outportFile.selectedFiles();
+        //theFilePath为所要的路径
+        QString outFilePath = outFilePaths[0];
+        qDebug()<<outFilePath;
+        QPixmap pixmap = QPixmap::grabWidget(glWidget);
+        pixmap.save(outFilePath,"JPG");
+    });
+
     //根据摄像机的位置改变设置输入框
     connect(glWidget,&GLWidget::xCameraPosiChanged,[=](double meters){
         ui->camera_position_x_spinbox->setValue(meters);
@@ -243,6 +257,37 @@ void MainWindow::on_camera_cameraup_up_spinbox_valueChanged(double arg1)
 void MainWindow::on_camera_cameraup_right_spinbox_valueChanged(double arg1)
 {
     qDebug()<<arg1;
+}
+
+
+void MainWindow::on_object_rotation_x_radioButton_clicked()
+{
+    glWidget->setXObjRotationSelected(true);
+    glWidget->setYObjRotationSelected(false);
+    glWidget->setZObjRotationSelected(false);
+}
+
+
+void MainWindow::on_object_rotation_y_radioButton_clicked()
+{
+    glWidget->setXObjRotationSelected(false);
+    glWidget->setYObjRotationSelected(true);
+    glWidget->setZObjRotationSelected(false);
+}
+
+
+void MainWindow::on_object_rotation_z_radioButton_clicked()
+{
+    glWidget->setXObjRotationSelected(false);
+    glWidget->setYObjRotationSelected(false);
+    glWidget->setZObjRotationSelected(true);
+}
+
+
+void MainWindow::on_tabWidget_currentChanged(int index)
+{
+    qDebug()<<index;
+    glWidget->setCurrentIndex(index);
 }
 
 
