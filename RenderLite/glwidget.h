@@ -170,17 +170,29 @@ private:
     float dirSpecular;
     LightData* lightData;
 
+    bool xrotation = true;
+    bool yrotation = false;
+    bool zrotation = false;
+
+    int currentIndex = 0;
+
 public:
     //导入模型
     void importModel(QString modelPath);
+    bool getXrotation() const;
 
-//--test
-    //Model* model;
-    //Model* model1;
+    void setXObjRotationSelected(bool booler);
+    void setYObjRotationSelected(bool booler);
+    void setZObjRotationSelected(bool booler);
+
 
     //shader参数设置  
     void setDirLight(bool activate,int objNum);
     void setPointLight(bool activate,int objNum);
+
+
+    void setCurrentIndex(int tabIndex);
+    int getPixObjectNumber(int x,int y);
 
 };
 

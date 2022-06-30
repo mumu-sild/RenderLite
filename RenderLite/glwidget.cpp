@@ -223,15 +223,11 @@ void GLWidget::initializeGL()
 void GLWidget::paintGL()
 {
     //Render类，来做渲染
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-
-    m_world.setToIdentity();
-    m_world.rotate(180.0f - (m_xRot / 16.0f), 1, 0, 0);
-    m_world.rotate(m_yRot / 16.0f, 0, 1, 0);
-    m_world.rotate(m_zRot / 16.0f, 0, 0, 1);
-    //m_world.scale(0.3,0.3,0.3);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);//开启深度测试
+    glEnable(GL_CULL_FACE);//开启面剔除
+    glEnable(GL_STENCIL_TEST);//开启模板测试
+    glStencilOp(GL_KEEP,GL_KEEP,GL_REPLACE);
 
 
 //--------------------------------------------
@@ -262,6 +258,10 @@ void GLWidget::paintGL()
     qDebug()<<"scene.size:"<<scene.objects.size();
     //Object Draw
     for(int i=0;i<scene.objects.size();i++){
+        glStencilFunc(GL_ALWAYS, i+1, 0xFF);//模板测试始终通过，ref为当前物体编号
+
+        m_world = scene.objects[i]->model.getmodel();
+        shaderSelector.getShader(i)->setUniformValue("model",m_world);
         qDebug()<<"DRAW:"<<i;
         scene.shaderProgram[i]->bind();
         scene.objects.at(i)->Draw(*scene.shaderProgram[i]);
@@ -270,8 +270,6 @@ void GLWidget::paintGL()
     }
     //model->Draw(shaderProgram);
     //model1->Draw(shaderProgram);
-
-
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -373,12 +371,44 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 //        setXRotation(m_xRot + 8 * dy);
 //        setZRotation(m_zRot + 8 * dx);
 //    }
-    if(QApplication::keyboardModifiers()==Qt::AltModifier
-            &&event->buttons() == Qt::LeftButton)
+
+    //摄像机旋转
+    if(currentIndex==1)
     {
-        maincamera.rotateCamera(dx,dy);
-        update();
+        if(QApplication::keyboardModifiers()==Qt::AltModifier
+                &&event->buttons() == Qt::LeftButton)
+        {
+            maincamera.rotateCamera(dx,dy);
+            update();
+        }
     }
+
+    //物体旋转
+    if(currentIndex==0)
+    {
+        if(xrotation&&QApplication::keyboardModifiers()==Qt::AltModifier
+                &&event->buttons() == Qt::LeftButton)
+        {
+            qDebug()<<"物体的x轴旋转";
+            scene.objects.at(0)->model.rotate(0,dx*0.5);
+            update();
+        }
+        if(yrotation&&QApplication::keyboardModifiers()==Qt::AltModifier
+                &&event->buttons() == Qt::LeftButton)
+        {
+            qDebug()<<"物体的y轴旋转";
+            scene.objects.at(0)->model.rotate(1,dx*0.5);
+            update();
+        }
+        if(zrotation&&QApplication::keyboardModifiers()==Qt::AltModifier
+                &&event->buttons() == Qt::LeftButton)
+        {
+            qDebug()<<"物体的z轴旋转";
+            scene.objects.at(0)->model.rotate(2,dx*0.5);
+            update();
+        }
+    }
+
     m_lastPos = event->pos();
 }
 
@@ -518,6 +548,39 @@ void GLWidget::keyReleaseEvent(QKeyEvent *event)
     if(event->key()==Qt::Key_D)
     {
     }
+}
+
+bool GLWidget::getXrotation() const
+{
+    return xrotation;
+}
+
+void GLWidget::setXObjRotationSelected(bool booler)
+{
+    xrotation = booler;
+}
+
+void GLWidget::setYObjRotationSelected(bool booler)
+{
+    yrotation = booler;
+}
+
+void GLWidget::setZObjRotationSelected(bool booler)
+{
+    zrotation = booler;
+}
+
+void GLWidget::setCurrentIndex(int tabIndex)
+{
+    currentIndex = tabIndex;
+}
+
+int GLWidget::getPixObjectNumber(int x, int y)
+{
+    int number;
+    glReadPixels(width()/2,height()/2,1,1,GL_STENCIL_INDEX,GL_INT,&number);
+    qDebug()<<"number="<<number;
+    return number;
 }
 
 void GLWidget::setXCameraPosi(double meters)

@@ -61,5 +61,9 @@ private slots:
     void on_camera_cameraup_front_spinbox_valueChanged(double arg1);
     void on_camera_cameraup_up_spinbox_valueChanged(double arg1);
     void on_camera_cameraup_right_spinbox_valueChanged(double arg1);
+    void on_object_rotation_x_radioButton_clicked();
+    void on_object_rotation_y_radioButton_clicked();
+    void on_object_rotation_z_radioButton_clicked();
+    void on_tabWidget_currentChanged(int index);
 };
 #endif // MAINWINDOW_H

@@ -4,10 +4,12 @@
 #include <QVector>
 #include <QDir>
 #include <QOpenGLTexture>
+#include <QMatrix4x4>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+
 
 #include "Object.h"
 #include "Mesh.h"
@@ -34,6 +36,7 @@ using namespace std;
 class Model:public Object
 {
 public:
+
     QVector<Texture*> textures_loaded;	//存储到目前为止加载的所有纹理，优化以确保纹理不会加载超过一次。
     QVector<Mesh*>    meshes;           //存储网格
     QDir directory;                     //模型所在路径目录

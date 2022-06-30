@@ -15,6 +15,7 @@
 #define M_PI 3.141592653589793f
 
 const float kInfinity = std::numeric_limits<float>::max();
+const float EPSILON = 0.00001;
 
 
 

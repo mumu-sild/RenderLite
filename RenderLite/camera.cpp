@@ -36,6 +36,7 @@ void camera::moveUpDownward(float meters)
 void camera::rotateCamera(float xRotate, float yRotate)
 {
     QVector4D cameraPosi4v = QVector4D(cameraPosi, 1.0f);
+    QVector4D cameraFocus4v = QVector4D(cameraFocus, 1.0f);
     QVector4D dirY4v = QVector4D(dirY, 1.0f);
 
 
@@ -47,15 +48,15 @@ void camera::rotateCamera(float xRotate, float yRotate)
     QMatrix4x4 rotateMetrix;
     rotateMetrix.setToIdentity();
     rotateMetrix.rotate(xRotate, dirY);
-    cameraPosi4v = rotateMetrix * cameraPosi4v;
-
-    rotateMetrix.setToIdentity();
     rotateMetrix.rotate(yRotate, -dirX);
+
     cameraPosi4v = rotateMetrix * cameraPosi4v;
+    cameraFocus4v = rotateMetrix * cameraFocus4v;
     dirY4v = rotateMetrix * dirY4v;
 
     dirY = QVector3D(dirY4v.x(), dirY4v.y(), dirY4v.z());
-    cameraPosi = QVector3D(cameraPosi4v.x(), cameraPosi4v.y(), cameraPosi4v.z());
+    cameraPosi =QVector3D(cameraPosi4v.x(), cameraPosi4v.y(), cameraPosi4v.z());
+    cameraFocus = QVector3D(cameraFocus4v.x(),cameraFocus4v.y(),cameraFocus4v.z());
     resetDirXYZ();
 
 }

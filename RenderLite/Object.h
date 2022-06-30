@@ -2,19 +2,24 @@
 #define OBJECT_H
 
 #include <QOpenGLShaderProgram>
+#include <QMatrix4x4>
 
-#include "vec.h"
+
 #include "Bounds3.h"
 #include "ray.h"
 #include "Intersection.h"
+#include "Objectmodel.h"
 
 
 class Object
 {
 public:
-    Object() {}
+    Objectmodel model;
+public:
+    Object() {};
 
     virtual void Draw(QOpenGLShaderProgram& shader)=0;
+
 
     virtual ~Object() {}
     //virtual bool intersect(const Ray& ray) = 0;
