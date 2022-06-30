@@ -154,14 +154,22 @@ private:
     float quadratic;
     LightData* lightData;
 
+    bool xrotation = true;
+    bool yrotation = false;
+    bool zrotation = false;
+
+    int currentIndex = 0;
+
 public:
     //导入模型
     void importModel(QString modelPath);
+    bool getXrotation() const;
 
-//--test
-    //Model* model;
-    //Model* model1;
+    void setXObjRotationSelected(bool booler);
+    void setYObjRotationSelected(bool booler);
+    void setZObjRotationSelected(bool booler);
 
+    void setCurrentIndex(int tabIndex);
 };
 
 #endif

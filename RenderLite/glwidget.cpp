@@ -149,11 +149,7 @@ void GLWidget::initializeGL()
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLWidget::cleanup);
 
     initializeOpenGLFunctions();
-    glClearColor(0.1, 0.1, 0.1, 1);
-    glEnable(GL_DEPTH_TEST);//开启深度测试
-    glEnable(GL_CULL_FACE);//开启面剔除
-    glEnable(GL_STENCIL_TEST);//开启模板测试
-    glStencilOp(GL_KEEP,GL_KEEP,GL_REPLACE);
+    glClearColor(0.1, 0.1, 0.1, m_transparent ? 0 : 1);
 
 
     shaderProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,":/lightObject.vsh");
@@ -163,7 +159,7 @@ void GLWidget::initializeGL()
 
     shaderProgram.bind();
 
-//--模型导入----------------------------------------
+//--将VBO，VAO,VEO作为一个整体，存储数据结构----------------------------------------
     //Model ourModel("C:/Users/mumu/Desktop/graphics/practicalTraining_2/RenderLite/RenderLite/Picture_source/nanosuit/nanosuit.obj");
     //model = new Model("D:/RenderLite-TMS/RenderLite/RenderLite/Picture_source/iPadScan/2022_06_28_19_38_53/textured_output.obj");
     //model = new Model("D:/RenderLite-TMS/RenderLite/RenderLite/Picture_source/ganyu/ganyu.pmx");
@@ -214,7 +210,19 @@ void GLWidget::initializeGL()
 void GLWidget::paintGL()
 {
     //Render类，来做渲染
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+
+
+
+//    m_world.setToIdentity();
+//    m_world.rotate(180.0f - (m_xRot / 16.0f), 1, 0, 0);
+//    m_world.rotate(m_yRot / 16.0f, 0, 1, 0);
+//    m_world.rotate(m_zRot / 16.0f, 0, 0, 1);
+    //m_world.scale(0.3,0.3,0.3);
+
+
 
     shaderProgram.bind();
     shaderProgram.setUniformValue("viewPos",maincamera.getCameraPos());
@@ -241,29 +249,18 @@ void GLWidget::paintGL()
     lightData->setQuadratic(quadratic);
 
     qDebug()<<"scene.size:"<<scene.objects.size();
-
-
     //Object Draw
     for(int i=0;i<scene.objects.size();i++){
-
-        glStencilFunc(GL_ALWAYS, i+1, 0xFF);//模板测试始终通过，ref为当前物体编号
-
-        //模板测试失败：不会测试失败
-        //模板通过，深度测试失败：最表面模板对应的物体编号不变
-        //模板通过，深度测试通过：最表面模板对应的编号应该更新为该物体编号
-
         m_world = scene.objects[i]->model.getmodel();
         shaderProgram.setUniformValue("model",m_world);
-        //qDebug()<<"DRAW:"<<i;
+        qDebug()<<"DRAW:"<<i;
         scene.objects.at(i)->Draw(shaderProgram);
         //qDebug()<<"Draw Finish"<<i;
     }
     //model->Draw(shaderProgram);
     //model1->Draw(shaderProgram);
 
-    int number;
-    glReadPixels(width()/2,height()/2,1,1,GL_STENCIL_INDEX,GL_INT,&number);
-    qDebug()<<"number="<<number;
+
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -328,12 +325,44 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 //        setXRotation(m_xRot + 8 * dy);
 //        setZRotation(m_zRot + 8 * dx);
 //    }
-    if(QApplication::keyboardModifiers()==Qt::AltModifier
-            &&event->buttons() == Qt::LeftButton)
+
+    //摄像机旋转
+    if(currentIndex==1)
     {
-        maincamera.rotateCamera(dx,dy);
-        update();
+        if(QApplication::keyboardModifiers()==Qt::AltModifier
+                &&event->buttons() == Qt::LeftButton)
+        {
+            maincamera.rotateCamera(dx,dy);
+            update();
+        }
     }
+
+    //物体旋转
+    if(currentIndex==0)
+    {
+        if(xrotation&&QApplication::keyboardModifiers()==Qt::AltModifier
+                &&event->buttons() == Qt::LeftButton)
+        {
+            qDebug()<<"物体的x轴旋转";
+            scene.objects.at(0)->model.rotate(0,dx*0.5);
+            update();
+        }
+        if(yrotation&&QApplication::keyboardModifiers()==Qt::AltModifier
+                &&event->buttons() == Qt::LeftButton)
+        {
+            qDebug()<<"物体的y轴旋转";
+            scene.objects.at(0)->model.rotate(1,dx*0.5);
+            update();
+        }
+        if(zrotation&&QApplication::keyboardModifiers()==Qt::AltModifier
+                &&event->buttons() == Qt::LeftButton)
+        {
+            qDebug()<<"物体的z轴旋转";
+            scene.objects.at(0)->model.rotate(2,dx*0.5);
+            update();
+        }
+    }
+
     m_lastPos = event->pos();
 }
 
@@ -473,6 +502,31 @@ void GLWidget::keyReleaseEvent(QKeyEvent *event)
     if(event->key()==Qt::Key_D)
     {
     }
+}
+
+bool GLWidget::getXrotation() const
+{
+    return xrotation;
+}
+
+void GLWidget::setXObjRotationSelected(bool booler)
+{
+    xrotation = booler;
+}
+
+void GLWidget::setYObjRotationSelected(bool booler)
+{
+    yrotation = booler;
+}
+
+void GLWidget::setZObjRotationSelected(bool booler)
+{
+    zrotation = booler;
+}
+
+void GLWidget::setCurrentIndex(int tabIndex)
+{
+    currentIndex = tabIndex;
 }
 
 void GLWidget::setXCameraPosi(double meters)

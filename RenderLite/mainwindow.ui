@@ -145,6 +145,13 @@
          </layout>
         </item>
         <item>
+         <widget class="Line" name="line">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
          <layout class="QFormLayout" name="formLayout_2">
           <item row="0" column="0">
            <widget class="QLabel" name="rotation_label">
@@ -219,7 +226,45 @@
             </property>
            </widget>
           </item>
+          <item row="0" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QRadioButton" name="object_rotation_x_radioButton">
+              <property name="text">
+               <string>x</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="object_rotation_y_radioButton">
+              <property name="text">
+               <string>y</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="object_rotation_z_radioButton">
+              <property name="text">
+               <string>z</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
          </layout>
+        </item>
+        <item>
+         <widget class="Line" name="line_2">
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
         </item>
         <item>
          <layout class="QFormLayout" name="formLayout_3">
@@ -291,6 +336,13 @@
            </widget>
           </item>
          </layout>
+        </item>
+        <item>
+         <widget class="Line" name="line_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
         </item>
         <item>
          <layout class="QFormLayout" name="formLayout_5">
@@ -635,7 +687,7 @@
       <x>329</x>
       <y>129</y>
       <width>161</width>
-      <height>181</height>
+      <height>221</height>
      </rect>
     </property>
     <property name="minimumSize">
@@ -652,6 +704,8 @@
     <addaction name="open_file"/>
     <addaction name="separator"/>
     <addaction name="import_file"/>
+    <addaction name="separator"/>
+    <addaction name="outport_file"/>
    </widget>
    <widget class="QMenu" name="edit_menu">
     <property name="geometry">
@@ -741,6 +795,16 @@
   <action name="use_specification">
    <property name="text">
     <string>使用说明</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="text">
+    <string>导出</string>
+   </property>
+  </action>
+  <action name="outport_file">
+   <property name="text">
+    <string>导出</string>
    </property>
   </action>
  </widget>
