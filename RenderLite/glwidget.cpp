@@ -63,23 +63,14 @@
 #include "camera.h"
 #include "lightData.h"
 #include "triangle.h"
+#include "Setting.h"
 
 
-
-
-bool GLWidget::m_transparent = false;
 
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent)
 {
     m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
-    // --transparent causes the clear color to be transparent. Therefore, on systems that
-    // support it, the widget will become transparent apart from the logo.
-    if (m_transparent) {
-        QSurfaceFormat fmt = format();
-        fmt.setAlphaBufferSize(8);
-        setFormat(fmt);
-    }
     this->setFocusPolicy(Qt::StrongFocus);
 }
 
@@ -90,50 +81,12 @@ GLWidget::~GLWidget()
 
 QSize GLWidget::minimumSizeHint() const
 {
-    return QSize(50, 50);
+    return QSize(windowsMinimumSize, windowsMinimumSize);
 }
 
 QSize GLWidget::sizeHint() const
 {
-    return QSize(400, 400);
-}
-
-static void qNormalizeAngle(int &angle)
-{
-    while (angle < 0)
-        angle += 360 * 16;
-    while (angle > 360 * 16)
-        angle -= 360 * 16;
-}
-
-void GLWidget::setXRotation(int angle)
-{
-    qNormalizeAngle(angle);
-    if (angle != m_xRot) {
-        m_xRot = angle;
-        emit xRotationChanged(angle);
-        update();
-    }
-}
-
-void GLWidget::setYRotation(int angle)
-{
-    qNormalizeAngle(angle);
-    if (angle != m_yRot) {
-        m_yRot = angle;
-        emit yRotationChanged(angle);
-        update();
-    }
-}
-
-void GLWidget::setZRotation(int angle)
-{
-    qNormalizeAngle(angle);
-    if (angle != m_zRot) {
-        m_zRot = angle;
-        emit zRotationChanged(angle);
-        update();
-    }
+    return QSize(windowsNormalSize, windowsNormalSize);
 }
 
 void GLWidget::cleanup()
@@ -143,27 +96,18 @@ void GLWidget::cleanup()
     doneCurrent();
 }
 
-
 void GLWidget::initializeGL()
 {
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLWidget::cleanup);
 
     initializeOpenGLFunctions();
-    glClearColor(0.1, 0.1, 0.1, 1);
-    glEnable(GL_DEPTH_TEST);//开启深度测试
-    glEnable(GL_CULL_FACE);//开启面剔除
-    glEnable(GL_STENCIL_TEST);//开启模板测试
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_STENCIL_TEST);
     glStencilOp(GL_KEEP,GL_KEEP,GL_REPLACE);
 
-    shaderSelector = ShaderSelector();
+    //shaderSelector = ShaderSelector();
 
-
-//    shaderProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,":/lightObject.vert");
-//    shaderProgram.addShaderFromSourceFile(QOpenGLShader::Fragment,":/lightObject.frag");
-//    shaderProgram.link();
-//    qDebug()<<"log:"<<shaderProgram.log();
-
-//    shaderProgram.bind();
 
 //--模型导入----------------------------------------
     //Model ourModel("C:/Users/mumu/Desktop/graphics/practicalTraining_2/RenderLite/RenderLite/Picture_source/nanosuit/nanosuit.obj");
@@ -173,12 +117,11 @@ void GLWidget::initializeGL()
     //"/Picture_source/paimeng/paimeng.pmx"
     Model* model = new Model(path+"/Picture_source/keqing/keqing.pmx");
     scene.Add(model);
-    //TODO：获取当前模型渲染的shader类型-------------
-    shaderSelector.compileShader(0);
+
+//TODO：获取当前模型渲染的shader类型-------------
+    shaderSelector.compileShader(1);
     //-------------------------------------------
     scene.shaderProgram.push_back(shaderSelector.getShader(0));
-    //model = new Model(path+"/Picture_source/ganyu/ganyu.pmx");
-    //scene.Add(model);
     //triangle test
     for(int i=0;i<1;i++){//>5850个三角形面片，报错
         QVector3D v[3];
@@ -193,14 +136,7 @@ void GLWidget::initializeGL()
         //-------------------------------------------
         scene.shaderProgram.push_back(shaderSelector.getShader(i+1));
     }
-
-//----摄像机类------------------------------------------------------------
-    // Our camera never changes in this example.
-
-    m_camera.setToIdentity();
-    m_camera.translate(0, 0, -1);
-
-    //-----------------光源位置/方向/强度---------------------
+//-----------------光源位置/方向/强度---------------------
     pointLightPosition.push_back(QVector3D(0.7f,  0.2f,  2.0f));
     pointLightPosition.push_back(QVector3D(2.3f, -3.3f, -4.0f));
     pointLightPosition.push_back(QVector3D(-4.0f,  2.0f, -12.0f));
@@ -229,15 +165,6 @@ void GLWidget::paintGL()
     //Render类，来做渲染
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 
-    glEnable(GL_DEPTH_TEST);//开启深度测试
-    glEnable(GL_CULL_FACE);//开启面剔除
-    glEnable(GL_STENCIL_TEST);//开启模板测试
-    glStencilOp(GL_KEEP,GL_KEEP,GL_REPLACE);
-
-
-//--------------------------------------------
-
-
     shaderSelector.getShader(1)->bind();
 //    shaderSelector.getShader()->setUniformValue("viewPos",maincamera.getCameraPos());
 //    shaderSelector.getShader()->setUniformValue("material.shiness",64.0f);
@@ -256,11 +183,8 @@ void GLWidget::paintGL()
     shaderSelector.getShader(0)->setUniformValue("projection",m_proj);
     shaderSelector.getShader(0)->setUniformValue("view",maincamera.getViewMetrix());
     shaderSelector.getShader(0)->setUniformValue("model",m_world);
-    setDirLight(false,0);
-    setPointLight(false,0);
-
-
-    qDebug()<<"scene.size:"<<scene.objects.size();
+    setDirLight(true,0);
+    setPointLight(true,0);
 
 
     //Object Draw
@@ -269,27 +193,23 @@ void GLWidget::paintGL()
 
         m_world = scene.objects[i]->model.getmodel();
         shaderSelector.getShader(i)->setUniformValue("model",m_world);
-        qDebug()<<"DRAW:"<<i;
         scene.shaderProgram[i]->bind();
         scene.objects.at(i)->Draw(*scene.shaderProgram[i]);
-        //scene.objects.at(i)->Draw(shaderProgram);
     }
-    //model->Draw(shaderProgram);
-    //model1->Draw(shaderProgram);
-
 }
 
 void GLWidget::resizeGL(int w, int h)
 {
     m_proj.setToIdentity();
     m_proj.perspective(45.0f, GLfloat(w) / h, 0.001f, 1000.0f);
-    qDebug()<<"resizeGL";
 }
 
 void GLWidget::importModel(QString modelPath)
 {
+    makeCurrent();
     scene.Add(new Model(modelPath));
     update();
+    doneCurrent();
 }
 
 
@@ -332,7 +252,6 @@ void GLWidget::setPointLight(bool activate, int objNum)
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
     m_lastPos = event->pos();
-
     //鼠标左键按下事件
     if(event->button()==Qt::LeftButton)
     {
@@ -366,18 +285,19 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     }
 }
 
+int GLWidget::getPixObjectNumber(int x, int y)
+{
+    makeCurrent();
+    int number;
+    this->glReadPixels(width()/2,height()/2,1,1,GL_STENCIL_INDEX,GL_INT,&number);
+    return number;
+    doneCurrent();
+}
+
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     int dx = m_lastPos.x() - event->x();
     int dy = m_lastPos.y() - event->y();
-
-//    if (event->buttons() & Qt::LeftButton) {
-//        setXRotation(m_xRot + 8 * dy);
-//        setYRotation(m_yRot + 8 * dx);
-//    } else if (event->buttons() & Qt::RightButton) {
-//        setXRotation(m_xRot + 8 * dy);
-//        setZRotation(m_zRot + 8 * dx);
-//    }
 
     //摄像机旋转
     if(currentIndex==1)
@@ -580,14 +500,6 @@ void GLWidget::setZObjRotationSelected(bool booler)
 void GLWidget::setCurrentIndex(int tabIndex)
 {
     currentIndex = tabIndex;
-}
-
-int GLWidget::getPixObjectNumber(int x, int y)
-{
-    int number;
-    glReadPixels(x,height()-y,1,1,GL_STENCIL_INDEX,GL_INT,&number);
-    qDebug()<<"number="<<number;
-    return number;
 }
 
 void GLWidget::setXCameraPosi(double meters)

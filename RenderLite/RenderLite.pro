@@ -33,6 +33,7 @@ HEADERS += \
     Model.h \
     Object.h \
     Objectmodel.h \
+    Setting.h \
     Texture.h \
     Vertex.h \
     camera.h \

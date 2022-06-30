@@ -84,9 +84,6 @@ public:
     QSize sizeHint() const override;
 
 public slots:
-    void setXRotation(int angle);
-    void setYRotation(int angle);
-    void setZRotation(int angle);
     void cleanup();
     void setXCameraPosi(double meters);
     void setYCameraPosi(double meters);
@@ -131,7 +128,7 @@ private:
     int m_projMatrixLoc = 0;
     int m_mvMatrixLoc = 0;
     int m_normalMatrixLoc = 0;
-    int m_lightPosLoc = 0;
+    //int m_lightPosLoc = 0;
     QMatrix4x4 m_proj;
     QMatrix4x4 m_camera;
     QMatrix4x4 m_world;
@@ -193,7 +190,6 @@ public:
 
     void setCurrentIndex(int tabIndex);
     int getPixObjectNumber(int x,int y);
-
 };
 
 #endif
