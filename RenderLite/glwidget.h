@@ -62,6 +62,7 @@
 #include "camera.h"
 #include "lightData.h"
 #include "scene.h"
+#include "shaderSelector.h"
 
 extern QString path;
 #define numPointLight 4
@@ -137,21 +138,36 @@ private:
     static bool m_transparent;
 //-----------------------------------
     Scene scene;
-
-    QOpenGLShaderProgram shaderProgram;
+    enum shaderTypes{
+        SHADER_TEXTURE = 0,
+        SHADER_LIGHT = 1,
+        SHADER_COLOR = 2
+    };
+    ShaderSelector shaderSelector;
+//    QOpenGLShaderProgram shaderProgram;
     camera maincamera;
 
-    QVector3D* pointLightPosition;
-    QVector3D pointLightAmbient;
-    QVector3D pointLightDiffuse;
-    QVector3D pointLightSpecular;
-    QVector3D dirLightDirection;
-    QVector3D dirLightAmbient;
-    QVector3D dirLightDiffuse;
-    QVector3D dirLightSpecular;
+    QVector<QVector3D> pointLightPosition;
+    QVector<QVector3D> pointLightColor;
+//    QVector3D pointLightAmbientColor;
+//    QVector3D pointLightDiffuseColor;
+//    QVector3D pointLightSpecularColor;
+    float pointAmbient;
+    float pointDiffuse;
+    float pointSpecular;
     float constant;
     float linear;
     float quadratic;
+
+    QVector3D dirLightDirection;
+    QVector3D dirLightColor;
+//    QVector3D dirLightAmbientColor;
+//    QVector3D dirLightDiffuseColor;
+//    QVector3D dirLightSpecularColor;
+
+    float dirAmbient;
+    float dirDiffuse;
+    float dirSpecular;
     LightData* lightData;
 
 public:
@@ -161,6 +177,10 @@ public:
 //--test
     //Model* model;
     //Model* model1;
+
+    //shader≤Œ ˝…Ë÷√  
+    void setDirLight(bool activate,int objNum);
+    void setPointLight(bool activate,int objNum);
 
 };
 

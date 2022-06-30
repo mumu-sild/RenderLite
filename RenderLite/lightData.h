@@ -12,16 +12,18 @@ public:
     LightData(QOpenGLShaderProgram* shaderProgram);
 
     void activateDirLight();
+    void disableDirLight();
     void setDirLightDirection(QVector3D& direction);
-    void setDirLightAmbient(QVector3D& ambient);
-    void setDirLightDiffuse(QVector3D& diffuse);
-    void setDirLightSpecular(QVector3D& specular);
+    void setDirLightAmbientColor(QVector3D Color,float ambient);
+    void setDirLightDiffuseColor(QVector3D Color, float diffuse);
+    void setDirLightSpecularColor(QVector3D Color, float specular);
 
     void activatePointLight();
-    void setPointLightPosition(QVector3D* position);
-    void setPointLightAmbient(QVector3D& ambient);
-    void setPointLightDiffuse(QVector3D& diffuse);
-    void setPointLightSpecular(QVector3D& specular);
+    void disablepointLight();
+    void setPointLightPosition(QVector<QVector3D>& position);
+    void setPointLightAmbientColor(QVector<QVector3D> Color,float ambient);
+    void setPointLightDiffuseColor(QVector<QVector3D> Color,float diffuse);
+    void setPointLightSpecularColor(QVector<QVector3D> Color, float specular);
     void setConstant(float constant);
     void setLinear(float linear);
     void setQuadratic(float quadratic);
