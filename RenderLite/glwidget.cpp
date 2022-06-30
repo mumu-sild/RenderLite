@@ -171,10 +171,10 @@ void GLWidget::initializeGL()
     //model = new Model("D:/RenderLite-TMS/RenderLite/RenderLite/Picture_source/ganyu/ganyu.pmx");
     //model = new Model("D:/RenderLite-TMS/RenderLite/RenderLite/Picture_source/keqing/keqing.pmx");
     //"/Picture_source/paimeng/paimeng.pmx"
-    Model* model = new Model(path+"/Picture_source/keqing/keqing.pmx");
+    Model* model = new Model(path+"/Picture_source/ganyu/ganyu.pmx");
     scene.Add(model);
     //TODO：获取当前模型渲染的shader类型-------------
-    shaderSelector.compileShader(0);
+    shaderSelector.compileShader(1);
     //-------------------------------------------
     scene.shaderProgram.push_back(shaderSelector.getShader(0));
     //model = new Model(path+"/Picture_source/ganyu/ganyu.pmx");
@@ -256,8 +256,8 @@ void GLWidget::paintGL()
     shaderSelector.getShader(0)->setUniformValue("projection",m_proj);
     shaderSelector.getShader(0)->setUniformValue("view",maincamera.getViewMetrix());
     shaderSelector.getShader(0)->setUniformValue("model",m_world);
-    setDirLight(false,0);
-    setPointLight(false,0);
+    setDirLight(dirLightActivated,0);
+    setPointLight(pointLightActivated,0);
 
 
     qDebug()<<"scene.size:"<<scene.objects.size();
@@ -557,6 +557,148 @@ void GLWidget::keyReleaseEvent(QKeyEvent *event)
     if(event->key()==Qt::Key_D)
     {
     }
+}
+
+void GLWidget::setDirLightActivated(int newDirLightActivated)
+{
+    dirLightActivated = newDirLightActivated == 0?false:true;
+    update();
+}
+
+void GLWidget::setPointLightActivated(int newPointLightActivated)
+{
+    pointLightActivated = newPointLightActivated == 0?false:true;
+    update();
+}
+
+float GLWidget::getDirSpecular() const
+{
+    return dirSpecular;
+}
+
+void GLWidget::setDirSpecular(float newDirSpecular)
+{
+    dirSpecular = newDirSpecular;
+    update();
+}
+
+float GLWidget::getDirDiffuse() const
+{
+    return dirDiffuse;
+}
+
+void GLWidget::setDirDiffuse(float newDirDiffuse)
+{
+    dirDiffuse = newDirDiffuse;
+    update();
+}
+
+float GLWidget::getDirAmbient() const
+{
+    return dirAmbient;
+}
+
+void GLWidget::setDirAmbient(float newDirAmbient)
+{
+    dirAmbient = newDirAmbient;
+    update();
+}
+
+const QVector3D &GLWidget::getDirLightColor() const
+{
+    return dirLightColor;
+}
+
+void GLWidget::setDirLightColorR(const int r)
+{
+    dirLightColor.setX(r/255.0f);
+    update();
+}
+void GLWidget::setDirLightColorG(const int g)
+{
+    dirLightColor.setY(g/255.0f);
+    update();
+}
+void GLWidget::setDirLightColorB(const int b)
+{
+    dirLightColor.setZ(b/255.0f);
+    update();
+}
+
+const QVector3D &GLWidget::getDirLightDirection() const
+{
+    return dirLightDirection;
+}
+
+void GLWidget::setDirLightDirectionX(const float x)
+{
+    dirLightDirection.setX(x);
+    update();
+}
+void GLWidget::setDirLightDirectionY(const float y)
+{
+    dirLightDirection.setY(y);
+    update();
+}
+void GLWidget::setDirLightDirectionZ(const float z)
+{
+    dirLightDirection.setZ(z);
+    update();
+}
+
+float GLWidget::getQuadratic() const
+{
+    return quadratic;
+}
+
+void GLWidget::setQuadratic(float newQuadratic)
+{
+    quadratic = newQuadratic;
+    update();
+}
+
+float GLWidget::getLinear() const
+{
+    return linear;
+}
+
+void GLWidget::setLinear(float newLinear)
+{
+    linear = newLinear;
+    update();
+}
+
+float GLWidget::getPointSpecular() const
+{
+    return pointSpecular;
+}
+
+void GLWidget::setPointSpecular(float newPointSpecular)
+{
+    pointSpecular = newPointSpecular;
+    update();
+}
+
+float GLWidget::getPointDiffuse() const
+{
+    return pointDiffuse;
+}
+
+void GLWidget::setPointDiffuse(float newPointDiffuse)
+{
+    pointDiffuse = newPointDiffuse;
+    update();
+}
+
+float GLWidget::getPointAmbient() const
+{
+    return pointAmbient;
+}
+
+void GLWidget::setPointAmbient(float newPointAmbient)
+{
+    pointAmbient = newPointAmbient;
+    update();
 }
 
 bool GLWidget::getXrotation() const

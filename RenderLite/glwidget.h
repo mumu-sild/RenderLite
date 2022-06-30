@@ -83,6 +83,8 @@ public:
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
 
+
+
 public slots:
     void setXRotation(int angle);
     void setYRotation(int angle);
@@ -147,11 +149,9 @@ private:
 //    QOpenGLShaderProgram shaderProgram;
     camera maincamera;
 
+    bool pointLightActivated = false;
     QVector<QVector3D> pointLightPosition;
     QVector<QVector3D> pointLightColor;
-//    QVector3D pointLightAmbientColor;
-//    QVector3D pointLightDiffuseColor;
-//    QVector3D pointLightSpecularColor;
     float pointAmbient;
     float pointDiffuse;
     float pointSpecular;
@@ -159,12 +159,9 @@ private:
     float linear;
     float quadratic;
 
+    bool dirLightActivated = true;
     QVector3D dirLightDirection;
     QVector3D dirLightColor;
-//    QVector3D dirLightAmbientColor;
-//    QVector3D dirLightDiffuseColor;
-//    QVector3D dirLightSpecularColor;
-
     float dirAmbient;
     float dirDiffuse;
     float dirSpecular;
@@ -194,6 +191,36 @@ public:
     void setCurrentIndex(int tabIndex);
     int getPixObjectNumber(int x,int y);
 
+    //light参数的get和set函数
+    //pointLight
+    float getPointAmbient() const;
+    void setPointAmbient(float newPointAmbient);
+    float getPointDiffuse() const;
+    void setPointDiffuse(float newPointDiffuse);
+    float getPointSpecular() const;
+    void setPointSpecular(float newPointSpecular);
+    float getLinear() const;
+    void setLinear(float newLinear);
+    float getQuadratic() const;
+    void setQuadratic(float newQuadratic);
+
+    //dirLight
+    const QVector3D &getDirLightDirection() const;
+    void setDirLightDirectionX(const float x);
+    void setDirLightDirectionY(const float y);
+    void setDirLightDirectionZ(const float z);
+    const QVector3D &getDirLightColor() const;
+    void setDirLightColorR(const int r);
+    void setDirLightColorG(const int g);
+    void setDirLightColorB(const int b);
+    float getDirAmbient() const;
+    void setDirAmbient(float newDirAmbient);
+    float getDirDiffuse() const;
+    void setDirDiffuse(float newDirDiffuse);
+    float getDirSpecular() const;
+    void setDirSpecular(float newDirSpecular);
+    void setPointLightActivated(int newPointLightActivated);
+    void setDirLightActivated(int newDirLightActivated);
 };
 
 #endif
