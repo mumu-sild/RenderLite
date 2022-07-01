@@ -77,6 +77,8 @@ public:
     Scene scene;
     ShaderSelector shaderSelector;
     camera maincamera;
+
+    int objectNumber = 0;
 private:
     //交互参数
     QPoint m_lastPos;
@@ -85,7 +87,7 @@ private:
     bool yrotation = false;
     bool zrotation = false;
     int currentIndex = 1;
-    int objectNumber = 0;
+
     int pixX=0,pixY=0;
 
     enum shaderTypes{
@@ -123,19 +125,19 @@ public:
     void setYObjRotationSelected(bool booler);
     void setZObjRotationSelected(bool booler);
 
+    void setCurrentObjectShader(int index);
+    void setCurrentObjectEmit(bool emits);
 
-    //shader参数设置
-    void setDirLight(bool activate,int objNum);
-    void setPointLight(bool activate,int objNum);
 
     void setCurrentIndex(int tabIndex);
-
     void setPixObjectNumber(int x,int y);
     int getObjectSize();
     void setObjectNumber(int newObjectNumber);
+    void objectChangEmitSignal();
+    void cleanup();
 
 public slots:
-    void cleanup();
+
     void setXCameraPosi(double meters);
     void setYCameraPosi(double meters);
     void setZCameraPosi(double meters);
@@ -159,38 +161,9 @@ signals:
 
 
     void objectPosiChanged(QVector3D position);
+    void objectRotationChanged(QVector3D rotate);
+    void objectScaleChanged(QVector3D scale);
     void objectNumberChanged(int objectNumber);    //light参数的get和set函数
-public:
-    //pointLight
-    float getPointAmbient() const;
-    void setPointAmbient(float newPointAmbient);
-    float getPointDiffuse() const;
-    void setPointDiffuse(float newPointDiffuse);
-    float getPointSpecular() const;
-    void setPointSpecular(float newPointSpecular);
-    float getLinear() const;
-    void setLinear(float newLinear);
-    float getQuadratic() const;
-    void setQuadratic(float newQuadratic);
-
-    //dirLight
-    const QVector3D &getDirLightDirection() const;
-    void setDirLightDirectionX(const float x);
-    void setDirLightDirectionY(const float y);
-    void setDirLightDirectionZ(const float z);
-    const QVector3D &getDirLightColor() const;
-    void setDirLightColorR(const int r);
-    void setDirLightColorG(const int g);
-    void setDirLightColorB(const int b);
-    float getDirAmbient() const;
-    void setDirAmbient(float newDirAmbient);
-    float getDirDiffuse() const;
-    void setDirDiffuse(float newDirDiffuse);
-    float getDirSpecular() const;
-    void setDirSpecular(float newDirSpecular);
-    void setPointLightActivated(int newPointLightActivated);
-    void setDirLightActivated(int newDirLightActivated);
-
 };
 
 #endif

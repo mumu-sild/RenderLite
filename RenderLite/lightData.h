@@ -5,6 +5,7 @@
 #include <QOpenGLShaderProgram>
 #include <string>
 #include <QDebug>
+#include "pointLight.h"
 
 class LightData
 {
@@ -20,10 +21,10 @@ public:
 
     void activatePointLight();
     void disablepointLight();
-    void setPointLightPosition(QVector<QVector3D>& position);
-    void setPointLightAmbientColor(QVector<QVector3D> Color,float ambient);
-    void setPointLightDiffuseColor(QVector<QVector3D> Color,float diffuse);
-    void setPointLightSpecularColor(QVector<QVector3D> Color, float specular);
+    void setPointLightPosition(QVector<PointLight*>& pointLight);
+    void setPointLightAmbientColor(QVector<PointLight*> pointLight,float ambient);
+    void setPointLightDiffuseColor(QVector<PointLight*> pointLight,float diffuse);
+    void setPointLightSpecularColor(QVector<PointLight*> pointLight, float specular);
     void setConstant(float constant);
     void setLinear(float linear);
     void setQuadratic(float quadratic);

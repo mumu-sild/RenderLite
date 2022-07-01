@@ -23,6 +23,12 @@ MainWindow::MainWindow(QWidget *parent)
     this->showMaximized();
 
     ui->tabWidget->setCurrentIndex(1);
+
+    ui->object_renderMethod_comboBox->addItem("零号渲染");
+    ui->object_renderMethod_comboBox->addItem("一号渲染");
+    ui->object_renderMethod_comboBox->addItem("二号渲染");
+    ui->object_color_widget->setHidden(true);
+
     ui->object_number_comboBox->addItem("无");
     for(;objectNumSize<=glWidget->getObjectSize();objectNumSize++)
     {
@@ -106,6 +112,20 @@ MainWindow::MainWindow(QWidget *parent)
         ui->object_position_z_spinbox->setValue(posi.z());
     });
 
+    //物体旋转改变设置ui
+    connect(glWidget,&GLWidget::objectRotationChanged,[=](QVector3D rotation){
+        ui->object_rotation_x_spinbox->setValue(rotation.x());
+        ui->object_rotation_y_spinbox->setValue(rotation.y());
+        ui->object_rotation_z_spinbox->setValue(rotation.z());
+    });
+
+    //物体伸缩改变设置ui
+    connect(glWidget,&GLWidget::objectScaleChanged,[=](QVector3D scale){
+        ui->object_scale_x_spinbox->setValue(scale.x());
+        ui->object_scale_y_spinbox->setValue(scale.y());
+        ui->object_scale_z_spinbox->setValue(scale.z());
+    });
+
 }
 
 void MainWindow::setUiStyle()
@@ -167,6 +187,14 @@ MainWindow::~MainWindow()
 void MainWindow::on_object_position_x_spinbox_valueChanged(double arg1)
 {
    qDebug()<<arg1;
+    if(ui->object_number_comboBox->currentIndex()>0)
+    {
+        glWidget->scene.objects.at(ui->object_number_comboBox->currentIndex()-1)
+                ->model.setPosition(QVector3D(ui->object_position_x_spinbox->value(),
+                                              ui->object_position_y_spinbox->value(),
+                                              ui->object_position_z_spinbox->value()));
+        glWidget->update();
+    }
 
 }
 
@@ -174,48 +202,109 @@ void MainWindow::on_object_position_x_spinbox_valueChanged(double arg1)
 void MainWindow::on_object_position_y_spinbox_valueChanged(double arg1)
 {
     qDebug()<<arg1;
+    if(ui->object_number_comboBox->currentIndex()>0)
+    {
+        glWidget->scene.objects.at(ui->object_number_comboBox->currentIndex()-1)
+                ->model.setPosition(QVector3D(ui->object_position_x_spinbox->value(),
+                                              ui->object_position_y_spinbox->value(),
+                                              ui->object_position_z_spinbox->value()));
+        glWidget->update();
+    }
 }
 
 
 void MainWindow::on_object_position_z_spinbox_valueChanged(double arg1)
 {
     qDebug()<<arg1;
+    if(ui->object_number_comboBox->currentIndex()>0)
+    {
+        glWidget->scene.objects.at(ui->object_number_comboBox->currentIndex()-1)
+                ->model.setPosition(QVector3D(ui->object_position_x_spinbox->value(),
+                                              ui->object_position_y_spinbox->value(),
+                                              ui->object_position_z_spinbox->value()));
+        glWidget->update();
+    }
 }
-
 
 void MainWindow::on_object_rotation_x_spinbox_valueChanged(double arg1)
 {
     qDebug()<<arg1;
+    if(ui->object_number_comboBox->currentIndex()>0)
+    {
+        glWidget->scene.objects.at(ui->object_number_comboBox->currentIndex()-1)
+                ->model.setRotate(QVector3D(ui->object_rotation_x_spinbox->value(),
+                                              ui->object_rotation_y_spinbox->value(),
+                                              ui->object_rotation_z_spinbox->value()));
+        glWidget->update();
+    }
 }
-
 
 void MainWindow::on_object_rotation_y_spinbox_valueChanged(double arg1)
 {
     qDebug()<<arg1;
+    if(ui->object_number_comboBox->currentIndex()>0)
+    {
+        glWidget->scene.objects.at(ui->object_number_comboBox->currentIndex()-1)
+                ->model.setRotate(QVector3D(ui->object_rotation_x_spinbox->value(),
+                                              ui->object_rotation_y_spinbox->value(),
+                                              ui->object_rotation_z_spinbox->value()));
+        glWidget->update();
+    }
 }
 
 
 void MainWindow::on_object_rotation_z_spinbox_valueChanged(double arg1)
 {
     qDebug()<<arg1;
+    if(ui->object_number_comboBox->currentIndex()>0)
+    {
+        glWidget->scene.objects.at(ui->object_number_comboBox->currentIndex()-1)
+                ->model.setRotate(QVector3D(ui->object_rotation_x_spinbox->value(),
+                                              ui->object_rotation_y_spinbox->value(),
+                                              ui->object_rotation_z_spinbox->value()));
+        glWidget->update();
+    }
 }
-
 
 void MainWindow::on_object_scale_x_spinbox_valueChanged(double arg1)
 {
     qDebug()<<arg1;
+    if(ui->object_number_comboBox->currentIndex()>0)
+    {
+        glWidget->scene.objects.at(ui->object_number_comboBox->currentIndex()-1)
+                ->model.setScale(QVector3D(ui->object_scale_x_spinbox->value(),
+                                              ui->object_scale_y_spinbox->value(),
+                                              ui->object_scale_z_spinbox->value()));
+        glWidget->update();
+    }
 }
 
 
 void MainWindow::on_object_scale_y_spinbox_valueChanged(double arg1)
 {
     qDebug()<<arg1;
+    if(ui->object_number_comboBox->currentIndex()>0)
+    {
+        glWidget->scene.objects.at(ui->object_number_comboBox->currentIndex()-1)
+                ->model.setScale(QVector3D(ui->object_scale_x_spinbox->value(),
+                                              ui->object_scale_y_spinbox->value(),
+                                              ui->object_scale_z_spinbox->value()));
+        glWidget->update();
+    }
 }
 
 
 void MainWindow::on_object_scale_z_spinbox_valueChanged(double arg1)
 {
     qDebug()<<arg1;
+    if(ui->object_number_comboBox->currentIndex()>0)
+    {
+        glWidget->scene.objects.at(ui->object_number_comboBox->currentIndex()-1)
+                ->model.setScale(QVector3D(ui->object_scale_x_spinbox->value(),
+                                              ui->object_scale_y_spinbox->value(),
+                                              ui->object_scale_z_spinbox->value()));
+        glWidget->update();
+    }
 }
 
 
@@ -328,109 +417,35 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 }
 
 
-void MainWindow::on_light_direction_x_spinbox_valueChanged(double arg1)
-{
-    glWidget->setDirLightDirectionX(arg1);
-}
-
-void MainWindow::on_light_color_red_spinbox_valueChanged(int arg1)
-{
-    glWidget->setDirLightColorR(arg1);
-}
-
-
-
-void MainWindow::on_light_direction_y_spinbox_valueChanged(double arg1)
-{
-    glWidget->setDirLightDirectionY(arg1);
-}
-
-
-void MainWindow::on_light_direction_z_spinbox_valueChanged(double arg1)
-{
-    glWidget->setDirLightDirectionZ(arg1);
-}
-
-
-void MainWindow::on_light_color_green_spinbox_valueChanged(int arg1)
-{
-    glWidget->setDirLightColorG(arg1);
-}
-
-
-void MainWindow::on_light_color_blue_spinbox_valueChanged(int arg1)
-{
-    glWidget->setDirLightColorB(arg1);
-}
-
-
-void MainWindow::on_light_parallel_checkbox_stateChanged(int arg1)
-{
-    glWidget->setPointLightActivated(arg1);
-}
-
-
-void MainWindow::on_horizontalSlider_valueChanged(int value)
-{
-    glWidget->setDirAmbient(value/100.0f);
-}
-
-
-void MainWindow::on_horizontalSlider_2_valueChanged(int value)
-{
-    glWidget->setDirDiffuse(value/100.0f);
-}
-
-
-void MainWindow::on_horizontalSlider_3_valueChanged(int value)
-{
-    glWidget->setDirSpecular(value/100.0f);
-}
-
-
-void MainWindow::on_doubleSpinBox_4_valueChanged(double arg1)
-{
-    glWidget->setLinear(arg1);
-}
-
-
-void MainWindow::on_doubleSpinBox_5_valueChanged(double arg1)
-{
-    glWidget->setQuadratic(arg1);
-}
-
-
-void MainWindow::on_horizontalSlider_4_valueChanged(int value)
-{
-    glWidget->setPointAmbient(value/100.0f);
-}
-
-
-void MainWindow::on_horizontalSlider_5_valueChanged(int value)
-{
-    glWidget->setPointDiffuse(value/100.0f);
-}
-
-
-void MainWindow::on_horizontalSlider_6_valueChanged(int value)
-{
-    glWidget->setPointSpecular(value/100.0f);
-}
-
-
-void MainWindow::on_checkBox_stateChanged(int arg1)
-{
-    glWidget->setDirLightActivated(arg1);
-}
-
-
 void MainWindow::on_object_number_comboBox_currentIndexChanged(int index)
 {
+    glWidget->setObjectNumber(index);
     if(index>0)
     {
-        glWidget->setObjectNumber(index);
+        glWidget->objectChangEmitSignal();
     }
 
 
 }
+
+void MainWindow::on_object_renderMethod_comboBox_currentIndexChanged(int index)
+{
+    if(index==2)
+    {
+        qDebug()<<"combobox:"<<index;
+        ui->object_color_widget->setHidden(false);
+    }
+    else
+    {
+        ui->object_color_widget->setHidden(true);
+    }
+    glWidget->setCurrentObjectShader(index);
+
+}
+
+void MainWindow::on_object_is_light_chekBox_stateChanged(int arg1)
+{
+    glWidget->setCurrentObjectEmit(arg1);
+}
+
 

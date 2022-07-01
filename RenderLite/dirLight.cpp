@@ -1,7 +1,23 @@
 #include "dirLight.h"
+#include "lightData.h"
 
+//void DirLight::setDirLight(DirLight *dirlight, QOpenGLShaderProgram* shader)
+//{
+//    LightData* lightData = new LightData(shader);
+//    if(!dirlight->dirLightActivated){
+//        lightData->disableDirLight();
+//        return;
+//    }
+//        lightData->activateDirLight();
+//        lightData->setDirLightDirection(dirlight->getDirection());
+//        lightData->setDirLightAmbientColor(dirlight->getColor(),DirLight::ambient);
+//        lightData->setDirLightDiffuseColor(dirlight->getColor(),DirLight::diffuse);
+//        lightData->setDirLightSpecularColor(dirlight->getColor(),DirLight::specular);
+//        delete lightData;
+//        return;
+//}
 
-const QVector3D &DirLight::getDirection() const
+QVector3D &DirLight::getDirection()
 {
     return direction;
 }
@@ -21,7 +37,7 @@ void DirLight::setDirectionZ(const float z)
     direction.setZ(z);
 }
 
-const QVector3D &DirLight::getColor() const
+QVector3D &DirLight::getColor()
 {
     return color;
 }

@@ -1,6 +1,7 @@
 #ifndef POINTLIGHT_H
 #define POINTLIGHT_H
 #include <QVector3D>
+#include <QOpenGLShaderProgram>
 
 class PointLight
 {
@@ -14,24 +15,29 @@ public:
     static float quadratic;
 
 
-    const QVector3D &getPosition() const;
+
+private:
+    QVector3D position;
+    QVector3D color;
+
+public:
+    PointLight(QVector3D posi,QVector3D color):position(posi),color(color){}
+
+//    void setPointLight(QVector<PointLight*>& pointLight, QOpenGLShaderProgram* shader);
+    void setPosition(const QVector3D &newPosition);
+    QVector3D &getPosition();
     void setPositionX(const float x);
     void setPositionY(const float y);
     void setPositionZ(const float z);
 
 
-
-    const QVector3D &getColor() const;
+    QVector3D &getColor();
     void setColorR(const float r);
     void setColorG(const float g);
     void setColorB(const float b);
 
-private:
-    QVector3D position;
-    QVector3D color;
-    bool pointLightActivated = false;
-
-
 };
+
+
 
 #endif // POINTLIGHT_H

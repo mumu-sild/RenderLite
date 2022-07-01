@@ -14,7 +14,6 @@ CONFIG += c++17
 
 SOURCES += \
     GLWeightIntersection.cpp \
-    LightSet.cpp \
     Mesh.cpp \
     Model.cpp \
     camera.cpp \
@@ -25,6 +24,7 @@ SOURCES += \
     mainwindow.cpp \
     matrix.cpp \
     pointLight.cpp \
+    rectangle.cpp \
     scene.cpp \
     shaderSelector.cpp \
     triangle.cpp
@@ -47,6 +47,7 @@ HEADERS += \
     mainwindow.h \
     pointLight.h \
     ray.h \
+    rectangle.h \
     scene.h \
     shaderSelector.h \
     triangle.h

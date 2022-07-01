@@ -222,6 +222,11 @@ void Model::Draw(QOpenGLShaderProgram &shader)
         meshes[i]->Draw(shader);
 }
 
+QVector3D Model::getlightpos()
+{
+    return QVector3D(QVector4D(0,1,0,1)*model.getmodel());
+}
+
 
 
 

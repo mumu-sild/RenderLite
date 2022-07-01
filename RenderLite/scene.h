@@ -15,11 +15,13 @@ public:
     //BVHAccel *bvh;
 
     QVector<Object* > objects;
-    QVector<QOpenGLShaderProgram*> shaderProgram;
-    QVector<PointLight*> pointlight;
-    DirLight* light;
+    QVector<QOpenGLShaderProgram*> shaderPrograms;
+    QVector<PointLight*> pointlights;
+    DirLight* dirlight;
 
     void Add(Object *object);
+    void Add(PointLight* pointlight);
+    void Add(QOpenGLShaderProgram* shaderprogram);
 
 public:
     Scene();

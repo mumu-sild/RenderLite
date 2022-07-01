@@ -91,6 +91,16 @@ void Triangle::Draw(QOpenGLShaderProgram &shader)
     VAO.release();
 }
 
+QVector3D Triangle::getlightpos()
+{
+    QVector3D center = (v.at(0).Position+v.at(1).Position+v.at(2).Position)/3;
+    QVector3D point = QVector3D(model.getmodel()*QVector4D(center,1.0f));
+    qDebug()<<model.getmodel();
+    qDebug()<<point;
+
+    return point;
+}
+
 //bool Triangle::intersect(const Ray &ray)
 //{
 //    return true;

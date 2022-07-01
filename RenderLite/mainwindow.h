@@ -69,20 +69,7 @@ private slots:
     void on_object_rotation_z_radioButton_clicked();
     void on_tabWidget_currentChanged(int index);
     void on_object_number_comboBox_currentIndexChanged(int index);
-    void on_light_direction_x_spinbox_valueChanged(double arg1);
-    void on_light_color_red_spinbox_valueChanged(int arg1);
-    void on_light_direction_y_spinbox_valueChanged(double arg1);
-    void on_light_direction_z_spinbox_valueChanged(double arg1);
-    void on_light_color_green_spinbox_valueChanged(int arg1);
-    void on_light_color_blue_spinbox_valueChanged(int arg1);
-    void on_light_parallel_checkbox_stateChanged(int arg1);
-    void on_horizontalSlider_valueChanged(int value);
-    void on_horizontalSlider_2_valueChanged(int value);
-    void on_horizontalSlider_3_valueChanged(int value);
-    void on_doubleSpinBox_4_valueChanged(double arg1);
-    void on_doubleSpinBox_5_valueChanged(double arg1);
-    void on_horizontalSlider_4_valueChanged(int value);
-    void on_horizontalSlider_5_valueChanged(int value);
-    void on_horizontalSlider_6_valueChanged(int value);
-    void on_checkBox_stateChanged(int arg1);};
+    void on_object_renderMethod_comboBox_currentIndexChanged(int index);
+    void on_object_is_light_chekBox_stateChanged(int arg1);
+};
 #endif // MAINWINDOW_H

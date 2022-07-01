@@ -43,7 +43,8 @@ public:
     QVector<Triangle*> triangles;
 
     Model(QString const& path);
-    void Draw(QOpenGLShaderProgram& shader);
+    void Draw(QOpenGLShaderProgram& shader)override;
+    QVector3D getlightpos()override;
 
     ~Model();
 private:
@@ -65,6 +66,7 @@ private:
 
     //加载三角形数据
     void loadTriangle();
+
 };
 
 

@@ -56,12 +56,12 @@ void LightData::disablepointLight()
     shader->setUniformValue("pointLightActivated",false);
 }
 
-void LightData::setPointLightPosition(QVector<QVector3D>& position){
+void LightData::setPointLightPosition(QVector<PointLight*>& pointLight){
     if(!pointLightActivated){
         qDebug()<<"PointLight is not activated";
         return;
     }
-    numPointLight = position.size();
+    numPointLight = pointLight.size();
     shader->setUniformValue("numPointLights",numPointLight);
 
     std::string structNameFront = "pointLights[";
@@ -70,11 +70,11 @@ void LightData::setPointLightPosition(QVector<QVector3D>& position){
     for(int i = 0; i < numPointLight; i++){
         std::string StringI = std::to_string(i);
 //        qDebug()<<(structNameFront+StringI+structNameRail).c_str();
-        shader->setUniformValue((structNameFront+StringI+structNameRail).c_str(),position[i]);
+        shader->setUniformValue((structNameFront+StringI+structNameRail).c_str(),pointLight[i]->getPosition());
     }
 }
 
-void LightData::setPointLightAmbientColor(QVector<QVector3D> Color,float ambient){
+void LightData::setPointLightAmbientColor(QVector<PointLight*> pointLight,float ambient){
     if(!pointLightActivated){
         qDebug()<<"PointLight is not activated";
         return;
@@ -84,11 +84,11 @@ void LightData::setPointLightAmbientColor(QVector<QVector3D> Color,float ambient
     for(int i = 0; i < numPointLight; i++){
         std::string StringI = std::to_string(i);
 //        qDebug()<<(structNameFront+StringI+structNameRail).c_str();
-        shader->setUniformValue((structNameFront+StringI+structNameRail).c_str(),Color[i] * ambient);
+        shader->setUniformValue((structNameFront+StringI+structNameRail).c_str(),pointLight[i]->getColor() * ambient);
     }
 }
 
-void LightData::setPointLightDiffuseColor(QVector<QVector3D> Color, float diffuse){
+void LightData::setPointLightDiffuseColor(QVector<PointLight*> pointLight, float diffuse){
     if(!pointLightActivated){
         qDebug()<<"PointLight is not activated";
         return;
@@ -98,11 +98,11 @@ void LightData::setPointLightDiffuseColor(QVector<QVector3D> Color, float diffus
     for(int i = 0; i < numPointLight; i++){
         std::string StringI = std::to_string(i);
 //        qDebug()<<(structNameFront+StringI+structNameRail).c_str();
-        shader->setUniformValue((structNameFront+StringI+structNameRail).c_str(),Color[i] * diffuse);
+        shader->setUniformValue((structNameFront+StringI+structNameRail).c_str(),pointLight[i]->getColor() * diffuse);
     }
 }
 
-void LightData::setPointLightSpecularColor(QVector<QVector3D> Color, float specular){
+void LightData::setPointLightSpecularColor(QVector<PointLight*> pointLight, float specular){
     if(!pointLightActivated){
         qDebug()<<"PointLight is not activated";
         return;
@@ -112,7 +112,7 @@ void LightData::setPointLightSpecularColor(QVector<QVector3D> Color, float specu
     for(int i = 0; i < numPointLight; i++){
         std::string StringI = std::to_string(i);
 //        qDebug()<<(structNameFront+StringI+structNameRail).c_str();
-        shader->setUniformValue((structNameFront+StringI+structNameRail).c_str(),Color[i] * specular);
+        shader->setUniformValue((structNameFront+StringI+structNameRail).c_str(),pointLight[i]->getColor() * specular);
     }
 }
 

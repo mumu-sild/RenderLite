@@ -1,7 +1,29 @@
 #include "pointLight.h"
+#include "lightData.h"
+
+//void PointLight::setPointLight(QVector<PointLight*>& pointLight, QOpenGLShaderProgram *shader)
+//{
+//    LightData* lightData = new LightData(shader);
 
 
-const QVector3D &PointLight::getPosition() const
+//    lightData->activatePointLight();
+//    lightData->setPointLightPosition(pointLight);
+//    lightData->setPointLightAmbientColor(pointLight,PointLight::ambient);
+//    lightData->setPointLightDiffuseColor(pointLight,PointLight::diffuse);
+//    lightData->setPointLightSpecularColor(pointLight,PointLight::specular);
+//    lightData->setConstant(constant);
+//    lightData->setLinear(linear);
+//    lightData->setQuadratic(quadratic);
+//    delete lightData;
+//    return;
+//}
+
+void PointLight::setPosition(const QVector3D &newPosition)
+{
+    position = newPosition;
+}
+
+QVector3D &PointLight::getPosition()
 {
     return position;
 }
@@ -21,7 +43,7 @@ void PointLight::setPositionZ(const float z)
     position.setZ(z);
 }
 
-const QVector3D &PointLight::getColor() const
+QVector3D &PointLight::getColor()
 {
     return color;
 }
@@ -38,5 +60,6 @@ void PointLight::setColorB(const float b)
 {
     color.setX(b);
 }
+
 
 
