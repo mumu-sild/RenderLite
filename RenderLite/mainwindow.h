@@ -69,8 +69,6 @@ private slots:
     void on_object_rotation_z_radioButton_clicked();
     void on_tabWidget_currentChanged(int index);
     void on_object_number_comboBox_currentIndexChanged(int index);
-    void on_light_addpointolite_pushbutton_clicked();
-    void on_light_parallel_checkbox_clicked();
     void on_light_direction_x_spinbox_valueChanged(double arg1);
     void on_light_color_red_spinbox_valueChanged(int arg1);
     void on_light_direction_y_spinbox_valueChanged(double arg1);

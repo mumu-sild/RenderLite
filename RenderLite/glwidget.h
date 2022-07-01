@@ -72,12 +72,12 @@ QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
-private:
+public:
     //
     Scene scene;
     ShaderSelector shaderSelector;
     camera maincamera;
-
+private:
     //交互参数
     QPoint m_lastPos;
 
@@ -93,27 +93,6 @@ private:
         SHADER_LIGHT = 1,
         SHADER_COLOR = 2
     };
-
-
-    bool pointLightActivated = false;
-//应该单独做一个类----------------------------------------------------------
-    QVector<QVector3D> pointLightPosition;
-    QVector<QVector3D> pointLightColor;
-    float pointAmbient;
-    float pointDiffuse;
-    float pointSpecular;
-    float constant;
-    float linear;
-    float quadratic;
-
-    bool dirLightActivated = true;
-    QVector3D dirLightDirection;
-    QVector3D dirLightColor;
-
-    float dirAmbient;
-    float dirDiffuse;
-    float dirSpecular;
-    LightData* lightData;
 //----------------------------------------------
 
 
@@ -178,9 +157,10 @@ signals:
     void yCameraFocusChanged(double meters);
     void zCameraFocusChanged(double meters);
 
-public:
+
     void objectPosiChanged(QVector3D position);
     void objectNumberChanged(int objectNumber);    //light参数的get和set函数
+public:
     //pointLight
     float getPointAmbient() const;
     void setPointAmbient(float newPointAmbient);

@@ -5,6 +5,8 @@
 #include <QVector>
 #include <QOpenGLShaderProgram>
 #include "Object.h"
+#include "dirLight.h"
+#include "pointLight.h"
 
 class Scene
 {
@@ -14,6 +16,8 @@ public:
 
     QVector<Object* > objects;
     QVector<QOpenGLShaderProgram*> shaderProgram;
+    QVector<PointLight*> pointlight;
+    DirLight* light;
 
     void Add(Object *object);
 

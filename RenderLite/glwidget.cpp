@@ -138,10 +138,16 @@ void GLWidget::initializeGL()
     }
 
 //-----------------光源位置/方向/强度---------------------
+    scene.add(new pointLight(QVector3D posi,QVec color));
+
+
     pointLightPosition.push_back(QVector3D(0.7f,  0.2f,  2.0f));
     pointLightPosition.push_back(QVector3D(2.3f, -3.3f, -4.0f));
     pointLightPosition.push_back(QVector3D(-4.0f,  2.0f, -12.0f));
     pointLightPosition.push_back(QVector3D(0.0f,  0.0f, -3.0f));
+
+    PointLight.Ambint = ;
+
     pointAmbient = 0.05f;
     pointDiffuse = 0.8f;
     pointSpecular = 1.0f;

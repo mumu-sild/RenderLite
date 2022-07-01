@@ -18,12 +18,13 @@ SOURCES += \
     Mesh.cpp \
     Model.cpp \
     camera.cpp \
+    dirLight.cpp \
     glwidget.cpp \
     lightData.cpp \
     main.cpp \
-    mainWindowsInter.cpp \
     mainwindow.cpp \
     matrix.cpp \
+    pointLight.cpp \
     scene.cpp \
     shaderSelector.cpp \
     triangle.cpp
@@ -40,9 +41,11 @@ HEADERS += \
     Texture.h \
     Vertex.h \
     camera.h \
+    dirLight.h \
     glwidget.h \
     lightData.h \
     mainwindow.h \
+    pointLight.h \
     ray.h \
     scene.h \
     shaderSelector.h \

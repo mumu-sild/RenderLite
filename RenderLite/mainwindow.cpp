@@ -327,16 +327,6 @@ void MainWindow::on_tabWidget_currentChanged(int index)
     glWidget->setCurrentIndex(index);
 }
 
-//void MainWindow::on_light_addpointolite_pushbutton_clicked()
-//{
-
-//}
-
-
-//void MainWindow::on_light_parallel_checkbox_clicked()
-//{
-
-//}
 
 void MainWindow::on_light_direction_x_spinbox_valueChanged(double arg1)
 {
