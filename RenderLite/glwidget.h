@@ -72,20 +72,22 @@ QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
-
-private:
+public:
     //
     Scene scene;
     ShaderSelector shaderSelector;
     camera maincamera;
 
+    int objectNumber = 0;
+private:
     //交互参数
     QPoint m_lastPos;
+
     bool xrotation = true;
     bool yrotation = false;
     bool zrotation = false;
     int currentIndex = 1;
-    int objectNumber = 0;
+
     int pixX=0,pixY=0;
 
     enum shaderTypes{
@@ -93,31 +95,6 @@ private:
         SHADER_LIGHT = 1,
         SHADER_COLOR = 2
     };
-
-
-//应该单独做一个类----------------------------------------------------------
-    QVector<QVector3D> pointLightPosition;
-    QVector<QVector3D> pointLightColor;
-//    QVector3D pointLightAmbientColor;
-//    QVector3D pointLightDiffuseColor;
-//    QVector3D pointLightSpecularColor;
-    float pointAmbient;
-    float pointDiffuse;
-    float pointSpecular;
-    float constant;
-    float linear;
-    float quadratic;
-
-    QVector3D dirLightDirection;
-    QVector3D dirLightColor;
-//    QVector3D dirLightAmbientColor;
-//    QVector3D dirLightDiffuseColor;
-//    QVector3D dirLightSpecularColor;
-
-    float dirAmbient;
-    float dirDiffuse;
-    float dirSpecular;
-    LightData* lightData;
 //----------------------------------------------
 
 
@@ -148,19 +125,19 @@ public:
     void setYObjRotationSelected(bool booler);
     void setZObjRotationSelected(bool booler);
 
-
-    //shader参数设置
-    void setDirLight(bool activate,int objNum);
-    void setPointLight(bool activate,int objNum);
+    void setCurrentObjectShader(int index);
+    void setCurrentObjectEmit(bool emits);
 
 
     void setCurrentIndex(int tabIndex);
     void setPixObjectNumber(int x,int y);
     int getObjectSize();
     void setObjectNumber(int newObjectNumber);
+    void objectChangEmitSignal();
+    void cleanup();
 
 public slots:
-    void cleanup();
+
     void setXCameraPosi(double meters);
     void setYCameraPosi(double meters);
     void setZCameraPosi(double meters);
@@ -182,15 +159,11 @@ signals:
     void yCameraFocusChanged(double meters);
     void zCameraFocusChanged(double meters);
 
+
     void objectPosiChanged(QVector3D position);
-    void objectNumberChanged(int objectNumber);
-
-
-
-
-
-
-
+    void objectRotationChanged(QVector3D rotate);
+    void objectScaleChanged(QVector3D scale);
+    void objectNumberChanged(int objectNumber);    //light参数的get和set函数
 };
 
 #endif

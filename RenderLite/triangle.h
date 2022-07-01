@@ -26,8 +26,8 @@ private:
     //QVector3D normal;
 
     QVector3D edge0_1,edge0_2;
-    QVector3D color;//new
-    QVector<Texture*> textures;//new
+    QVector3D color;
+    QVector<Texture*> textures;
 
     float area;
     //Material* m;
@@ -47,7 +47,8 @@ public:
 //    void Sample(Intersection &pos, float &pdf)override;
 
     //void setTexture(QVector2D* texcoords,QVector<Texture*> texture);
-    void Draw(QOpenGLShaderProgram& shader);
+    void Draw(QOpenGLShaderProgram& shader)override;
+    QVector3D getlightpos()override;
     ~Triangle();
 private:
     void setupVAO();

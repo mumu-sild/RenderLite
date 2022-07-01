@@ -34,6 +34,7 @@ private:
     Ui::MainWindow *ui;
     GLWidget *glWidget;
     QWidget *mainWidget;
+    QWidget *addlightwidget;
 
     int objectNumSize=1;
 
@@ -68,5 +69,7 @@ private slots:
     void on_object_rotation_z_radioButton_clicked();
     void on_tabWidget_currentChanged(int index);
     void on_object_number_comboBox_currentIndexChanged(int index);
+    void on_object_renderMethod_comboBox_currentIndexChanged(int index);
+    void on_object_is_light_chekBox_stateChanged(int arg1);
 };
 #endif // MAINWINDOW_H

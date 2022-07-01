@@ -7,6 +7,9 @@
 #include <QOpenGLFunctions>
 #include <QDebug>
 
+#include "dirLight.h"
+#include "pointLight.h"
+
 class GLWidget;
 
 class ShaderSelector
@@ -23,8 +26,12 @@ public:
         ":color.frag"
     };
     ShaderSelector();
+public:
     QOpenGLShaderProgram* getShader(int objNum=2);
     void compileShader(int i);
+    void setLightDir(int shader,DirLight* dirlight);
+    void setPointDir(int shader,QVector<PointLight*> pointlights);
+
 private:
     QVector<QOpenGLShaderProgram*> shaderProgram;
 

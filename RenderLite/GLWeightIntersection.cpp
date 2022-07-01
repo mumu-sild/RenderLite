@@ -5,7 +5,8 @@ void GLWidget::importModel(QString modelPath)
 {
     makeCurrent();
     scene.Add(new Model(modelPath));
-    scene.shaderProgram.push_back(shaderSelector.getShader());
+    scene.shaderPrograms.push_back(shaderSelector.getShader(2));
+    scene.Add(new PointLight(scene.objects.last()->getlightpos(),QVector3D(1,1,1)));
     update();
     doneCurrent();
 }
@@ -32,6 +33,8 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
+
+
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     int dx = m_lastPos.x() - event->x();
@@ -49,29 +52,25 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     }
 
     //物体旋转
-    if(currentIndex==0 && objectNumber!=0)
+    if(currentIndex==0 && objectNumber!=0&&
+            QApplication::keyboardModifiers()==Qt::AltModifier&&
+            event->buttons() == Qt::LeftButton)
     {
-        if(xrotation&&QApplication::keyboardModifiers()==Qt::AltModifier
-                &&event->buttons() == Qt::LeftButton)
-        {
+        if(xrotation){
             qDebug()<<"物体的x轴旋转";
             scene.objects.at(objectNumber-1)->model.rotate(0,dx*0.5);
-            update();
         }
-        if(yrotation&&QApplication::keyboardModifiers()==Qt::AltModifier
-                &&event->buttons() == Qt::LeftButton)
-        {
+        if(yrotation){
             qDebug()<<"物体的y轴旋转";
             scene.objects.at(objectNumber-1)->model.rotate(1,dx*0.5);
-            update();
         }
-        if(zrotation&&QApplication::keyboardModifiers()==Qt::AltModifier
-                &&event->buttons() == Qt::LeftButton)
-        {
+        if(zrotation){
             qDebug()<<"物体的z轴旋转";
             scene.objects.at(objectNumber-1)->model.rotate(2,dx*0.5);
-            update();
         }
+        emit objectRotationChanged(scene.objects.at(objectNumber-1)
+                               ->model.getRotate());
+        update();
     }
 
     m_lastPos = event->pos();
@@ -127,13 +126,15 @@ void GLWidget::wheelEvent(QWheelEvent *event)
         {
             scene.objects.at(objectNumber-1)->model.scale(QVector3D(0.9,0.9,0.9));
 
-
-
+            emit objectScaleChanged(scene.objects.at(objectNumber-1)
+                                   ->model.getScale());
             update();
         }
         if(event->delta()>0&&objectNumber!=0)
         {
             scene.objects.at(objectNumber-1)->model.scale(QVector3D(1.1,1.1,1.1));
+            emit objectScaleChanged(scene.objects.at(objectNumber-1)
+                                               ->model.getScale());
             update();
         }
 

@@ -5,8 +5,8 @@
 #include "camera.h"
 #include "Global.h"
 
-camera::camera() :cameraPosi{ 0.0f,0.0f,0.3f }, cameraFocus{ 0.0f,0.0f,0.0f },
-                    cameraUp{ 0.0f,-0.1f,0.0f }
+camera::camera() :cameraPosi{ 0.0f,5.0f,3.0f }, cameraFocus{ 0.0f,5.0f,0.0f },
+                    cameraUp{ 0.0f,1.0f,0.0f }
 {
     dirZ = (cameraPosi - cameraFocus).normalized();
     dirX = (QVector3D::crossProduct(dirZ, cameraUp));

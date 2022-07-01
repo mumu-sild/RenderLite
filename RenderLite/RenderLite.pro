@@ -14,15 +14,17 @@ CONFIG += c++17
 
 SOURCES += \
     GLWeightIntersection.cpp \
-    LightSet.cpp \
     Mesh.cpp \
     Model.cpp \
     camera.cpp \
+    dirLight.cpp \
     glwidget.cpp \
     lightData.cpp \
     main.cpp \
     mainwindow.cpp \
     matrix.cpp \
+    pointLight.cpp \
+    rectangle.cpp \
     scene.cpp \
     shaderSelector.cpp \
     triangle.cpp
@@ -39,10 +41,13 @@ HEADERS += \
     Texture.h \
     Vertex.h \
     camera.h \
+    dirLight.h \
     glwidget.h \
     lightData.h \
     mainwindow.h \
+    pointLight.h \
     ray.h \
+    rectangle.h \
     scene.h \
     shaderSelector.h \
     triangle.h

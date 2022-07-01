@@ -15,13 +15,15 @@ class Object
 {
 public:
     Objectmodel model;
+    bool islight = false;
+    QVector3D color = QVector3D(0.1,0.1,0.1);
 public:
-    Object() {};
+    Object(){};
 
     virtual void Draw(QOpenGLShaderProgram& shader)=0;
 
-
-    virtual ~Object() {}
+    virtual QVector3D getlightpos()=0;
+    virtual ~Object(){};
     //virtual bool intersect(const Ray& ray) = 0;
     //virtual bool intersect(const Ray& ray, float &, uint32_t &) const = 0;
     //virtual Intersection getIntersection(Ray _ray) = 0;

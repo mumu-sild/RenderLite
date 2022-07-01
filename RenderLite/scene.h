@@ -5,6 +5,8 @@
 #include <QVector>
 #include <QOpenGLShaderProgram>
 #include "Object.h"
+#include "dirLight.h"
+#include "pointLight.h"
 
 class Scene
 {
@@ -13,9 +15,13 @@ public:
     //BVHAccel *bvh;
 
     QVector<Object* > objects;
-    QVector<QOpenGLShaderProgram*> shaderProgram;
+    QVector<QOpenGLShaderProgram*> shaderPrograms;
+    QVector<PointLight*> pointlights;
+    DirLight* dirlight;
 
     void Add(Object *object);
+    void Add(PointLight* pointlight);
+    void Add(QOpenGLShaderProgram* shaderprogram);
 
 public:
     Scene();
