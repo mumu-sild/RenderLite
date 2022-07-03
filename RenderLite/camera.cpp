@@ -47,7 +47,7 @@ void camera::rotateCamera(float xRotate, float yRotate)
     //
     QMatrix4x4 rotateMetrix;
     rotateMetrix.setToIdentity();
-    rotateMetrix.rotate(xRotate, dirY);
+    rotateMetrix.rotate(xRotate, cameraUp);
     rotateMetrix.rotate(yRotate, -dirX);
 
     cameraPosi4v = rotateMetrix * cameraPosi4v;

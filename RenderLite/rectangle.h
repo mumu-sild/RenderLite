@@ -28,6 +28,7 @@ public:
     rectangle(float width = 1,float height = 1,QVector3D color = QVector3D(0.1,0.1,0.1));
     void Draw(QOpenGLShaderProgram& shader)override;
     QVector3D getlightpos()override;
+    QVector3D getlightNormal()override;
     ~rectangle();
 private:
     void setupVAO();

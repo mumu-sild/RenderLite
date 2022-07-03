@@ -25,6 +25,7 @@ public:
     void setPointLightAmbientColor(QVector<PointLight*> pointLight,float ambient);
     void setPointLightDiffuseColor(QVector<PointLight*> pointLight,float diffuse);
     void setPointLightSpecularColor(QVector<PointLight*> pointLight, float specular);
+    void setPointLightNormal(QVector<PointLight*> pointLight);
     void setConstant(float constant);
     void setLinear(float linear);
     void setQuadratic(float quadratic);

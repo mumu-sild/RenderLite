@@ -748,7 +748,7 @@
      <attribute name="title">
       <string>灯光</string>
      </attribute>
-     <widget class="QScrollArea" name="scrollArea3">
+     <widget class="QScrollArea" name="Parallel">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -873,7 +873,7 @@
          <string>蓝：</string>
         </property>
        </widget>
-       <widget class="QSpinBox" name="light_color_red_spinbox_2">
+       <widget class="QSpinBox" name="light_color_red">
         <property name="geometry">
          <rect>
           <x>180</x>
@@ -886,7 +886,7 @@
          <number>255</number>
         </property>
        </widget>
-       <widget class="QSpinBox" name="light_color_green_spinbox_2">
+       <widget class="QSpinBox" name="light_color_green">
         <property name="geometry">
          <rect>
           <x>180</x>
@@ -899,7 +899,7 @@
          <number>255</number>
         </property>
        </widget>
-       <widget class="QSpinBox" name="light_color_blue_spinbox_2">
+       <widget class="QSpinBox" name="light_color_blue">
         <property name="geometry">
          <rect>
           <x>180</x>
@@ -951,7 +951,7 @@
          <string>环境光强度：</string>
         </property>
        </widget>
-       <widget class="QSlider" name="horizontalSlider_4">
+       <widget class="QSlider" name="DirLightAmbient">
         <property name="geometry">
          <rect>
           <x>120</x>
@@ -1008,7 +1008,7 @@
          <number>0</number>
         </property>
        </widget>
-       <widget class="QSlider" name="horizontalSlider_5">
+       <widget class="QSlider" name="DirLightDiffuse">
         <property name="geometry">
          <rect>
           <x>119</x>
@@ -1056,7 +1056,7 @@
          <number>0</number>
         </property>
        </widget>
-       <widget class="QSlider" name="horizontalSlider_6">
+       <widget class="QSlider" name="DirLightSpecular">
         <property name="geometry">
          <rect>
           <x>119</x>
@@ -1088,6 +1088,9 @@
         <property name="maximum">
          <number>100</number>
         </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
         <property name="pageStep">
          <number>10</number>
         </property>
@@ -1104,7 +1107,7 @@
          <number>0</number>
         </property>
        </widget>
-       <widget class="QDoubleSpinBox" name="light_direction_x_spinbox_2">
+       <widget class="QDoubleSpinBox" name="light_direction_x">
         <property name="geometry">
          <rect>
           <x>40</x>
@@ -1114,13 +1117,16 @@
          </rect>
         </property>
         <property name="minimum">
-         <double>-99.989999999999995</double>
+         <double>-180.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>180.000000000000000</double>
         </property>
         <property name="singleStep">
          <double>0.050000000000000</double>
         </property>
        </widget>
-       <widget class="QDoubleSpinBox" name="light_direction_y_spinbox_2">
+       <widget class="QDoubleSpinBox" name="light_direction_y">
         <property name="geometry">
          <rect>
           <x>40</x>
@@ -1130,13 +1136,16 @@
          </rect>
         </property>
         <property name="minimum">
-         <double>-99.989999999999995</double>
+         <double>-180.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>180.000000000000000</double>
         </property>
         <property name="singleStep">
          <double>0.050000000000000</double>
         </property>
        </widget>
-       <widget class="QDoubleSpinBox" name="light_direction_z_spinbox_2">
+       <widget class="QDoubleSpinBox" name="light_direction_z">
         <property name="geometry">
          <rect>
           <x>40</x>
@@ -1146,13 +1155,16 @@
          </rect>
         </property>
         <property name="minimum">
-         <double>-99.989999999999995</double>
+         <double>-180.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>180.000000000000000</double>
         </property>
         <property name="singleStep">
          <double>0.050000000000000</double>
         </property>
        </widget>
-       <widget class="QCheckBox" name="checkBox_2">
+       <widget class="QCheckBox" name="hasParallel">
         <property name="geometry">
          <rect>
           <x>21</x>
@@ -1205,7 +1217,7 @@
         <string>线性衰减速率：</string>
        </property>
       </widget>
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
+      <widget class="QDoubleSpinBox" name="linear">
        <property name="geometry">
         <rect>
          <x>140</x>
@@ -1215,10 +1227,10 @@
         </rect>
        </property>
        <property name="maximum">
-        <double>1.000000000000000</double>
+        <double>100.000000000000000</double>
        </property>
        <property name="singleStep">
-        <double>0.050000000000000</double>
+        <double>1.000000000000000</double>
        </property>
       </widget>
       <widget class="QLabel" name="label_13">
@@ -1234,7 +1246,7 @@
         <string>二次衰减速率：</string>
        </property>
       </widget>
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
+      <widget class="QDoubleSpinBox" name="quadratic">
        <property name="geometry">
         <rect>
          <x>140</x>
@@ -1244,10 +1256,10 @@
         </rect>
        </property>
        <property name="maximum">
-        <double>1.000000000000000</double>
+        <double>100.000000000000000</double>
        </property>
        <property name="singleStep">
-        <double>0.050000000000000</double>
+        <double>1.000000000000000</double>
        </property>
       </widget>
       <widget class="QLabel" name="label_14">
@@ -1263,7 +1275,7 @@
         <string>环境光强度：</string>
        </property>
       </widget>
-      <widget class="QSlider" name="horizontalSlider_7">
+      <widget class="QSlider" name="pointLightAmbient">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -1279,7 +1291,7 @@
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
-      <widget class="QSlider" name="horizontalSlider_8">
+      <widget class="QSlider" name="pointLightDiffuse">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -1295,7 +1307,7 @@
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
-      <widget class="QSlider" name="horizontalSlider_9">
+      <widget class="QSlider" name="pointLightSpecular">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -1353,19 +1365,6 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="groupBox">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>630</y>
-      <width>120</width>
-      <height>80</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>GroupBox</string>
-    </property>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -1394,7 +1393,14 @@
     <property name="title">
      <string>文件</string>
     </property>
-    <addaction name="new_file"/>
+    <widget class="QMenu" name="menu">
+     <property name="title">
+      <string>新建</string>
+     </property>
+     <addaction name="new_model_triangle"/>
+     <addaction name="new_model_rectangle"/>
+    </widget>
+    <addaction name="menu"/>
     <addaction name="separator"/>
     <addaction name="open_file"/>
     <addaction name="separator"/>
@@ -1408,7 +1414,7 @@
       <x>381</x>
       <y>129</y>
       <width>161</width>
-      <height>70</height>
+      <height>101</height>
      </rect>
     </property>
     <property name="minimumSize">
@@ -1420,6 +1426,7 @@
     <property name="title">
      <string>编辑</string>
     </property>
+    <addaction name="edit_object_name"/>
    </widget>
    <widget class="QMenu" name="render_menu">
     <property name="geometry">
@@ -1472,11 +1479,6 @@
    <addaction name="help_menu"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="new_file">
-   <property name="text">
-    <string>新建</string>
-   </property>
-  </action>
   <action name="open_file">
    <property name="text">
     <string>打开</string>
@@ -1500,6 +1502,21 @@
   <action name="outport_file">
    <property name="text">
     <string>导出</string>
+   </property>
+  </action>
+  <action name="new_model_triangle">
+   <property name="text">
+    <string>三角形</string>
+   </property>
+  </action>
+  <action name="new_model_rectangle">
+   <property name="text">
+    <string>矩形</string>
+   </property>
+  </action>
+  <action name="edit_object_name">
+   <property name="text">
+    <string>物体编号</string>
    </property>
   </action>
  </widget>

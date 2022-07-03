@@ -1,5 +1,24 @@
 #include "triangle.h"
 
+Triangle::Triangle():VBO(QOpenGLBuffer::VertexBuffer)
+{
+    initializeOpenGLFunctions();
+    QVector3D vv[3];
+    vv[0] = QVector3D(-10,0,-10);
+    vv[1] = QVector3D(0,0,10);
+    vv[2] = QVector3D(10,0,-10);
+    Vertex vertex;
+    edge0_1 = vv[1] - vv[0];
+    edge0_2 = vv[2] - vv[0];
+    for(int i=0;i<3;i++){
+        vertex.Position = vv[i];
+        vertex.Normal = QVector3D(0,1,0);
+        v.push_back(vertex);
+    }
+    center = (v.at(0).Position+v.at(1).Position+v.at(2).Position)/3;
+    setupVAO();
+}
+
 Triangle::Triangle(QVector3D _v[3],QVector3D Color)
     :VBO(QOpenGLBuffer::VertexBuffer)
 {
@@ -7,6 +26,7 @@ Triangle::Triangle(QVector3D _v[3],QVector3D Color)
     edge0_1 = _v[1] - _v[0];
     edge0_2 = _v[2] - _v[0];
     QVector3D normal = QVector3D::crossProduct(edge0_1, edge0_2).normalized();
+//    qDebug()<<"normal:"<<normal;(0,1,0)
     area = QVector3D::crossProduct(edge0_1, edge0_2).length()*0.5;
     color = Color;
 
@@ -16,7 +36,7 @@ Triangle::Triangle(QVector3D _v[3],QVector3D Color)
         vertex.Normal = normal;
         v.push_back(vertex);
     }
-
+    center = (v.at(0).Position+v.at(1).Position+v.at(2).Position)/3;
     setupVAO();
 }
 
@@ -93,12 +113,14 @@ void Triangle::Draw(QOpenGLShaderProgram &shader)
 
 QVector3D Triangle::getlightpos()
 {
-    QVector3D center = (v.at(0).Position+v.at(1).Position+v.at(2).Position)/3;
-    QVector3D point = QVector3D(model.getmodel()*QVector4D(center,1.0f));
-    qDebug()<<model.getmodel();
-    qDebug()<<point;
+    return model.getmodel()*center;
+}
 
-    return point;
+QVector3D Triangle::getlightNormal()
+{
+    QMatrix4x4 modle_inv = model.getmodel().inverted().transposed();
+    QVector3D transNormal = QVector3D(modle_inv*QVector4D(v[0].Normal,0.0f));
+    return transNormal;
 }
 
 //bool Triangle::intersect(const Ray &ray)

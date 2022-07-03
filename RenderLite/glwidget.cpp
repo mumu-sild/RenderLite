@@ -111,10 +111,10 @@ void GLWidget::initializeGL()
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLWidget::cleanup);
 
     initializeOpenGLFunctions();
-	glClearColor(0.1, 0.1, 0.1, 1);
+    glClearColor(0.0, 0.0, 0.0, 1);
 
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_STENCIL_TEST);
 
     //shader编译
@@ -142,9 +142,9 @@ void GLWidget::initializeGL()
     //triangle test
     for(int i=0;i<1;i++){//>5850个三角形面片，报错
         QVector3D v[3];
-        v[0] = QVector3D(-10,-i*0.01,-10);
-        v[1] = QVector3D(0,-i*0.01,10);
-        v[2] = QVector3D(10,-i*0.01,-10);
+        v[0] = QVector3D(-10,1,-10);
+        v[1] = QVector3D(0,1,10);
+        v[2] = QVector3D(10,1,-10);
         QVector3D color(0.2,0.3,0.2);
         Triangle* tri = new Triangle(v,color);
         scene.Add(tri);
@@ -157,34 +157,6 @@ void GLWidget::initializeGL()
     scene.Add(rec);
     scene.Add(shaderSelector.getShader(2));
     scene.Add(new PointLight(rec->getlightpos(),QVector3D(1,1,1)));
-
-//-----------------光源位置/方向/强度---------------------
-
-
-
-//    pointLightPosition.push_back(QVector3D(0.7f,  0.2f,  2.0f));
-//    pointLightPosition.push_back(QVector3D(2.3f, -3.3f, -4.0f));
-//    pointLightPosition.push_back(QVector3D(-4.0f,  2.0f, -12.0f));
-//    pointLightPosition.push_back(QVector3D(0.0f,  0.0f, -3.0f));
-
-//    PointLight.Ambint = ;
-
-//    pointAmbient = 0.05f;
-//    pointDiffuse = 0.8f;
-//    pointSpecular = 1.0f;
-//    pointLightColor.push_back(QVector3D(1.0f,1.0f,1.0f));
-//    pointLightColor.push_back(QVector3D(1.0f,1.0f,1.0f));
-//    pointLightColor.push_back(QVector3D(1.0f,1.0f,1.0f));
-//    pointLightColor.push_back(QVector3D(1.0f,1.0f,1.0f));
-//    constant = 1.0f;
-//    linear = 0.09f;
-//    quadratic = 0.032f;
-
-//    dirLightDirection = QVector3D(-0.2f, -1.0f, -0.3f);
-//    dirLightColor = QVector3D(1.0f,1.0f,1.0f);
-//    dirAmbient = 0.4f;
-//    dirDiffuse = 0.5f;
-//    dirSpecular = 0.5f;
 
 }
 
@@ -199,14 +171,15 @@ void GLWidget::paintGL()
 
     for(int k = 0; k < scene.objects.size(); k++){
             if(scene.objects[k]->islight){
-                qDebug()<<"pointLight"<<k;
+                //qDebug()<<"pointLight"<<k;
                 scene.pointlights[k]->setPosition(scene.objects[k]->getlightpos());
+                 scene.pointlights[k]->lightNormal = scene.objects.at(k)->getlightNormal();
                 pointLight.push_back(scene.pointlights[k]);
             }
         }
 
     for(int j = 0; j < shaderSelector.fragmentPath.size();j++){
-        qDebug()<<j<<"shaderSelector";
+        //qDebug()<<j<<"shaderSelector";
         shaderSelector.getShader(j)->bind();
         shaderSelector.getShader(j)->setUniformValue("view",maincamera.getViewMetrix());
         shaderSelector.getShader(j)->setUniformValue("projection",projection);
@@ -228,13 +201,27 @@ void GLWidget::paintGL()
         scene.shaderPrograms[i]->bind();
         m_world = scene.objects[i]->model.getmodel();
         scene.shaderPrograms[i]->setUniformValue("model",m_world);
+        if(scene.shaderPrograms[i] == shaderSelector.getShader(shaderTypes::SHADER_COLOR)){
+            scene.shaderPrograms[i]->setUniformValue("color",scene.objects.at(i)->color);
+        }
         scene.objects.at(i)->Draw(*scene.shaderPrograms[i]);
         qDebug()<<i<< "Draw";
     }
 
+    //边框
     if(objectNumber){
-//        glStencilOp(GL_KEEP,GL_KEEP,GL_REPLACE);
-//        glStencilFunc()
+        //qDebug()<<"objectnumber:"<<objectNumber;
+        glDisable(GL_DEPTH_TEST);
+        glStencilFunc(GL_LESS,objectNumber,0xFF);
+        glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
+
+        shaderSelector.getShader(2)->bind();
+        m_world = scene.objects[objectNumber-1]->model.getmodel();
+        m_world.scale(QVector3D(1.01,1.01,1.01));
+        shaderSelector.getShader(2)->setUniformValue("model",m_world);
+        scene.objects.at(objectNumber-1)->Draw(*shaderSelector.getShader(2));
+
+        glEnable(GL_DEPTH_TEST);
     }
 
 }
@@ -283,6 +270,7 @@ void GLWidget::setCurrentObjectShader(int index)
 void GLWidget::setCurrentObjectEmit(bool emits){
     if(objectNumber>0){
         scene.objects.at(objectNumber-1)->islight = emits;
+        if(emits)scene.shaderPrograms.replace(objectNumber-1,shaderSelector.getShader(shaderTypes::SHADER_COLOR));
     }
     update();
 }
@@ -297,7 +285,7 @@ void GLWidget::setPixObjectNumber(int x, int y)
     makeCurrent();
     int yy = height()-y;
     glReadPixels(x,yy,1,1,GL_STENCIL_INDEX,GL_INT,&objectNumber);
-    qDebug()<<"objectNumber="<<objectNumber;
+//    qDebug()<<"objectNumber="<<objectNumber;
     doneCurrent();
     emit objectNumberChanged(objectNumber);
 

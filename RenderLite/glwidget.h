@@ -79,6 +79,8 @@ public:
     camera maincamera;
 
     int objectNumber = 0;
+    int mousePressObjNumber = 0;
+    double modelMoveCoefficient;
 private:
     //交互参数
     QPoint m_lastPos;
@@ -119,6 +121,8 @@ protected:
 public:
     //导入模型
     void importModel(QString modelPath);
+    void importTriangle();
+    void importRectangle();
     bool getXrotation() const;
 
     void setXObjRotationSelected(bool booler);
@@ -133,6 +137,7 @@ public:
     void setPixObjectNumber(int x,int y);
     int getObjectSize();
     void setObjectNumber(int newObjectNumber);
+    void calCulateModelMoveCoefficient();
     void objectChangEmitSignal();
     void cleanup();
 

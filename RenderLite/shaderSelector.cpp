@@ -29,6 +29,7 @@ void ShaderSelector::setPointDir(int shader, QVector<PointLight *> pointlights)
     lightData->setPointLightAmbientColor(pointlights,PointLight::ambient);
     lightData->setPointLightDiffuseColor(pointlights,PointLight::diffuse);
     lightData->setPointLightSpecularColor(pointlights,PointLight::specular);
+    lightData->setPointLightNormal(pointlights);
     lightData->setConstant(PointLight::constant);
     lightData->setLinear(PointLight::linear);
     lightData->setQuadratic(PointLight::quadratic);

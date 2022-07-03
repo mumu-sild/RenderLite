@@ -71,5 +71,20 @@ private slots:
     void on_object_number_comboBox_currentIndexChanged(int index);
     void on_object_renderMethod_comboBox_currentIndexChanged(int index);
     void on_object_is_light_chekBox_stateChanged(int arg1);
+    void on_hasParallel_stateChanged(int arg1);
+    void on_light_direction_x_valueChanged(double arg1);
+    void on_light_direction_y_valueChanged(double arg1);
+    void on_light_direction_z_valueChanged(double arg1);
+    void on_light_color_red_valueChanged(int arg1);
+    void on_light_color_green_valueChanged(int arg1);
+    void on_light_color_blue_valueChanged(int arg1);
+    void on_DirLightAmbient_valueChanged(int value);
+    void on_DirLightDiffuse_valueChanged(int value);
+    void on_DirLightSpecular_valueChanged(int value);
+    void on_linear_valueChanged(double arg1);
+    void on_quadratic_valueChanged(double arg1);
+    void on_pointLightAmbient_valueChanged(int value);
+    void on_pointLightDiffuse_valueChanged(int value);
+    void on_pointLightSpecular_valueChanged(int value);
 };
 #endif // MAINWINDOW_H

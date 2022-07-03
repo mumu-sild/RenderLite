@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QDesktopServices>
+#include <QLineEdit>
 
 
 
@@ -34,6 +35,38 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ui->object_number_comboBox->addItem(tr("%1").arg(objectNumSize));
     }
+
+    //对话框
+    QWidget *editObjectNameWidget = new QWidget;
+    editObjectNameWidget->resize(600,400);
+    QLabel *objNameInputLabel = new QLabel(editObjectNameWidget);
+    objNameInputLabel->resize(200,30);
+    objNameInputLabel->move(200,160);
+    objNameInputLabel->setText("输入当前模型名称");
+    QLineEdit *objNameInput = new QLineEdit(editObjectNameWidget);
+    objNameInput->resize(200,30);
+    objNameInput->move(200,200);
+    QPushButton *sureBtn = new QPushButton(editObjectNameWidget);
+    sureBtn->setText("确定");
+    sureBtn->resize(100,30);
+    sureBtn->move(230,300);
+
+    connect(ui->edit_object_name,&QAction::triggered,[=](){
+        if(glWidget->objectNumber>0)
+        {
+           editObjectNameWidget->show();
+           objNameInput->setText(ui->object_number_comboBox->currentText());
+           sureBtn->setFocus();
+        }
+    });
+
+    connect(sureBtn,&QPushButton::clicked,[=](){
+       QString name =  objNameInput->text();
+       ui->object_number_comboBox->setItemText(glWidget->objectNumber,name);
+       editObjectNameWidget->close();
+    });
+
+
 
 
     //点击“导入”的动作打开文件
@@ -94,6 +127,27 @@ MainWindow::MainWindow(QWidget *parent)
        else{
            ui->tabWidget->setCurrentIndex(0);
            ui->object_number_comboBox->setCurrentIndex(objectNumber);
+
+           //设置灯光状态
+           if(glWidget->scene.objects.at(objectNumber-1)->islight==false)
+           {
+
+               ui->object_is_light_chekBox->setCheckState(Qt::Unchecked);
+           }
+           else
+           {
+               ui->object_is_light_chekBox->setCheckState(Qt::Checked);
+           }
+           QOpenGLShaderProgram* shader = glWidget->scene.shaderPrograms.at(objectNumber-1);
+
+           for(int i=0;i<glWidget->shaderSelector.vertexPath.size();++i){
+               if(shader == glWidget->shaderSelector.getShader(i)){
+                   ui->object_renderMethod_comboBox->setCurrentIndex(i);
+                   break;
+               }
+           }
+           //设置使用的渲染器编号
+
        }
     });
 
@@ -125,6 +179,19 @@ MainWindow::MainWindow(QWidget *parent)
         ui->object_scale_y_spinbox->setValue(scale.y());
         ui->object_scale_z_spinbox->setValue(scale.z());
     });
+
+    //新建三角形
+    connect(ui->new_model_triangle,&QAction::triggered,[=](){
+        glWidget->importTriangle();
+        emit objectSizeChanged(glWidget->getObjectSize());
+    });
+
+    //新建矩形
+    connect(ui->new_model_rectangle,&QAction::triggered,[=](){
+        glWidget->importRectangle();
+        emit objectSizeChanged(glWidget->getObjectSize());
+    });
+
 
 }
 
@@ -308,21 +375,30 @@ void MainWindow::on_object_scale_z_spinbox_valueChanged(double arg1)
 }
 
 
-void MainWindow::on_object_color_red_spinbox_valueChanged(int arg1)
+void MainWindow::on_object_color_red_spinbox_valueChanged(int R)
 {
-    qDebug()<<arg1;
+    if(glWidget->objectNumber){
+        glWidget->scene.objects.at(glWidget->objectNumber-1)->color[0]=float(R)/255;
+    }
+    glWidget->update();
 }
 
 
-void MainWindow::on_object_color_green_spinbox_valueChanged(int arg1)
+void MainWindow::on_object_color_green_spinbox_valueChanged(int G)
 {
-    qDebug()<<arg1;
+    if(glWidget->objectNumber){
+        glWidget->scene.objects.at(glWidget->objectNumber-1)->color[1]=float(G)/255;
+    }
+    glWidget->update();
 }
 
 
-void MainWindow::on_object_color_blue_spinbox_valueChanged(int arg1)
+void MainWindow::on_object_color_blue_spinbox_valueChanged(int B)
 {
-    qDebug()<<arg1;
+    if(glWidget->objectNumber){
+        glWidget->scene.objects.at(glWidget->objectNumber-1)->color[2]=float(B)/255;
+    }
+    glWidget->update();
 }
 
 
@@ -420,11 +496,12 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 void MainWindow::on_object_number_comboBox_currentIndexChanged(int index)
 {
     glWidget->setObjectNumber(index);
+    emit glWidget->objectNumberChanged(index);
     if(index>0)
     {
         glWidget->objectChangEmitSignal();
     }
-
+    glWidget->setFocus();
 
 }
 
@@ -448,4 +525,107 @@ void MainWindow::on_object_is_light_chekBox_stateChanged(int arg1)
     glWidget->setCurrentObjectEmit(arg1);
 }
 
+void MainWindow::on_hasParallel_stateChanged(int state)
+{
+    glWidget->scene.dirlight->dirLightActivated = state;
+    glWidget->update();
+}
+
+
+void MainWindow::on_light_direction_x_valueChanged(double x)
+{
+    glWidget->scene.dirlight->setDirectionX(x);
+    glWidget->update();
+}
+
+
+void MainWindow::on_light_direction_y_valueChanged(double y)
+{
+    glWidget->scene.dirlight->setDirectionY(y);
+    glWidget->update();
+}
+
+
+void MainWindow::on_light_direction_z_valueChanged(double z)
+{
+    glWidget->scene.dirlight->setDirectionZ(z);
+    glWidget->update();
+}
+
+
+void MainWindow::on_light_color_red_valueChanged(int R)
+{
+    glWidget->scene.dirlight->setColorR(R);
+    glWidget->update();
+}
+
+
+void MainWindow::on_light_color_green_valueChanged(int G)
+{
+    glWidget->scene.dirlight->setColorG(G);
+    glWidget->update();
+}
+
+
+void MainWindow::on_light_color_blue_valueChanged(int B)
+{
+    glWidget->scene.dirlight->setColorB(B);
+    glWidget->update();
+}
+
+
+void MainWindow::on_DirLightAmbient_valueChanged(int value)
+{
+    DirLight::ambient = float(value)*0.01;
+    glWidget->update();
+}
+
+
+void MainWindow::on_DirLightDiffuse_valueChanged(int value)
+{
+    DirLight::diffuse = float(value)*0.01;
+    glWidget->update();
+}
+
+
+void MainWindow::on_DirLightSpecular_valueChanged(int value)
+{
+    DirLight::specular = float(value)*0.01;
+    glWidget->update();
+}
+
+
+void MainWindow::on_linear_valueChanged(double linear)
+{
+    PointLight::linear = linear*0.001;
+    glWidget->update();
+}
+
+
+void MainWindow::on_quadratic_valueChanged(double quadratic)
+{
+    PointLight::quadratic = quadratic*0.001;
+    glWidget->update();
+}
+
+
+void MainWindow::on_pointLightAmbient_valueChanged(int ambient)
+{
+    PointLight::ambient = float(ambient)*0.01;
+    glWidget->update();
+}
+
+
+void MainWindow::on_pointLightDiffuse_valueChanged(int diffuse)
+{
+    PointLight::diffuse = float(diffuse)*0.01;
+    glWidget->update();
+}
+
+
+void MainWindow::on_pointLightSpecular_valueChanged(int specular)
+{
+    PointLight::specular = float(specular)*0.01;
+    glWidget->update();
+}
 

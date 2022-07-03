@@ -6,7 +6,6 @@
 
 class Objectmodel{
 private:
-    QMatrix4x4 model;
     QVector3D mposition;
     QVector3D mrotate;
     QVector3D mscale;
@@ -25,7 +24,7 @@ public:
     QVector3D getRotate();
     QVector3D getScale();
 
-    QMatrix4x4& getmodel();
+    QMatrix4x4 getmodel();
     void updateModel();
 
 };
@@ -77,20 +76,17 @@ inline QVector3D Objectmodel::getScale()
     return mscale;
 }
 
-inline QMatrix4x4 &Objectmodel::getmodel()
+inline QMatrix4x4 Objectmodel::getmodel()
 {
-    updateModel();
-    return model;
-}
-
-inline void Objectmodel::updateModel()
-{
+    QMatrix4x4 model;
     model.setToIdentity();
-    model.scale(mscale);
+    model.translate(mposition);
+
     model.rotate(mrotate.x(),QVector3D(1,0,0));
     model.rotate(mrotate.y(),QVector3D(0,1,0));
     model.rotate(mrotate.z(),QVector3D(0,0,1));
-    model.translate(mposition);
+    model.scale(mscale);
+    return model;
 }
 
 #endif // OBJECTMODEL_H

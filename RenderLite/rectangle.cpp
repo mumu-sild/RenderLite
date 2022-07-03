@@ -19,7 +19,7 @@ rectangle::rectangle(float width, float height, QVector3D color)
         vertex[i].Normal = QVector3D(0,1,0);
         v.push_back(vertex[i]);
     }
-    unsigned int pointindex[6] = {0,1,3,1,2,3};
+    unsigned int pointindex[6] = {0,3,2,0,2,1};
     for(int i=0;i<6;i++){
         indices.push_back(pointindex[i]);
     }
@@ -65,8 +65,14 @@ void rectangle::Draw(QOpenGLShaderProgram &shader)
 
 QVector3D rectangle::getlightpos()
 {
+    return model.getmodel()*QVector3D(0,0,0);
+}
 
-    return QVector3D(0,0,0)*model.getmodel();
+QVector3D rectangle::getlightNormal()
+{
+    QMatrix4x4 modle_inv = model.getmodel().inverted().transposed();
+    QVector3D transNormal = QVector3D(modle_inv*QVector4D(v[0].Normal,0.0f));
+    return transNormal;
 }
 
 

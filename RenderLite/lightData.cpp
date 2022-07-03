@@ -116,6 +116,21 @@ void LightData::setPointLightSpecularColor(QVector<PointLight*> pointLight, floa
     }
 }
 
+void LightData::setPointLightNormal(QVector<PointLight *> pointLight)
+{
+    if(!pointLightActivated){
+        qDebug()<<"PointLight is not activated";
+        return;
+    }
+    std::string structNameFront = "pointLights[";
+    std::string structNameRail = "].lightnormal";
+    for(int i = 0; i < numPointLight; i++){
+        std::string StringI = std::to_string(i);
+//        qDebug()<<(structNameFront+StringI+structNameRail).c_str();
+        shader->setUniformValue((structNameFront+StringI+structNameRail).c_str(),pointLight[i]->lightNormal);
+    }
+}
+
 void LightData::setConstant(float constant){
     if(!pointLightActivated){
         qDebug()<<"PointLight is not activated";

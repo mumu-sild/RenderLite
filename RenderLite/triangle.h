@@ -26,7 +26,7 @@ private:
     //QVector3D normal;
 
     QVector3D edge0_1,edge0_2;
-    QVector3D color;
+    QVector3D center;
     QVector<Texture*> textures;
 
     float area;
@@ -35,6 +35,7 @@ private:
     QOpenGLVertexArrayObject VAO;
     QOpenGLBuffer VBO;
 public:
+    Triangle();
     Triangle(QVector3D _v[3],QVector3D Color);
     //Triangle(QVector3D _v[3],QVector2D texcoords[3],QVector<Texture*> texture);
 //    bool intersect(const Ray& ray)override;//没有实现
@@ -49,6 +50,7 @@ public:
     //void setTexture(QVector2D* texcoords,QVector<Texture*> texture);
     void Draw(QOpenGLShaderProgram& shader)override;
     QVector3D getlightpos()override;
+    QVector3D getlightNormal()override;
     ~Triangle();
 private:
     void setupVAO();

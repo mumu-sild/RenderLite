@@ -25,6 +25,7 @@ struct PointLight {
         float constant;
         float linear;
         float quadratic;
+        vec3 lightnormal;
 };
 
 
@@ -80,8 +81,12 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir){
 
 vec3 CalcPointLight(PointLight light,vec3 normal, vec3 fragPos,vec3 viewDir){
         vec3 lightDir = normalize(light.position - fragPos);
+//        light.lightnormal = vec3(-light.lightnormal.x,light.lightnormal.y,-light.lightnormal.z);
+        float angleDecay = 1.0f;
+        if(any(notEqual(light.lightnormal,vec3(0,0,0)))){
+            angleDecay = max(dot(-lightDir,normalize(light.lightnormal)),0.0f);
+        }
         float diff = max(dot(lightDir,normal),0.0);
-
         vec3 reflectDir = reflect(-lightDir,normal);
         float spec = pow(max(dot(reflectDir,viewDir),0.0),material.shiness);
 
@@ -95,6 +100,10 @@ vec3 CalcPointLight(PointLight light,vec3 normal, vec3 fragPos,vec3 viewDir){
         ambient *= attenuation;
         diffuse *= attenuation;
         specular *= attenuation;
+
+        ambient *= angleDecay;
+        diffuse *= angleDecay;
+        specular *= angleDecay;
 
         return (ambient + diffuse + specular);
 }

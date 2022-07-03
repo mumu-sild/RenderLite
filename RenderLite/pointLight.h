@@ -14,6 +14,8 @@ public:
     static float linear;
     static float quadratic;
 
+    QVector3D lightNormal;
+
 
 
 private:
