@@ -37,6 +37,7 @@ private:
     QWidget *addlightwidget;
 
     int objectNumSize=1;
+    int objectSerialNumber = 4;
 
 signals:
     void widgetSizeChanged();

@@ -105,6 +105,8 @@ void rectangle::setupVAO()
 
 rectangle::~rectangle()
 {
-
+    VAO.destroy();
+    VBO.destroy();
+    EBO.destroy();
 }
 

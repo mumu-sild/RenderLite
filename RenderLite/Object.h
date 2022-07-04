@@ -9,6 +9,7 @@
 #include "ray.h"
 #include "Intersection.h"
 #include "Objectmodel.h"
+#include "Setting.h"
 
 
 class Object
@@ -16,7 +17,7 @@ class Object
 public:
     Objectmodel model;
     bool islight = false;
-    QVector3D color = QVector3D(0.1,0.1,0.1);
+    QVector3D color = ObjectDefaultColor;
 public:
     Object(){};
 

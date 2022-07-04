@@ -14,6 +14,15 @@ Model::~Model()
     for(int i=0;i<meshes.size();i++){
         delete meshes[i];
     }
+    for(int i=0;i<meshes.size();i++){
+        delete meshes[i];
+    }
+    for(int i = 0; i< textures_loaded.size();i++){
+        delete textures_loaded[i];
+    }
+    for(int i = 0; i<triangles.size();i++){
+        delete triangles[i];
+    }
 }
 
 /*从Importer中读取数据，并构建结点*/

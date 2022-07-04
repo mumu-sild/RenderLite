@@ -186,7 +186,8 @@ QVector3D Triangle::getlightNormal()
 
 Triangle::~Triangle()
 {
-
+    VAO.destroy();
+    VBO.destroy();
 }
 
 

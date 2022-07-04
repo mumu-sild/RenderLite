@@ -162,11 +162,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     //根据导入模型个数新增下拉框项数
     connect(this,&MainWindow::objectSizeChanged,[=](int theObjectSize){
-        for(;objectNumSize<=glWidget->getObjectSize();objectNumSize++)
+        for(;objectNumSize<=glWidget->getObjectSize();objectNumSize++,objectSerialNumber++)
         {
-            ui->object_number_comboBox->addItem(tr("%1").arg(objectNumSize));
+            ui->object_number_comboBox->addItem(tr("%1").arg(objectSerialNumber));
         }
     });
+    //删除物体重新设置下拉框
+    connect(glWidget,&GLWidget::objectIsDeleted,[=](int objectNumber){
+        glWidget->deleteObject(objectNumber-1);
+        ui->object_number_comboBox->removeItem(objectNumber);
+        objectNumSize -= 1;
+    });
+
 
     //物体位置改变设置ui
     connect(glWidget,&GLWidget::objectPosiChanged,[=](QVector3D posi){

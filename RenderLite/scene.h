@@ -11,7 +11,6 @@
 class Scene
 {
 public:
-    QVector3D backgroundColor = QVector3D(0.235294, 0.67451, 0.843137);
     //BVHAccel *bvh;
 
     QVector<Object* > objects;

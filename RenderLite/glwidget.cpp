@@ -68,15 +68,15 @@
 #include "rectangle.h"
 
 
-float PointLight::ambient = 0.5f;
-float PointLight::diffuse = 0.8f;
-float PointLight::specular = 1.0f;
-float PointLight::constant = 0.001f;
-float PointLight::linear = 0.009f;
-float PointLight::quadratic=0.0032;
-float DirLight::ambient = 0.4f;
-float DirLight::diffuse = 0.5f;
-float DirLight::specular = 0.5f;
+float PointLight::ambient = pointLightDefaultAmbient;
+float PointLight::diffuse = PointLightDefaultDiffuse;
+float PointLight::specular = PointLightDefaultSpecular;
+float PointLight::constant = PointLightDefaultConstant;
+float PointLight::linear = PointLightDefaultLinear;
+float PointLight::quadratic=PointLightDefaultQuadratic;
+float DirLight::ambient = DirLightDefaultAmbient;
+float DirLight::diffuse = DirLightDefaultDiffuse;
+float DirLight::specular = DirLightDefaultSpecular;
 
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent)
@@ -111,7 +111,9 @@ void GLWidget::initializeGL()
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLWidget::cleanup);
 
     initializeOpenGLFunctions();
-    glClearColor(0.0, 0.0, 0.0, 1);
+    glClearColor(backgroundDefaultColor.x(),
+                 backgroundDefaultColor.y(),
+                 backgroundDefaultColor.z(), 1);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -140,18 +142,18 @@ void GLWidget::initializeGL()
 
 
     //triangle test
-    for(int i=0;i<1;i++){//>5850个三角形面片，报错
-        QVector3D v[3];
-        v[0] = QVector3D(-10,1,-10);
-        v[1] = QVector3D(0,1,10);
-        v[2] = QVector3D(10,1,-10);
-        QVector3D color(0.2,0.3,0.2);
-        Triangle* tri = new Triangle(v,color);
-        scene.Add(tri);
-        scene.shaderPrograms.push_back(shaderSelector.getShader(2));
-        scene.Add(new PointLight(tri->getlightpos(),QVector3D(1,1,1)));
-        tri->islight = true;
-    }
+
+    QVector3D v[3];
+    v[0] = QVector3D(-10,1,-10);
+    v[1] = QVector3D(0,1,10);
+    v[2] = QVector3D(10,1,-10);
+    QVector3D color(0.2,0.3,0.2);
+    Triangle* tri = new Triangle(v,color);
+    scene.Add(tri);
+    scene.shaderPrograms.push_back(shaderSelector.getShader(2));
+    scene.Add(new PointLight(tri->getlightpos(),QVector3D(1,1,1)));
+    tri->islight = true;
+
 
     rectangle* rec = new rectangle(300,300);
     scene.Add(rec);
@@ -216,17 +218,18 @@ void GLWidget::paintGL()
     //边框
     if(objectNumber){
         //qDebug()<<"objectnumber:"<<objectNumber;
-        glDisable(GL_DEPTH_TEST);
-        glStencilFunc(GL_LESS,objectNumber,0xFF);
+//        glDisable(GL_DEPTH_TEST);
+        glStencilFunc(GL_NOTEQUAL,objectNumber,0xFF);
         glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
 
         shaderSelector.getShader(2)->bind();
         m_world = scene.objects[objectNumber-1]->model.getmodel();
-        m_world.scale(QVector3D(1.01,1.01,1.01));
+        m_world.scale(frameScale);
         shaderSelector.getShader(2)->setUniformValue("model",m_world);
+        shaderSelector.getShader(2)->setUniformValue("color",QVector3D(1,1,1));
         scene.objects.at(objectNumber-1)->Draw(*shaderSelector.getShader(2));
 
-        glEnable(GL_DEPTH_TEST);
+//        glEnable(GL_DEPTH_TEST);
     }
 
 }

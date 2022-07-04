@@ -7,7 +7,7 @@ void GLWidget::importModel(QString modelPath)
 {
     makeCurrent();
     scene.Add(new Model(modelPath));
-    scene.shaderPrograms.push_back(shaderSelector.getShader(2));
+    scene.shaderPrograms.push_back(shaderSelector.getShader(defaultshader));
     scene.Add(new PointLight(scene.objects.last()->getlightpos(),QVector3D(1,1,1)));
     update();
     doneCurrent();
@@ -17,7 +17,7 @@ void GLWidget::importTriangle()
 {
     makeCurrent();
     scene.Add(new Triangle());
-    scene.shaderPrograms.push_back(shaderSelector.getShader(2));
+    scene.shaderPrograms.push_back(shaderSelector.getShader(defaultshader));
     scene.Add(new PointLight(scene.objects.last()->getlightpos(),QVector3D(1,1,1)));
     update();
     doneCurrent();
@@ -27,7 +27,7 @@ void GLWidget::importRectangle()
 {
     makeCurrent();
     scene.Add(new rectangle(10,10));
-    scene.shaderPrograms.push_back(shaderSelector.getShader(2));
+    scene.shaderPrograms.push_back(shaderSelector.getShader(defaultshader));
     scene.Add(new PointLight(scene.objects.last()->getlightpos(),QVector3D(1,1,1)));
     update();
     doneCurrent();
@@ -52,7 +52,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if(event->button()==Qt::LeftButton)
     {
-       if(abs(event->pos().x()-pixX)<3&&abs(event->pos().y()-pixY)<3)
+       if(abs(event->pos().x()-pixX)<mouseClickOffset&&abs(event->pos().y()-pixY)<mouseClickOffset)
        {
            setPixObjectNumber(event->pos().x(),event->pos().y());
        }
@@ -311,7 +311,9 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             update();
         }
     }
-
+    if(event->key()==Qt::Key_Delete&&objectNumber){
+        emit objectIsDeleted(objectNumber);
+    }
 
 }
 
@@ -383,3 +385,12 @@ void GLWidget::setZCameraFocus(double meters)
     update();
 }
 
+void GLWidget::deleteObject(int objectNumber)
+{
+    delete scene.objects.at(objectNumber);
+    scene.objects.removeAt(objectNumber);
+    scene.shaderPrograms.removeAt(objectNumber);
+    delete scene.pointlights.at(objectNumber);
+    scene.pointlights.removeAt(objectNumber);
+    update();
+}

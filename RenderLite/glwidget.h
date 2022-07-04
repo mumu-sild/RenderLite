@@ -119,6 +119,10 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
+
+
+
+
 public:
     //导入模型
     void importModel(QString modelPath);
@@ -141,6 +145,7 @@ public:
     void calCulateModelMoveCoefficient();
     void objectChangEmitSignal();
     void cleanup();
+    void deleteObject(int objectNumber);
 
 public slots:
 
@@ -164,6 +169,7 @@ signals:
     void xCameraFocusChanged(double meters);
     void yCameraFocusChanged(double meters);
     void zCameraFocusChanged(double meters);
+    void objectIsDeleted(int);
 
 
     void objectPosiChanged(QVector3D position);
