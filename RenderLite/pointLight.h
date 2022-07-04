@@ -15,12 +15,12 @@ public:
     static float quadratic;
 
     QVector3D lightNormal;
-
+    QVector3D color;
 
 
 private:
     QVector3D position;
-    QVector3D color;
+
 
 public:
     PointLight(QVector3D posi,QVector3D color):position(posi),color(color){}

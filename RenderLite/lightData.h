@@ -21,6 +21,7 @@ public:
 
     void activatePointLight();
     void disablepointLight();
+    void setPointLightColor(QVector<PointLight*>&pointLight);
     void setPointLightPosition(QVector<PointLight*>& pointLight);
     void setPointLightAmbientColor(QVector<PointLight*> pointLight,float ambient);
     void setPointLightDiffuseColor(QVector<PointLight*> pointLight,float diffuse);

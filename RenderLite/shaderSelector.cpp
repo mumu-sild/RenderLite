@@ -33,6 +33,7 @@ void ShaderSelector::setPointDir(int shader, QVector<PointLight *> pointlights)
     lightData->setConstant(PointLight::constant);
     lightData->setLinear(PointLight::linear);
     lightData->setQuadratic(PointLight::quadratic);
+    lightData->setPointLightColor(pointlights);
     delete lightData;
     return;
 }

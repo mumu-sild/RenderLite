@@ -56,6 +56,20 @@ void LightData::disablepointLight()
     shader->setUniformValue("pointLightActivated",false);
 }
 
+void LightData::setPointLightColor(QVector<PointLight *> &pointLight)
+{
+    if(!pointLightActivated){
+        qDebug()<<"PointLight is not activated";
+        return;
+    }
+    QString structNameFront = "pointLights[";
+    QString structNameRail = "].color";
+    for(int i = 0; i < numPointLight; i++){
+        QString StringI = structNameFront+i+structNameRail;
+        shader->setUniformValue((StringI).toStdString().c_str(),pointLight[i]->color);
+    }
+}
+
 void LightData::setPointLightPosition(QVector<PointLight*>& pointLight){
     if(!pointLightActivated){
         qDebug()<<"PointLight is not activated";

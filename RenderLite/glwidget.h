@@ -95,7 +95,8 @@ private:
     enum shaderTypes{
         SHADER_TEXTURE = 0,
         SHADER_LIGHT = 1,
-        SHADER_COLOR = 2
+        SHADER_COLOR = 2,
+        SHADER_LIGHTCOLOR = 3
     };
 //----------------------------------------------
 

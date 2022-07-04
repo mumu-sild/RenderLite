@@ -124,7 +124,7 @@ void GLWidget::initializeGL()
 
     //-------光照------------------------------------
     scene.dirlight = new DirLight();
-    scene.dirlight->dirLightActivated = false;
+    scene.dirlight->dirLightActivated = true;
 
 
 //--模型加载----------可删除---------------------------
@@ -155,7 +155,7 @@ void GLWidget::initializeGL()
 
     rectangle* rec = new rectangle(300,300);
     scene.Add(rec);
-    scene.Add(shaderSelector.getShader(2));
+    scene.Add(shaderSelector.getShader(3));
     scene.Add(new PointLight(rec->getlightpos(),QVector3D(1,1,1)));
 
 }
@@ -173,7 +173,8 @@ void GLWidget::paintGL()
             if(scene.objects[k]->islight){
                 //qDebug()<<"pointLight"<<k;
                 scene.pointlights[k]->setPosition(scene.objects[k]->getlightpos());
-                 scene.pointlights[k]->lightNormal = scene.objects.at(k)->getlightNormal();
+                scene.pointlights[k]->lightNormal = scene.objects.at(k)->getlightNormal();
+                scene.pointlights[k]->color = scene.objects.at(k)->color;
                 pointLight.push_back(scene.pointlights[k]);
             }
         }
@@ -184,7 +185,7 @@ void GLWidget::paintGL()
         shaderSelector.getShader(j)->setUniformValue("view",maincamera.getViewMetrix());
         shaderSelector.getShader(j)->setUniformValue("projection",projection);
 
-        if(j==shaderTypes::SHADER_LIGHT){
+        if(j==shaderTypes::SHADER_LIGHT||j==shaderTypes::SHADER_LIGHTCOLOR){
             shaderSelector.getShader(j)->setUniformValue("viewPos",maincamera.getCameraPos());
             shaderSelector.getShader(j)->setUniformValue("material.shiness",64.0f);
             shaderSelector.setLightDir(j,scene.dirlight);
@@ -204,9 +205,13 @@ void GLWidget::paintGL()
         if(scene.shaderPrograms[i] == shaderSelector.getShader(shaderTypes::SHADER_COLOR)){
             scene.shaderPrograms[i]->setUniformValue("color",scene.objects.at(i)->color);
         }
+        if(scene.shaderPrograms[i] == shaderSelector.getShader(shaderTypes::SHADER_LIGHTCOLOR)){
+           scene.shaderPrograms[i]->setUniformValue("material.color",scene.objects[i]->color);
+       }
         scene.objects.at(i)->Draw(*scene.shaderPrograms[i]);
         qDebug()<<i<< "Draw";
     }
+
 
     //边框
     if(objectNumber){
@@ -270,7 +275,7 @@ void GLWidget::setCurrentObjectShader(int index)
 void GLWidget::setCurrentObjectEmit(bool emits){
     if(objectNumber>0){
         scene.objects.at(objectNumber-1)->islight = emits;
-        if(emits)scene.shaderPrograms.replace(objectNumber-1,shaderSelector.getShader(shaderTypes::SHADER_COLOR));
+//        if(emits)scene.shaderPrograms.replace(objectNumber-1,shaderSelector.getShader(shaderTypes::SHADER_COLOR));
     }
     update();
 }

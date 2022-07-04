@@ -18,12 +18,14 @@ public:
     QVector<QString> vertexPath{
         ":/texture.vert",
         ":/lightObject.vert",
-        ":/color.vert"
+        ":/color.vert",
+        ":/lightColor.vert"
     };
     QVector<QString> fragmentPath{
         ":/texture.frag",
         ":/lightObject.frag",
-        ":color.frag"
+        ":color.frag",
+        ":/lightColor.frag"
     };
     ShaderSelector();
 public:

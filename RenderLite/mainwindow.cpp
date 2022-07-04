@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->object_renderMethod_comboBox->addItem("零号渲染");
     ui->object_renderMethod_comboBox->addItem("一号渲染");
     ui->object_renderMethod_comboBox->addItem("二号渲染");
+    ui->object_renderMethod_comboBox->addItem("三号渲染");
     ui->object_color_widget->setHidden(true);
 
     ui->object_number_comboBox->addItem("无");
@@ -138,6 +139,8 @@ MainWindow::MainWindow(QWidget *parent)
            {
                ui->object_is_light_chekBox->setCheckState(Qt::Checked);
            }
+
+           //设置使用的渲染器编号
            QOpenGLShaderProgram* shader = glWidget->scene.shaderPrograms.at(objectNumber-1);
 
            for(int i=0;i<glWidget->shaderSelector.vertexPath.size();++i){
@@ -146,8 +149,14 @@ MainWindow::MainWindow(QWidget *parent)
                    break;
                }
            }
-           //设置使用的渲染器编号
 
+           //设置二号渲染器的颜色
+          if(shader == glWidget->shaderSelector.getShader(2))
+          {
+              ui->object_color_red_spinbox->setValue(glWidget->scene.objects.at(glWidget->objectNumber-1)->color[0]*255);
+              ui->object_color_green_spinbox->setValue(glWidget->scene.objects.at(glWidget->objectNumber-1)->color[1]*255);
+              ui->object_color_blue_spinbox->setValue(glWidget->scene.objects.at(glWidget->objectNumber-1)->color[2]*255);
+          }
        }
     });
 
@@ -168,9 +177,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     //物体旋转改变设置ui
     connect(glWidget,&GLWidget::objectRotationChanged,[=](QVector3D rotation){
-        ui->object_rotation_x_spinbox->setValue(rotation.x());
-        ui->object_rotation_y_spinbox->setValue(rotation.y());
-        ui->object_rotation_z_spinbox->setValue(rotation.z());
+        ui->object_rotation_x_spinbox->setValue(int(rotation.x()+180)%360-180);
+        ui->object_rotation_y_spinbox->setValue(int(rotation.y()+180)%360-180);
+        ui->object_rotation_z_spinbox->setValue(int(rotation.z()+180)%360-180);
     });
 
     //物体伸缩改变设置ui
@@ -507,7 +516,7 @@ void MainWindow::on_object_number_comboBox_currentIndexChanged(int index)
 
 void MainWindow::on_object_renderMethod_comboBox_currentIndexChanged(int index)
 {
-    if(index==2)
+    if(index==2||index==3)
     {
         qDebug()<<"combobox:"<<index;
         ui->object_color_widget->setHidden(false);
@@ -555,21 +564,21 @@ void MainWindow::on_light_direction_z_valueChanged(double z)
 
 void MainWindow::on_light_color_red_valueChanged(int R)
 {
-    glWidget->scene.dirlight->setColorR(R);
+    glWidget->scene.dirlight->setColorR(float(R)/255);
     glWidget->update();
 }
 
 
 void MainWindow::on_light_color_green_valueChanged(int G)
 {
-    glWidget->scene.dirlight->setColorG(G);
+    glWidget->scene.dirlight->setColorG(float(G)/255);
     glWidget->update();
 }
 
 
 void MainWindow::on_light_color_blue_valueChanged(int B)
 {
-    glWidget->scene.dirlight->setColorB(B);
+    glWidget->scene.dirlight->setColorB(float(B)/255);
     glWidget->update();
 }
 
