@@ -76,9 +76,9 @@ private slots:
     void on_light_direction_x_valueChanged(double arg1);
     void on_light_direction_y_valueChanged(double arg1);
     void on_light_direction_z_valueChanged(double arg1);
-    void on_light_color_red_valueChanged(int arg1);
-    void on_light_color_green_valueChanged(int arg1);
-    void on_light_color_blue_valueChanged(int arg1);
+    void on_dirlight_color_red_valueChanged(int arg1);
+    void on_dirlight_color_green_valueChanged(int arg1);
+    void on_dirlight_color_blue_valueChanged(int arg1);
     void on_DirLightAmbient_valueChanged(int value);
     void on_DirLightDiffuse_valueChanged(int value);
     void on_DirLightSpecular_valueChanged(int value);

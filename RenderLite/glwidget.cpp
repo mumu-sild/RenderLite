@@ -136,7 +136,9 @@ void GLWidget::initializeGL()
     //model = new Model("D:/RenderLite-TMS/RenderLite/RenderLite/Picture_source/keqing/keqing.pmx");
     //"/Picture_source/paimeng/paimeng.pmx"
 
-    scene.Add(new Model(path+"/Picture_source/keqing/keqing.pmx"));
+    scene.Add(new Model(path+"/Picture_source/scanmodel/model/textured_output.obj"));
+    scene.objects.at(0)->model.scale(QVector3D(80,80,80));
+    scene.objects.at(0)->model.translate(QVector3D(0,15,0));
     scene.shaderPrograms.push_back(shaderSelector.getShader(1));
     scene.Add(new PointLight(scene.objects.last()->getlightpos(),QVector3D(1,1,1)));
 
@@ -200,7 +202,7 @@ void GLWidget::paintGL()
     for(int i=0;i<scene.objects.size();i++){
         glStencilFunc(GL_ALWAYS, i+1, 0xFF);//模板测试始终通过，ref为当前物体编号
 
-        qDebug()<<i;
+        //qDebug()<<i;
         scene.shaderPrograms[i]->bind();
         m_world = scene.objects[i]->model.getmodel();
         scene.shaderPrograms[i]->setUniformValue("model",m_world);
@@ -211,16 +213,17 @@ void GLWidget::paintGL()
            scene.shaderPrograms[i]->setUniformValue("material.color",scene.objects[i]->color);
        }
         scene.objects.at(i)->Draw(*scene.shaderPrograms[i]);
-        qDebug()<<i<< "Draw";
+        //qDebug()<<i<< "Draw";
     }
 
 
     //边框
     if(objectNumber){
+        glDisable(GL_CULL_FACE);
         //qDebug()<<"objectnumber:"<<objectNumber;
 //        glDisable(GL_DEPTH_TEST);
         glStencilFunc(GL_NOTEQUAL,objectNumber,0xFF);
-        glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
+        glStencilOp(GL_KEEP,GL_KEEP,GL_REPLACE);
 
         shaderSelector.getShader(2)->bind();
         m_world = scene.objects[objectNumber-1]->model.getmodel();
@@ -228,7 +231,7 @@ void GLWidget::paintGL()
         shaderSelector.getShader(2)->setUniformValue("model",m_world);
         shaderSelector.getShader(2)->setUniformValue("color",QVector3D(1,1,1));
         scene.objects.at(objectNumber-1)->Draw(*shaderSelector.getShader(2));
-
+        glEnable(GL_CULL_FACE);
 //        glEnable(GL_DEPTH_TEST);
     }
 

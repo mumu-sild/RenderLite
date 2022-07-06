@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="object">
      <attribute name="title">
@@ -95,10 +95,10 @@
           <item row="1" column="1">
            <widget class="QDoubleSpinBox" name="object_position_x_spinbox">
             <property name="minimum">
-             <double>-100.000000000000000</double>
+             <double>-10000.000000000000000</double>
             </property>
             <property name="maximum">
-             <double>100.000000000000000</double>
+             <double>10000.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>0.010000000000000</double>
@@ -115,10 +115,10 @@
           <item row="2" column="1">
            <widget class="QDoubleSpinBox" name="object_position_y_spinbox">
             <property name="minimum">
-             <double>-100.000000000000000</double>
+             <double>-10000.000000000000000</double>
             </property>
             <property name="maximum">
-             <double>100.000000000000000</double>
+             <double>10000.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>0.010000000000000</double>
@@ -135,10 +135,10 @@
           <item row="3" column="1">
            <widget class="QDoubleSpinBox" name="object_position_z_spinbox">
             <property name="minimum">
-             <double>-100.000000000000000</double>
+             <double>-10000.000000000000000</double>
             </property>
             <property name="maximum">
-             <double>100.000000000000000</double>
+             <double>10000.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>0.010000000000000</double>
@@ -306,6 +306,9 @@
           </item>
           <item row="1" column="1">
            <widget class="QDoubleSpinBox" name="object_scale_x_spinbox">
+            <property name="minimum">
+             <double>0.010000000000000</double>
+            </property>
             <property name="maximum">
              <double>99.989999999999995</double>
             </property>
@@ -326,6 +329,9 @@
           </item>
           <item row="2" column="1">
            <widget class="QDoubleSpinBox" name="object_scale_y_spinbox">
+            <property name="minimum">
+             <double>0.010000000000000</double>
+            </property>
             <property name="singleStep">
              <double>0.010000000000000</double>
             </property>
@@ -343,6 +349,9 @@
           </item>
           <item row="3" column="1">
            <widget class="QDoubleSpinBox" name="object_scale_z_spinbox">
+            <property name="minimum">
+             <double>0.010000000000000</double>
+            </property>
             <property name="singleStep">
              <double>0.010000000000000</double>
             </property>
@@ -540,10 +549,10 @@
           <item row="1" column="1">
            <widget class="QDoubleSpinBox" name="camera_position_x_spinbox">
             <property name="minimum">
-             <double>-100.000000000000000</double>
+             <double>-10000.000000000000000</double>
             </property>
             <property name="maximum">
-             <double>100.000000000000000</double>
+             <double>10000.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>0.100000000000000</double>
@@ -560,10 +569,10 @@
           <item row="2" column="1">
            <widget class="QDoubleSpinBox" name="camera_position_y_spinbox">
             <property name="minimum">
-             <double>-100.000000000000000</double>
+             <double>-10000.000000000000000</double>
             </property>
             <property name="maximum">
-             <double>100.000000000000000</double>
+             <double>10000.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>0.100000000000000</double>
@@ -580,10 +589,10 @@
           <item row="3" column="1">
            <widget class="QDoubleSpinBox" name="camera_position_z_spinbox">
             <property name="minimum">
-             <double>-100.000000000000000</double>
+             <double>-10000.000000000000000</double>
             </property>
             <property name="maximum">
-             <double>100.000000000000000</double>
+             <double>10000.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>0.100000000000000</double>
@@ -614,10 +623,10 @@
           <item row="1" column="1">
            <widget class="QDoubleSpinBox" name="camera_focus_x_spinbox">
             <property name="minimum">
-             <double>-100.000000000000000</double>
+             <double>-10000.000000000000000</double>
             </property>
             <property name="maximum">
-             <double>100.000000000000000</double>
+             <double>10000.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>0.100000000000000</double>
@@ -634,10 +643,10 @@
           <item row="2" column="1">
            <widget class="QDoubleSpinBox" name="camera_focus_y_spinbox">
             <property name="minimum">
-             <double>-100.000000000000000</double>
+             <double>-10000.000000000000000</double>
             </property>
             <property name="maximum">
-             <double>100.000000000000000</double>
+             <double>10000.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>0.100000000000000</double>
@@ -654,10 +663,10 @@
           <item row="3" column="1">
            <widget class="QDoubleSpinBox" name="camera_focus_z_spinbox">
             <property name="minimum">
-             <double>-100.000000000000000</double>
+             <double>-10000.000000000000000</double>
             </property>
             <property name="maximum">
-             <double>100.000000000000000</double>
+             <double>10000.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>0.100000000000000</double>
@@ -873,7 +882,7 @@
          <string>蓝：</string>
         </property>
        </widget>
-       <widget class="QSpinBox" name="light_color_red">
+       <widget class="QSpinBox" name="dirlight_color_red">
         <property name="geometry">
          <rect>
           <x>180</x>
@@ -886,7 +895,7 @@
          <number>255</number>
         </property>
        </widget>
-       <widget class="QSpinBox" name="light_color_green">
+       <widget class="QSpinBox" name="dirlight_color_green">
         <property name="geometry">
          <rect>
           <x>180</x>
@@ -899,7 +908,7 @@
          <number>255</number>
         </property>
        </widget>
-       <widget class="QSpinBox" name="light_color_blue">
+       <widget class="QSpinBox" name="dirlight_color_blue">
         <property name="geometry">
          <rect>
           <x>180</x>

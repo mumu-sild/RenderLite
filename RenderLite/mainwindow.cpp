@@ -11,6 +11,7 @@
 #include <QFileDialog>
 #include <QDesktopServices>
 #include <QLineEdit>
+#include <QMessageBox>
 
 
 
@@ -36,6 +37,15 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ui->object_number_comboBox->addItem(tr("%1").arg(objectNumSize));
     }
+
+    ui->light_direction_x->setValue(glWidget->scene.dirlight->getDirection().x());
+    ui->light_direction_y->setValue(glWidget->scene.dirlight->getDirection().y());
+    ui->light_direction_z->setValue(glWidget->scene.dirlight->getDirection().z());
+    ui->dirlight_color_red->setValue(glWidget->scene.dirlight->getColor().x()*255);
+    ui->dirlight_color_green->setValue(glWidget->scene.dirlight->getColor().y()*255);
+    ui->dirlight_color_blue->setValue(glWidget->scene.dirlight->getColor().z()*255);
+
+
 
     //对话框
     QWidget *editObjectNameWidget = new QWidget;
@@ -96,7 +106,13 @@ MainWindow::MainWindow(QWidget *parent)
         QString outFilePath = outFilePaths[0];
         qDebug()<<outFilePath;
         QPixmap pixmap = QPixmap::grabWidget(glWidget);
-        pixmap.save(outFilePath,"JPG");
+        if(pixmap.save(outFilePath,"JPG"))
+        {
+            QMessageBox::warning(glWidget, tr("提示"), tr("保存成功"), QMessageBox::Yes);
+        }
+        else{
+            QMessageBox::warning(glWidget, tr("提示"), tr("保存失败"), QMessageBox::Yes);
+        }
     });
 
     //根据摄像机的位置改变设置输入框
@@ -184,6 +200,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     //物体旋转改变设置ui
     connect(glWidget,&GLWidget::objectRotationChanged,[=](QVector3D rotation){
+        while(rotation.x()<-180)rotation[0]+=360;
+        while(rotation.y()<-180)rotation[1]+=360;
+        while(rotation.z()<-180)rotation[2]+=360;
         ui->object_rotation_x_spinbox->setValue(int(rotation.x()+180)%360-180);
         ui->object_rotation_y_spinbox->setValue(int(rotation.y()+180)%360-180);
         ui->object_rotation_z_spinbox->setValue(int(rotation.z()+180)%360-180);
@@ -206,6 +225,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->new_model_rectangle,&QAction::triggered,[=](){
         glWidget->importRectangle();
         emit objectSizeChanged(glWidget->getObjectSize());
+    });
+
+    connect(ui->use_specification,&QAction::triggered,[=](){
+        const QUrl regUrl(QLatin1String("https://github.com/mumu-sild/RenderLite"));
+        QDesktopServices::openUrl(regUrl);
     });
 
 
@@ -569,21 +593,21 @@ void MainWindow::on_light_direction_z_valueChanged(double z)
 }
 
 
-void MainWindow::on_light_color_red_valueChanged(int R)
+void MainWindow::on_dirlight_color_red_valueChanged(int R)
 {
     glWidget->scene.dirlight->setColorR(float(R)/255);
     glWidget->update();
 }
 
 
-void MainWindow::on_light_color_green_valueChanged(int G)
+void MainWindow::on_dirlight_color_green_valueChanged(int G)
 {
     glWidget->scene.dirlight->setColorG(float(G)/255);
     glWidget->update();
 }
 
 
-void MainWindow::on_light_color_blue_valueChanged(int B)
+void MainWindow::on_dirlight_color_blue_valueChanged(int B)
 {
     glWidget->scene.dirlight->setColorB(float(B)/255);
     glWidget->update();

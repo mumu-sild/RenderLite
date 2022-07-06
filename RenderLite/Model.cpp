@@ -1,19 +1,18 @@
 ﻿#include "Model.h"
 #include <QFile>
 #include <QDir>
+#include <QDialog>
 
 /*构建path路径下的模型*/
 Model::Model(const QString &path):directory(path)
 {
+
     loadModel(path);
     //loadTriangle();
 }
 
 Model::~Model()
 {
-    for(int i=0;i<meshes.size();i++){
-        delete meshes[i];
-    }
     for(int i=0;i<meshes.size();i++){
         delete meshes[i];
     }

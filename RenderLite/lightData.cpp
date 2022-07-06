@@ -80,7 +80,7 @@ void LightData::setPointLightPosition(QVector<PointLight*>& pointLight){
 
     std::string structNameFront = "pointLights[";
     std::string structNameRail = "].position";
-    qDebug()<<"numPoints"<<numPointLight;
+    //qDebug()<<"numPoints"<<numPointLight;
     for(int i = 0; i < numPointLight; i++){
         std::string StringI = std::to_string(i);
 //        qDebug()<<(structNameFront+StringI+structNameRail).c_str();

@@ -2,6 +2,7 @@
 #include "glwidget.h"
 #include "triangle.h"
 #include "rectangle.h"
+#include <QMessageBox>
 
 void GLWidget::importModel(QString modelPath)
 {
@@ -85,15 +86,15 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
             if(QApplication::keyboardModifiers()==Qt::AltModifier)
             {
                 if(xrotation){
-                    qDebug()<<"物体的x轴旋转";
+                    //qDebug()<<"物体的x轴旋转";
                     scene.objects.at(objectNumber-1)->model.rotate(0,dx*0.5);
                 }
                 if(yrotation){
-                    qDebug()<<"物体的y轴旋转";
+                    //qDebug()<<"物体的y轴旋转";
                     scene.objects.at(objectNumber-1)->model.rotate(1,dx*0.5);
                 }
                 if(zrotation){
-                    qDebug()<<"物体的z轴旋转";
+                    //qDebug()<<"物体的z轴旋转";
                     scene.objects.at(objectNumber-1)->model.rotate(2,dx*0.5);
                 }
                 emit objectRotationChanged(scene.objects.at(objectNumber-1)
@@ -102,8 +103,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
             }
             else
             {
-                qDebug()<<"objectNumber:"<<objectNumber;
-                qDebug()<<"mousePressObjNumber"<<mousePressObjNumber;
+                //qDebug()<<"objectNumber:"<<objectNumber;
+                //qDebug()<<"mousePressObjNumber"<<mousePressObjNumber;
 
                 if(objectNumber==mousePressObjNumber)
                 {
@@ -130,7 +131,7 @@ void GLWidget::wheelEvent(QWheelEvent *event)
     {
         if(event->delta()>0)
         {
-            qDebug()<<"滚轮往前滚";
+            //qDebug()<<"滚轮往前滚";
             maincamera.moveForBackward(-1);
 
             emit xCameraPosiChanged(maincamera.getCameraPos().x());
@@ -149,7 +150,7 @@ void GLWidget::wheelEvent(QWheelEvent *event)
         }
         if(event->delta()<0)
         {
-            qDebug()<<"滚轮往后滚";
+            //qDebug()<<"滚轮往后滚";
             maincamera.moveForBackward(1);
 
             emit xCameraPosiChanged(maincamera.getCameraPos().x());
@@ -213,7 +214,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         }
         if(event->key()==Qt::Key_S)
         {
-            qDebug()<<"按下S键";
+            //qDebug()<<"按下S键";
             maincamera.moveUpDownward(-1);
 
             emit xCameraPosiChanged(maincamera.getCameraPos().x());
@@ -232,7 +233,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         }
         if(event->key()==Qt::Key_A)
         {
-            maincamera.moveLRward(-1);
+            maincamera.moveLRward(1);
 
             emit xCameraPosiChanged(maincamera.getCameraPos().x());
             emit yCameraPosiChanged(maincamera.getCameraPos().y());
@@ -250,7 +251,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         }
         if(event->key()==Qt::Key_D)
         {
-            maincamera.moveLRward(1);
+            maincamera.moveLRward(-1);
 
             emit xCameraPosiChanged(maincamera.getCameraPos().x());
             emit yCameraPosiChanged(maincamera.getCameraPos().y());
@@ -323,7 +324,7 @@ void GLWidget::calCulateModelMoveCoefficient()
     {
         QVector3D DistenceSquare = maincamera.getCameraPos()-scene.objects.at(objectNumber-1)->model.getPosition();
         modelMoveCoefficient = DistenceSquare.length();
-        qDebug()<<"modelMoveCoefficient:"<<modelMoveCoefficient;
+        //qDebug()<<"modelMoveCoefficient:"<<modelMoveCoefficient;
     }
 
 }
