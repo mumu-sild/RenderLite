@@ -16,14 +16,15 @@ public:
 
     QVector3D lightNormal;
     QVector3D color;
-
-
-private:
+//    bool active;
     QVector3D position;
 
 
 public:
-    PointLight(QVector3D posi,QVector3D color):position(posi),color(color){}
+    PointLight(QVector3D posi,QVector3D c){
+        position = posi;
+        color = c;
+    }
 
 //    void setPointLight(QVector<PointLight*>& pointLight, QOpenGLShaderProgram* shader);
     void setPosition(const QVector3D &newPosition);

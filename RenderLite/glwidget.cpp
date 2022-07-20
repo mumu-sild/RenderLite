@@ -173,18 +173,20 @@ void GLWidget::paintGL()
     QMatrix4x4 m_world;
     QVector<PointLight*> pointLight;
 
-    for(int k = 0; k < scene.objects.size(); k++){
-            if(scene.objects[k]->islight){
-                //qDebug()<<"pointLight"<<k;
-                scene.pointlights[k]->setPosition(scene.objects[k]->getlightpos());
-                scene.pointlights[k]->lightNormal = scene.objects.at(k)->getlightNormal();
-                scene.pointlights[k]->color = scene.objects.at(k)->color;
-                pointLight.push_back(scene.pointlights[k]);
-            }
-        }
 
+    //第一次层循环，获取光照信息
+    for(int k = 0; k < scene.objects.size(); k++){
+        if(scene.objects[k]->islight){
+//            scene.pointlights[k]->active = scene.objects.at(k)->islight;
+            scene.pointlights[k]->position = scene.objects[k]->getlightpos();
+            scene.pointlights[k]->lightNormal = scene.objects.at(k)->getlightNormal();
+            scene.pointlights[k]->color = scene.objects.at(k)->color;
+            pointLight.push_back(scene.pointlights[k]);
+        }
+    }
+
+    //第二层循环设置每个shader的不变参数
     for(int j = 0; j < shaderSelector.fragmentPath.size();j++){
-        //qDebug()<<j<<"shaderSelector";
         shaderSelector.getShader(j)->bind();
         shaderSelector.getShader(j)->setUniformValue("view",maincamera.getViewMetrix());
         shaderSelector.getShader(j)->setUniformValue("projection",projection);
@@ -239,6 +241,7 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL(int w, int h)
 {
+    //glViewport(0,0,w/2,h);
     maincamera.projection.setToIdentity();
     maincamera.projection.perspective(45.0f, GLfloat(w) / h, 0.001f, 1000.0f);
 }
@@ -280,6 +283,7 @@ void GLWidget::setCurrentObjectShader(int index)
 
 void GLWidget::setCurrentObjectEmit(bool emits){
     if(objectNumber>0){
+        qDebug()<<"285::islight="<<emits;
         scene.objects.at(objectNumber-1)->islight = emits;
 //        if(emits)scene.shaderPrograms.replace(objectNumber-1,shaderSelector.getShader(shaderTypes::SHADER_COLOR));
     }

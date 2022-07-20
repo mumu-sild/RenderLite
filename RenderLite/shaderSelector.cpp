@@ -3,38 +3,73 @@
 
 ShaderSelector::ShaderSelector(){}
 
-void ShaderSelector::setLightDir(int shader, DirLight *dirlight)
+ShaderSelector::~ShaderSelector()
 {
-    LightData* lightData = new LightData(getShader(shader));
-    if(!dirlight->dirLightActivated){
-        lightData->disableDirLight();
-        return;
+    for(int i=0;i<shaderProgram.size();++i){
+        delete shaderProgram.at(i);
     }
-        lightData->activateDirLight();
-        lightData->setDirLightDirection(dirlight->getDirection());
-        lightData->setDirLightAmbientColor(dirlight->getColor(),DirLight::ambient);
-        lightData->setDirLightDiffuseColor(dirlight->getColor(),DirLight::diffuse);
-        lightData->setDirLightSpecularColor(dirlight->getColor(),DirLight::specular);
-        delete lightData;
-        return;
 }
 
-void ShaderSelector::setPointDir(int shader, QVector<PointLight *> pointlights)
+void ShaderSelector::setLightDir(int i, DirLight *dirlight)
 {
-    LightData* lightData = new LightData(getShader(shader));
+//    struct DirLight {
+//            bool Activated;
+//            vec3 direction;
+//
+//            vec3 ambient;
+//            vec3 diffuse;
+//            vec3 specular;
+//    }dirLight;
+    QOpenGLShaderProgram *shader = getShader(i);
+    shader->setUniformValue("dirLight.Activated",dirlight->dirLightActivated);
+    shader->setUniformValue("dirLight.direction",dirlight->getDirection());
+    shader->setUniformValue("dirLight.ambient",dirlight->getColor()*DirLight::ambient);
+    shader->setUniformValue("dirLight.diffuse",dirlight->getColor()*DirLight::diffuse);
+    shader->setUniformValue("dirLight.specular",dirlight->getColor()*DirLight::specular);
+    return;
+}
 
+void ShaderSelector::setPointDir(int j, QVector<PointLight *> pointlights)
+{
+//    struct PointLight {
+//            vec3 position;
 
-    lightData->activatePointLight();
-    lightData->setPointLightPosition(pointlights);
-    lightData->setPointLightAmbientColor(pointlights,PointLight::ambient);
-    lightData->setPointLightDiffuseColor(pointlights,PointLight::diffuse);
-    lightData->setPointLightSpecularColor(pointlights,PointLight::specular);
-    lightData->setPointLightNormal(pointlights);
-    lightData->setConstant(PointLight::constant);
-    lightData->setLinear(PointLight::linear);
-    lightData->setQuadratic(PointLight::quadratic);
-    lightData->setPointLightColor(pointlights);
-    delete lightData;
+//            vec3 ambient;
+//            vec3 diffuse;
+//            vec3 specular;
+
+//            vec3 lightnormal;
+
+//            float constant;
+//            float linear;
+//            float quadratic;
+
+//    }pointLights[16];
+    QOpenGLShaderProgram *shader = getShader(j);
+    int numPointLight = pointlights.size();
+    shader->setUniformValue("numPointLights",numPointLight);
+    QString structNameFront = "pointLights[";
+    for(int i = 0; i < numPointLight; i++){
+        QString StringNum;
+        StringNum.setNum(i);
+        QString StringI = structNameFront+StringNum;
+        shader->setUniformValue(QString(StringI+"].position").toStdString().c_str(),
+                                pointlights[i]->position);
+        shader->setUniformValue(QString(StringI+"].ambient").toStdString().c_str(),
+                                pointlights[i]->color * PointLight::ambient);
+        shader->setUniformValue(QString(StringI+"].diffuse").toStdString().c_str(),
+                                pointlights[i]->color * PointLight::diffuse);
+        shader->setUniformValue(QString(StringI+"].specular").toStdString().c_str(),
+                                pointlights[i]->color * PointLight::specular);
+        shader->setUniformValue(QString(StringI+"].lightnormal").toStdString().c_str(),
+                                pointlights[i]->lightNormal);
+        shader->setUniformValue(QString(StringI+"].constant").toStdString().c_str(),
+                                PointLight::constant);
+        shader->setUniformValue(QString(StringI+"].linear").toStdString().c_str(),
+                                PointLight::linear);
+        shader->setUniformValue(QString(StringI+"].quadratic").toStdString().c_str(),
+                                PointLight::quadratic);
+    }
     return;
 }
 
@@ -47,7 +82,7 @@ void ShaderSelector::compileShader(int i){
     shader->addShaderFromSourceFile(QOpenGLShader::Vertex,vertexPath[i]);
     shader->addShaderFromSourceFile(QOpenGLShader::Fragment,fragmentPath[i]);
     shader->link();
-    qDebug()<<"compile shader"<<i<<":"<<vertexPath[i];
+    qDebug()<<"compile shader"<<i<<":"<<vertexPath[i]<<"success";
     shaderProgram.push_back(shader);
 }
 

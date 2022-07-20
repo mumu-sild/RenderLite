@@ -28,8 +28,9 @@ public:
         ":/lightColor.frag"
     };
     ShaderSelector();
+    ~ShaderSelector();
 public:
-    QOpenGLShaderProgram* getShader(int objNum=2);
+    QOpenGLShaderProgram* getShader(int shaderNum=2);
     void compileShader(int i);
     void setLightDir(int shader,DirLight* dirlight);
     void setPointDir(int shader,QVector<PointLight*> pointlights);
