@@ -19,7 +19,6 @@ SOURCES += \
     camera.cpp \
     dirLight.cpp \
     glwidget.cpp \
-    lightData.cpp \
     main.cpp \
     mainwindow.cpp \
     matrix.cpp \
@@ -43,7 +42,6 @@ HEADERS += \
     camera.h \
     dirLight.h \
     glwidget.h \
-    lightData.h \
     mainwindow.h \
     pointLight.h \
     ray.h \
@@ -60,7 +58,8 @@ DISTFILES += \
 
 RESOURCES += \
     shader.qrc
-    win32: LIBS += -L$$PWD/../ -llibassimp.dll
+
+win32: LIBS += -L$$PWD/../ -llibassimp.dll
 
 INCLUDEPATH += $$PWD/include
 DEPENDPATH += $$PWD/include

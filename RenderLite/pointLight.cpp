@@ -1,5 +1,4 @@
 #include "pointLight.h"
-#include "lightData.h"
 
 //void PointLight::setPointLight(QVector<PointLight*>& pointLight, QOpenGLShaderProgram *shader)
 //{

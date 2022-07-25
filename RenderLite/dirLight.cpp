@@ -1,5 +1,5 @@
 #include "dirLight.h"
-#include "lightData.h"
+
 
 //void DirLight::setDirLight(DirLight *dirlight, QOpenGLShaderProgram* shader)
 //{

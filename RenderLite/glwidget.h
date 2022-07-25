@@ -54,6 +54,7 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLVertexArrayObject>
+#include <QOpenGLFramebufferObject>
 #include <QOpenGLBuffer>
 #include <QMatrix4x4>
 
@@ -81,6 +82,13 @@ public:
     int objectNumber = 0;
     int mousePressObjNumber = 0;
     double modelMoveCoefficient;
+
+    //-----------------测试参数
+    QOpenGLFramebufferObject* depthMapFBO;
+    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    QOpenGLShaderProgram* simpleDepthShader,*debug_dep;
+    void renderQuad();
+
 private:
     //交互参数
     QPoint m_lastPos;
@@ -146,6 +154,7 @@ public:
     void objectChangEmitSignal();
     void cleanup();
     void deleteObject(int objectNumber);
+
 
 public slots:
 

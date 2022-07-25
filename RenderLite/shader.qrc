@@ -12,5 +12,9 @@
         <file>skybox.vert</file>
         <file>lightColor.frag</file>
         <file>lightColor.vert</file>
+        <file>simpleDepthShader.vert</file>
+        <file>simpleDepthShader.frag</file>
+        <file>map_depth.vert</file>
+        <file>map_depth.frag</file>
     </qresource>
 </RCC>

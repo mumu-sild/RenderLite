@@ -19,8 +19,8 @@ public:
     void setDirLightDiffuseColor(QVector3D Color, float diffuse);
     void setDirLightSpecularColor(QVector3D Color, float specular);
 
-    void activatePointLight();
-    void disablepointLight();
+    void activatePointLight(QVector<PointLight *> &pointLight);
+    void disablepointLight(QVector<PointLight *> &pointLight);
     void setPointLightColor(QVector<PointLight*>&pointLight);
     void setPointLightPosition(QVector<PointLight*>& pointLight);
     void setPointLightAmbientColor(QVector<PointLight*> pointLight,float ambient);
@@ -33,10 +33,10 @@ public:
 private:
     QOpenGLShaderProgram* shader = nullptr;
     //parallel lights attribs
-    bool dirLightActivated = false;
+//    bool dirLightActivated = false;
 
     //point lights attribs
-    bool pointLightActivated = false;
+//    bool pointLightActivated = false;
     int numPointLight = -1;
     QVector3D* pointLightPosition;
     const static int MAX_POINT_LIGHT = 16;

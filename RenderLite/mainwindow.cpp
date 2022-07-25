@@ -227,6 +227,7 @@ MainWindow::MainWindow(QWidget *parent)
         emit objectSizeChanged(glWidget->getObjectSize());
     });
 
+    //项目仓库
     connect(ui->use_specification,&QAction::triggered,[=](){
         const QUrl regUrl(QLatin1String("https://github.com/mumu-sild/RenderLite"));
         QDesktopServices::openUrl(regUrl);
@@ -335,7 +336,7 @@ void MainWindow::on_object_position_z_spinbox_valueChanged(double arg1)
 
 void MainWindow::on_object_rotation_x_spinbox_valueChanged(double arg1)
 {
-    qDebug()<<arg1;
+    //qDebug()<<arg1;
     if(ui->object_number_comboBox->currentIndex()>0)
     {
         glWidget->scene.objects.at(ui->object_number_comboBox->currentIndex()-1)
@@ -348,7 +349,7 @@ void MainWindow::on_object_rotation_x_spinbox_valueChanged(double arg1)
 
 void MainWindow::on_object_rotation_y_spinbox_valueChanged(double arg1)
 {
-    qDebug()<<arg1;
+    //qDebug()<<arg1;
     if(ui->object_number_comboBox->currentIndex()>0)
     {
         glWidget->scene.objects.at(ui->object_number_comboBox->currentIndex()-1)
@@ -362,7 +363,7 @@ void MainWindow::on_object_rotation_y_spinbox_valueChanged(double arg1)
 
 void MainWindow::on_object_rotation_z_spinbox_valueChanged(double arg1)
 {
-    qDebug()<<arg1;
+    //qDebug()<<arg1;
     if(ui->object_number_comboBox->currentIndex()>0)
     {
         glWidget->scene.objects.at(ui->object_number_comboBox->currentIndex()-1)
@@ -375,7 +376,7 @@ void MainWindow::on_object_rotation_z_spinbox_valueChanged(double arg1)
 
 void MainWindow::on_object_scale_x_spinbox_valueChanged(double arg1)
 {
-    qDebug()<<arg1;
+    //qDebug()<<arg1;
     if(ui->object_number_comboBox->currentIndex()>0)
     {
         glWidget->scene.objects.at(ui->object_number_comboBox->currentIndex()-1)
@@ -389,7 +390,7 @@ void MainWindow::on_object_scale_x_spinbox_valueChanged(double arg1)
 
 void MainWindow::on_object_scale_y_spinbox_valueChanged(double arg1)
 {
-    qDebug()<<arg1;
+    //qDebug()<<arg1;
     if(ui->object_number_comboBox->currentIndex()>0)
     {
         glWidget->scene.objects.at(ui->object_number_comboBox->currentIndex()-1)
@@ -403,7 +404,7 @@ void MainWindow::on_object_scale_y_spinbox_valueChanged(double arg1)
 
 void MainWindow::on_object_scale_z_spinbox_valueChanged(double arg1)
 {
-    qDebug()<<arg1;
+    //qDebug()<<arg1;
     if(ui->object_number_comboBox->currentIndex()>0)
     {
         glWidget->scene.objects.at(ui->object_number_comboBox->currentIndex()-1)
@@ -444,7 +445,7 @@ void MainWindow::on_object_color_blue_spinbox_valueChanged(int B)
 
 void MainWindow::on_camera_position_x_spinbox_valueChanged(double arg1)
 {
-    qDebug()<<arg1;
+    //qDebug()<<arg1;
     glWidget->setXCameraPosi(arg1);
 }
 
@@ -458,47 +459,47 @@ void MainWindow::on_camera_position_y_spinbox_valueChanged(double arg1)
 
 void MainWindow::on_camera_position_z_spinbox_valueChanged(double arg1)
 {
-    qDebug()<<arg1;
+    //qDebug()<<arg1;
     glWidget->setZCameraPosi(arg1);
 }
 
 
 void MainWindow::on_camera_focus_x_spinbox_valueChanged(double arg1)
 {
-    qDebug()<<arg1;
+    //qDebug()<<arg1;
     glWidget->setXCameraFocus(arg1);
 }
 
 
 void MainWindow::on_camera_focus_y_spinbox_valueChanged(double arg1)
 {
-    qDebug()<<arg1;
+    //qDebug()<<arg1;
     glWidget->setYCameraFocus(arg1);
 }
 
 
 void MainWindow::on_camera_focus_z_spinbox_valueChanged(double arg1)
 {
-    qDebug()<<arg1;
+    //qDebug()<<arg1;
     glWidget->setZCameraFocus(arg1);
 }
 
 
 void MainWindow::on_camera_cameraup_front_spinbox_valueChanged(double arg1)
 {
-    qDebug()<<arg1;
+    //qDebug()<<arg1;
 }
 
 
 void MainWindow::on_camera_cameraup_up_spinbox_valueChanged(double arg1)
 {
-    qDebug()<<arg1;
+    //qDebug()<<arg1;
 }
 
 
 void MainWindow::on_camera_cameraup_right_spinbox_valueChanged(double arg1)
 {
-    qDebug()<<arg1;
+    //qDebug()<<arg1;
 }
 
 

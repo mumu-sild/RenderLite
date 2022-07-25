@@ -50,12 +50,14 @@
 
 #include <QMouseEvent>
 #include <QOpenGLShaderProgram>
+#include <QOpenGLFramebufferObject>
 #include <QCoreApplication>
 #include <math.h>
 #include <QDir>
 #include <QString>
 #include <iostream>
 #include <QDebug>
+#include <QOpenGLFunctions_3_3_Core>
 
 #include "Model.h"
 #include "glwidget.h"
@@ -124,6 +126,7 @@ void GLWidget::initializeGL()
         shaderSelector.compileShader(i);
     }
 
+
     //-------光照------------------------------------
     scene.dirlight = new DirLight();
     scene.dirlight->dirLightActivated = true;
@@ -136,9 +139,10 @@ void GLWidget::initializeGL()
     //model = new Model("D:/RenderLite-TMS/RenderLite/RenderLite/Picture_source/keqing/keqing.pmx");
     //"/Picture_source/paimeng/paimeng.pmx"
 
-    scene.Add(new Model(path+"/Picture_source/scanmodel/model/textured_output.obj"));
-    scene.objects.at(0)->model.scale(QVector3D(80,80,80));
-    scene.objects.at(0)->model.translate(QVector3D(0,15,0));
+    scene.Add(new Model(path+"/Picture_source/keqing/keqing.pmx"));
+    scene.objects.at(0)->model.scale(QVector3D(2,2,2));
+    //scene.objects.at(0)->model.translate(QVector3D(0,0,0));
+    //scene.objects.at(0)->model.rotate(0,180);
     scene.shaderPrograms.push_back(shaderSelector.getShader(1));
     scene.Add(new PointLight(scene.objects.last()->getlightpos(),QVector3D(1,1,1)));
 
@@ -162,10 +166,76 @@ void GLWidget::initializeGL()
     scene.Add(shaderSelector.getShader(3));
     scene.Add(new PointLight(rec->getlightpos(),QVector3D(1,1,1)));
 
+
+
+    //----------------阴影处理-----------------------------------
+    depthMapFBO = new QOpenGLFramebufferObject(SHADOW_WIDTH,SHADOW_HEIGHT,QOpenGLFramebufferObject::Depth);
+
+    simpleDepthShader = new QOpenGLShaderProgram();
+    simpleDepthShader->addShaderFromSourceFile(QOpenGLShader::Vertex,":/simpleDepthShader.vert");
+    simpleDepthShader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/simpleDepthShader.frag");
+    simpleDepthShader->link();
+
+    debug_dep = new QOpenGLShaderProgram();
+    debug_dep->addShaderFromSourceFile(QOpenGLShader::Vertex,":/map_depth.vert");
+    debug_dep->addShaderFromSourceFile(QOpenGLShader::Fragment,":/map_depth.frag");
+    debug_dep->link();
 }
 
 void GLWidget::paintGL()
 {
+//--------阴影处理
+    // 1. 在平行光光源视角下生成
+    // --------------------------------------------------------------
+    QMatrix4x4 lightSpaceMatrix;
+    {
+        QVector3D lightPos = -scene.dirlight->getDirection().normalized()*50;
+        QMatrix4x4 lightProjection, lightView;
+
+        float near_plane = 0.50f, far_plane = 100.5f;//????
+        const float eyeing = 50.0f;
+        lightProjection.ortho(-eyeing, eyeing, -eyeing, eyeing, near_plane, far_plane);
+        lightView.lookAt(lightPos, QVector3D(0,0,0), QVector3D(0.0, 1.0, 0.0));
+        lightSpaceMatrix = lightProjection * lightView;
+    }
+
+
+
+    // 生成shadow mapping 图
+    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+    depthMapFBO->bind();
+    glEnable(GL_DEPTH_TEST);
+    glClearColor(1,1,1,1);
+    glClear(GL_COLOR_BUFFER_BIT |GL_DEPTH_BUFFER_BIT);
+
+    //glCullFace(GL_FRONT);
+
+    simpleDepthShader->bind();//阴影图着色器
+    simpleDepthShader->setUniformValue("lightSpaceMatrix",lightSpaceMatrix);
+    for(int i=0;i<scene.objects.size();++i){
+        simpleDepthShader->setUniformValue("model",scene.objects.at(i)->model.getmodel());
+        scene.objects.at(i)->Draw(*simpleDepthShader);
+    }
+    depthMapFBO->release();
+
+    //glCullFace(GL_BACK); // 不要忘记设回原先的culling face
+    glClearColor(0,0,0,1);//渲染背景
+
+//    // 显示shadow mapp 图
+//    glViewport(0,0,width(),height());
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+//    debug_dep->bind();//shader
+//    debug_dep->setUniformValue("depthMap",0);
+//    glActiveTexture(GL_TEXTURE0);
+//    glBindTexture(GL_TEXTURE_2D,depthMapFBO->texture());
+
+
+//    renderQuad();
+//    debug_dep->release();
+//    return;
+
+//------------------------------------------------------------------
+    glViewport(0, 0, width(), height());
     //Render类，来做渲染
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
     glStencilOp(GL_KEEP,GL_KEEP,GL_REPLACE);
@@ -173,18 +243,20 @@ void GLWidget::paintGL()
     QMatrix4x4 m_world;
     QVector<PointLight*> pointLight;
 
-    for(int k = 0; k < scene.objects.size(); k++){
-            if(scene.objects[k]->islight){
-                //qDebug()<<"pointLight"<<k;
-                scene.pointlights[k]->setPosition(scene.objects[k]->getlightpos());
-                scene.pointlights[k]->lightNormal = scene.objects.at(k)->getlightNormal();
-                scene.pointlights[k]->color = scene.objects.at(k)->color;
-                pointLight.push_back(scene.pointlights[k]);
-            }
-        }
 
+    //第一次层循环，获取光照信息
+    for(int k = 0; k < scene.objects.size(); k++){
+        if(scene.objects[k]->islight){
+//            scene.pointlights[k]->active = scene.objects.at(k)->islight;
+            scene.pointlights[k]->position = scene.objects[k]->getlightpos();
+            scene.pointlights[k]->lightNormal = scene.objects.at(k)->getlightNormal();
+            scene.pointlights[k]->color = scene.objects.at(k)->color;
+            pointLight.push_back(scene.pointlights[k]);
+        }
+    }
+
+    //第二层循环设置每个shader的不变参数
     for(int j = 0; j < shaderSelector.fragmentPath.size();j++){
-        //qDebug()<<j<<"shaderSelector";
         shaderSelector.getShader(j)->bind();
         shaderSelector.getShader(j)->setUniformValue("view",maincamera.getViewMetrix());
         shaderSelector.getShader(j)->setUniformValue("projection",projection);
@@ -194,6 +266,7 @@ void GLWidget::paintGL()
             shaderSelector.getShader(j)->setUniformValue("material.shiness",64.0f);
             shaderSelector.setLightDir(j,scene.dirlight);
             shaderSelector.setPointDir(j,pointLight);
+            shaderSelector.getShader(j)->setUniformValue("lightSpaceMatrix",lightSpaceMatrix);
         }
     }
 
@@ -202,10 +275,22 @@ void GLWidget::paintGL()
     for(int i=0;i<scene.objects.size();i++){
         glStencilFunc(GL_ALWAYS, i+1, 0xFF);//模板测试始终通过，ref为当前物体编号
 
-        //qDebug()<<i;
         scene.shaderPrograms[i]->bind();
         m_world = scene.objects[i]->model.getmodel();
         scene.shaderPrograms[i]->setUniformValue("model",m_world);
+        if( scene.shaderPrograms[i] == shaderSelector.getShader(shaderTypes::SHADER_COLOR)||
+            scene.shaderPrograms[i] == shaderSelector.getShader(shaderTypes::SHADER_LIGHTCOLOR))
+        {
+            scene.shaderPrograms[i]->setUniformValue("shadowMap",0);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D,depthMapFBO->texture());
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+            GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+            glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+        }
         if(scene.shaderPrograms[i] == shaderSelector.getShader(shaderTypes::SHADER_COLOR)){
             scene.shaderPrograms[i]->setUniformValue("color",scene.objects.at(i)->color);
         }
@@ -213,15 +298,12 @@ void GLWidget::paintGL()
            scene.shaderPrograms[i]->setUniformValue("material.color",scene.objects[i]->color);
        }
         scene.objects.at(i)->Draw(*scene.shaderPrograms[i]);
-        //qDebug()<<i<< "Draw";
     }
 
 
     //边框
     if(objectNumber){
         glDisable(GL_CULL_FACE);
-        //qDebug()<<"objectnumber:"<<objectNumber;
-//        glDisable(GL_DEPTH_TEST);
         glStencilFunc(GL_NOTEQUAL,objectNumber,0xFF);
         glStencilOp(GL_KEEP,GL_KEEP,GL_REPLACE);
 
@@ -232,7 +314,6 @@ void GLWidget::paintGL()
         shaderSelector.getShader(2)->setUniformValue("color",QVector3D(1,1,1));
         scene.objects.at(objectNumber-1)->Draw(*shaderSelector.getShader(2));
         glEnable(GL_CULL_FACE);
-//        glEnable(GL_DEPTH_TEST);
     }
 
 }
@@ -280,6 +361,7 @@ void GLWidget::setCurrentObjectShader(int index)
 
 void GLWidget::setCurrentObjectEmit(bool emits){
     if(objectNumber>0){
+        qDebug()<<"285::islight="<<emits;
         scene.objects.at(objectNumber-1)->islight = emits;
 //        if(emits)scene.shaderPrograms.replace(objectNumber-1,shaderSelector.getShader(shaderTypes::SHADER_COLOR));
     }
@@ -314,5 +396,32 @@ void GLWidget::objectChangEmitSignal()
                            ->model.getScale());
 }
 
+// renderQuad() renders a 1x1 XY quad in NDC
+// -----------------------------------------
+
+void GLWidget::renderQuad()
+{
+    float quadVertices[] = {
+        // positions        // texture Coords
+        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+         1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+         1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+    };
+    // setup plane VAO
+    QOpenGLVertexArrayObject quadVAO;
+    QOpenGLBuffer quadVBO(QOpenGLBuffer::VertexBuffer);
+    quadVAO.create();
+    quadVAO.bind();
+    quadVBO.create();
+    quadVBO.bind();
+    quadVBO.allocate(quadVertices,sizeof(quadVertices));
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    quadVAO.release();
+}
 
 
