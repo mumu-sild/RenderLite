@@ -670,3 +670,10 @@ void MainWindow::on_pointLightSpecular_valueChanged(int specular)
     glWidget->update();
 }
 
+
+void MainWindow::on_light_parallel_checkbox_stateChanged(int arg1)
+{
+    glWidget->shadowShow = (arg1!=0);
+    glWidget->update();
+}
+

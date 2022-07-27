@@ -15,7 +15,6 @@ uniform mat4 lightSpaceMatrix;
 
 void main()
 {
-
         Normal = mat3(transpose(inverse(model))) * aNormal;
         TexCoords = aTexCoords;
         FragPos = vec3(model * vec4(aPos,1.0));

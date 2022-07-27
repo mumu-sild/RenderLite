@@ -146,6 +146,13 @@ void GLWidget::initializeGL()
     scene.shaderPrograms.push_back(shaderSelector.getShader(1));
     scene.Add(new PointLight(scene.objects.last()->getlightpos(),QVector3D(1,1,1)));
 
+    scene.Add(new Model("C:/Users/mumu/Desktop/graphics/practicalTraining_2/Picture_source/Tomie/scene/ice.pmx"));
+    //scene.objects.at(1)->model.scale(QVector3D(2,2,2));
+    //scene.objects.at(1)->model.translate(QVector3D(0,0,0));
+    //scene.objects.at(1)->model.rotate(0,180);
+    scene.shaderPrograms.push_back(shaderSelector.getShader(1));
+    scene.Add(new PointLight(scene.objects.last()->getlightpos(),QVector3D(1,1,1)));
+
 
     //triangle test
 
@@ -192,8 +199,8 @@ void GLWidget::paintGL()
         QVector3D lightPos = -scene.dirlight->getDirection().normalized()*50;
         QMatrix4x4 lightProjection, lightView;
 
-        float near_plane = 0.50f, far_plane = 100.5f;//????
-        const float eyeing = 50.0f;
+        float near_plane = -50.50f, far_plane = 100.5f;//????
+        const float eyeing = 100.0f;
         lightProjection.ortho(-eyeing, eyeing, -eyeing, eyeing, near_plane, far_plane);
         lightView.lookAt(lightPos, QVector3D(0,0,0), QVector3D(0.0, 1.0, 0.0));
         lightSpaceMatrix = lightProjection * lightView;
@@ -222,17 +229,19 @@ void GLWidget::paintGL()
     glClearColor(0,0,0,1);//渲染背景
 
 //    // 显示shadow mapp 图
-//    glViewport(0,0,width(),height());
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
-//    debug_dep->bind();//shader
-//    debug_dep->setUniformValue("depthMap",0);
-//    glActiveTexture(GL_TEXTURE0);
-//    glBindTexture(GL_TEXTURE_2D,depthMapFBO->texture());
+    if(shadowShow){
+        glViewport(0,0,width(),height());
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+        debug_dep->bind();//shader
+        debug_dep->setUniformValue("depthMap",0);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D,depthMapFBO->texture());
 
 
-//    renderQuad();
-//    debug_dep->release();
-//    return;
+        renderQuad();
+        debug_dep->release();
+        return;
+    }
 
 //------------------------------------------------------------------
     glViewport(0, 0, width(), height());
@@ -278,11 +287,12 @@ void GLWidget::paintGL()
         scene.shaderPrograms[i]->bind();
         m_world = scene.objects[i]->model.getmodel();
         scene.shaderPrograms[i]->setUniformValue("model",m_world);
-        if( scene.shaderPrograms[i] == shaderSelector.getShader(shaderTypes::SHADER_COLOR)||
+        if( scene.shaderPrograms[i] == shaderSelector.getShader(shaderTypes::SHADER_LIGHT)||
             scene.shaderPrograms[i] == shaderSelector.getShader(shaderTypes::SHADER_LIGHTCOLOR))
         {
-            scene.shaderPrograms[i]->setUniformValue("shadowMap",0);
-            glActiveTexture(GL_TEXTURE0);
+            //注意，对于有纹理的阴影生成，不能将阴影图的绑定点与纹理绑定点相同****
+            scene.shaderPrograms[i]->setUniformValue("shadowMap",5);
+            glActiveTexture(GL_TEXTURE5);
             glBindTexture(GL_TEXTURE_2D,depthMapFBO->texture());
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

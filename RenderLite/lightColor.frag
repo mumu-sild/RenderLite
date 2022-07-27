@@ -54,7 +54,7 @@ uniform Material material;
 #define PI2 6.283185307179586
 
 //采样数
-#define NUM_SAMPLES 100
+#define NUM_SAMPLES 30
 //采样圈数
 #define NUM_RINGS 10
 
@@ -116,16 +116,6 @@ float averageBlockDep(vec3 projCoords,vec2 texelSize){
     int count = 0;
     int r=5;
     //在一定范围内判断是否有遮挡物
-//    for(int x = -r; x < r; x++){
-//        for(int y = -r; y < r; y++){
-//            float depth = texture(shadowMap,projCoords.xy+vec2(x,y) * texelSize).r;
-//            if(depth < projCoords.z){//如果为遮挡物
-//                count++;
-//                blockerZ +=depth;
-//            }
-//        }
-//    }
-
     poissonDiskSamples(projCoords.xy+vec2(0.1314,0.351));
     for(int i=0;i<NUM_SAMPLES;++i){
         float depth = texture(shadowMap, projCoords.xy + r * poissonDisk[i] * texelSize).r;
@@ -227,8 +217,8 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir){
     // 变换到[0,1]的范围
     projCoords = projCoords * 0.5 + 0.5;
     // 计算阴影
-    float shadow = PCSS(projCoords);
-    //float shadow = PCF(projCoords,20);
+    //float shadow = PCSS(projCoords);
+    float shadow = PCF(projCoords,20);
     vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular));
 
     return lighting;

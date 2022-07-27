@@ -132,7 +132,7 @@ void GLWidget::wheelEvent(QWheelEvent *event)
         if(event->delta()>0)
         {
             //qDebug()<<"¹öÂÖÍùÇ°¹ö";
-            maincamera.moveForBackward(-1);
+            maincamera.moveForBackward(-3);
 
             emit xCameraPosiChanged(maincamera.getCameraPos().x());
             emit yCameraPosiChanged(maincamera.getCameraPos().y());
@@ -141,17 +141,13 @@ void GLWidget::wheelEvent(QWheelEvent *event)
             emit xCameraFocusChanged(maincamera.getCameraFocus().x());
             emit yCameraFocusChanged(maincamera.getCameraFocus().y());
             emit zCameraFocusChanged(maincamera.getCameraFocus().z());
-
-            qDebug()<<maincamera.getCameraPos().x();
-            qDebug()<<maincamera.getCameraPos().y();
-            qDebug()<<maincamera.getCameraPos().z();
 
             update();
         }
         if(event->delta()<0)
         {
             //qDebug()<<"¹öÂÖÍùºó¹ö";
-            maincamera.moveForBackward(1);
+            maincamera.moveForBackward(3);
 
             emit xCameraPosiChanged(maincamera.getCameraPos().x());
             emit yCameraPosiChanged(maincamera.getCameraPos().y());
@@ -160,11 +156,6 @@ void GLWidget::wheelEvent(QWheelEvent *event)
             emit xCameraFocusChanged(maincamera.getCameraFocus().x());
             emit yCameraFocusChanged(maincamera.getCameraFocus().y());
             emit zCameraFocusChanged(maincamera.getCameraFocus().z());
-
-            qDebug()<<maincamera.getCameraPos().x();
-            qDebug()<<maincamera.getCameraPos().y();
-            qDebug()<<maincamera.getCameraPos().z();
-
             update();
         }
     }
