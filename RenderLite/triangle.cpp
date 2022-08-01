@@ -27,7 +27,7 @@ Triangle::Triangle(QVector3D _v[3],QVector3D Color)
     edge0_2 = _v[2] - _v[0];
     QVector3D normal = QVector3D::crossProduct(edge0_1, edge0_2).normalized();
 //    qDebug()<<"normal:"<<normal;(0,1,0)
-    area = QVector3D::crossProduct(edge0_1, edge0_2).length()*0.5;
+//    area = QVector3D::crossProduct(edge0_1, edge0_2).length()*0.5;
     color = Color;
 
     Vertex vertex;
@@ -121,6 +121,17 @@ QVector3D Triangle::getlightNormal()
     QMatrix4x4 modle_inv = model.getmodel().inverted().transposed();
     QVector3D transNormal = QVector3D(modle_inv*QVector4D(v[0].Normal,0.0f));
     return transNormal;
+}
+
+float Triangle::getArea()
+{
+    QVector3D v0 = model.getmodel()*v[0].Position;
+    QVector3D v1 = model.getmodel()*v[1].Position;
+    QVector3D v2 = model.getmodel()*v[2].Position;
+    QVector3D edge01 = v1-v0;
+    QVector3D edge02 = v2-v0;
+    area = QVector3D::crossProduct(edge01, edge02).length()*0.5;
+    return area;
 }
 
 //bool Triangle::intersect(const Ray &ray)

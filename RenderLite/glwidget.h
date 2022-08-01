@@ -79,16 +79,19 @@ public:
     ShaderSelector shaderSelector;
     camera maincamera;
 
-    int objectNumber = 0;
+    int objectNumber = 0;//物体号，0为摄像机，1为0号物体
     int mousePressObjNumber = 0;
     double modelMoveCoefficient;
 
     //-----------------测试参数
-    QOpenGLFramebufferObject* depthMapFBO;
-    const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
     QOpenGLShaderProgram* simpleDepthShader,*debug_dep;
     bool shadowShow = false;
     void renderQuad();
+
+
+    //调参量
+    bool gamma = true;
+    bool blinn = true;
 
 
 private:
@@ -98,7 +101,7 @@ private:
     bool xrotation = true;
     bool yrotation = false;
     bool zrotation = false;
-    int currentIndex = 1;
+    int currentIndex = 1;//工具框
 
     int pixX=0,pixY=0;
 
@@ -129,8 +132,10 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
-
-
+private:
+    void showShadow(GLuint ID);
+    void generateDirShadow();
+    void generatePointShadow(int k);
 
 
 public:
@@ -138,6 +143,9 @@ public:
     void importModel(QString modelPath);
     void importTriangle();
     void importRectangle();
+
+
+public:
     bool getXrotation() const;
 
     void setXObjRotationSelected(bool booler);
@@ -156,6 +164,10 @@ public:
     void objectChangEmitSignal();
     void cleanup();
     void deleteObject(int objectNumber);
+
+
+
+
 
 
 public slots:

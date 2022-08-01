@@ -46,6 +46,7 @@ public:
     void Draw(QOpenGLShaderProgram& shader)override;
     QVector3D getlightpos()override;
     QVector3D getlightNormal()override;
+    float getArea()override;
 
     ~Model();
 private:

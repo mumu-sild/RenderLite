@@ -132,7 +132,7 @@ void GLWidget::wheelEvent(QWheelEvent *event)
         if(event->delta()>0)
         {
             //qDebug()<<"¹öÂÖÍùÇ°¹ö";
-            maincamera.moveForBackward(-3);
+            maincamera.moveForBackward(-5);
 
             emit xCameraPosiChanged(maincamera.getCameraPos().x());
             emit yCameraPosiChanged(maincamera.getCameraPos().y());
@@ -147,7 +147,7 @@ void GLWidget::wheelEvent(QWheelEvent *event)
         if(event->delta()<0)
         {
             //qDebug()<<"¹öÂÖÍùºó¹ö";
-            maincamera.moveForBackward(3);
+            maincamera.moveForBackward(5);
 
             emit xCameraPosiChanged(maincamera.getCameraPos().x());
             emit yCameraPosiChanged(maincamera.getCameraPos().y());

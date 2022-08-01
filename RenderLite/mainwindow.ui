@@ -1236,10 +1236,10 @@
         </rect>
        </property>
        <property name="maximum">
-        <double>100.000000000000000</double>
+        <double>20.000000000000000</double>
        </property>
        <property name="singleStep">
-        <double>1.000000000000000</double>
+        <double>0.500000000000000</double>
        </property>
       </widget>
       <widget class="QLabel" name="label_13">
@@ -1265,10 +1265,10 @@
         </rect>
        </property>
        <property name="maximum">
-        <double>100.000000000000000</double>
+        <double>2.000000000000000</double>
        </property>
        <property name="singleStep">
-        <double>1.000000000000000</double>
+        <double>0.010000000000000</double>
        </property>
       </widget>
       <widget class="QLabel" name="label_14">
@@ -1371,6 +1371,32 @@
         <string>阴影</string>
        </property>
       </widget>
+     </widget>
+     <widget class="QCheckBox" name="Blinn">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>560</y>
+        <width>105</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>blinn</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="gamma">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>590</y>
+        <width>105</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>gamma</string>
+      </property>
      </widget>
     </widget>
    </widget>

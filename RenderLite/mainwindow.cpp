@@ -270,18 +270,18 @@ void MainWindow::setUiStyle()
 void MainWindow::mouseDoubleClickEvent(QMouseEvent *e)
 {
 
-    qDebug()<<"双击了鼠标";
+    //qDebug()<<"双击了鼠标";
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *e)
 {
-    qDebug()<<"按下鼠标左键";
+   // qDebug()<<"按下鼠标左键";
 
 }
 
 void MainWindow::mouseMoveEvent(QMouseEvent *event)
 {
-    qDebug()<<"鼠标移动";
+    //qDebug()<<"鼠标移动";
 }
 
 
@@ -294,7 +294,7 @@ MainWindow::~MainWindow()
 //参数arg1是改变后的值
 void MainWindow::on_object_position_x_spinbox_valueChanged(double arg1)
 {
-   qDebug()<<arg1;
+   //qDebug()<<arg1;
     if(ui->object_number_comboBox->currentIndex()>0)
     {
         glWidget->scene.objects.at(ui->object_number_comboBox->currentIndex()-1)
@@ -309,7 +309,7 @@ void MainWindow::on_object_position_x_spinbox_valueChanged(double arg1)
 
 void MainWindow::on_object_position_y_spinbox_valueChanged(double arg1)
 {
-    qDebug()<<arg1;
+    //qDebug()<<arg1;
     if(ui->object_number_comboBox->currentIndex()>0)
     {
         glWidget->scene.objects.at(ui->object_number_comboBox->currentIndex()-1)
@@ -323,7 +323,7 @@ void MainWindow::on_object_position_y_spinbox_valueChanged(double arg1)
 
 void MainWindow::on_object_position_z_spinbox_valueChanged(double arg1)
 {
-    qDebug()<<arg1;
+    //qDebug()<<arg1;
     if(ui->object_number_comboBox->currentIndex()>0)
     {
         glWidget->scene.objects.at(ui->object_number_comboBox->currentIndex()-1)
@@ -452,7 +452,7 @@ void MainWindow::on_camera_position_x_spinbox_valueChanged(double arg1)
 
 void MainWindow::on_camera_position_y_spinbox_valueChanged(double arg1)
 {
-    qDebug()<<arg1;
+    //qDebug()<<arg1;
     glWidget->setYCameraPosi(arg1);
 }
 
@@ -529,7 +529,6 @@ void MainWindow::on_object_rotation_z_radioButton_clicked()
 
 void MainWindow::on_tabWidget_currentChanged(int index)
 {
-    qDebug()<<index;
     glWidget->setCurrentIndex(index);
 }
 
@@ -550,7 +549,7 @@ void MainWindow::on_object_renderMethod_comboBox_currentIndexChanged(int index)
 {
     if(index==2||index==3)
     {
-        qDebug()<<"combobox:"<<index;
+        //qDebug()<<"combobox:"<<index;
         ui->object_color_widget->setHidden(false);
     }
     else
@@ -568,7 +567,7 @@ void MainWindow::on_object_is_light_chekBox_stateChanged(int arg1)
 
 void MainWindow::on_hasParallel_stateChanged(int state)
 {
-    glWidget->scene.dirlight->dirLightActivated = state;
+    glWidget->scene.dirlight->Activated = state;
     glWidget->update();
 }
 
@@ -674,6 +673,20 @@ void MainWindow::on_pointLightSpecular_valueChanged(int specular)
 void MainWindow::on_light_parallel_checkbox_stateChanged(int arg1)
 {
     glWidget->shadowShow = (arg1!=0);
+    glWidget->update();
+}
+
+
+void MainWindow::on_Blinn_stateChanged(int arg1)
+{
+    glWidget->blinn = (arg1!=0);
+    glWidget->update();
+}
+
+
+void MainWindow::on_gamma_stateChanged(int arg1)
+{
+    glWidget->gamma = (arg1!=0);
     glWidget->update();
 }
 

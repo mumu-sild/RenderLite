@@ -12,6 +12,8 @@ struct DirLight {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+
+    sampler2D shadowMap;
 };
 
 
@@ -32,9 +34,8 @@ struct PointLight {
 in vec3 Normal;
 in vec3 FragPos;
 in vec2 TexCoords;
-
 in vec4 FragPosLightSpace;
-uniform sampler2D shadowMap;
+
 //输出
 out vec4 FragColor;
 
@@ -49,6 +50,10 @@ uniform int numPointLights;
 
 
 uniform Material material;
+//gamma
+uniform bool gamma;
+//光照
+bool blinn;
 
 #define PI 3.141592653589793
 #define PI2 6.283185307179586
@@ -62,9 +67,9 @@ uniform Material material;
 //函数申明
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(PointLight light,vec3 normal, vec3 fragPos,vec3 viewDir);
-float PCF(vec3 projCoords,int r);
-float PCSS(vec3 projCoords);
-float averageBlockDep(vec3 projCoords,vec2 texelSize);
+float PCF(vec3 projCoords,int r,sampler2D shadowMap);
+float PCSS(vec3 projCoords,sampler2D shadowMap);
+float averageBlockDep(vec3 projCoords,vec2 texelSize,sampler2D shadowMap);
 void poissonDiskSamples(const in vec2 randomSeed);
 
 //全局参数
@@ -108,10 +113,14 @@ void main()
        for(int i = 0; i < numPointLights; i++){
             result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
        }
+       float gamma_ = 2.2;
+       if(gamma){
+           result.rgb = pow(result.rgb, vec3(1.0/gamma_));
+       }
        FragColor = vec4(result,1.0);
 }
 
-float averageBlockDep(vec3 projCoords,vec2 texelSize){
+float averageBlockDep(vec3 projCoords,vec2 texelSize,sampler2D shadowMap){
     float blockerZ = 0.0;//遮挡物总深度
     int count = 0;
     int r=5;
@@ -130,7 +139,7 @@ float averageBlockDep(vec3 projCoords,vec2 texelSize){
     return blockerZ / count;
 }
 
-float PCSS(vec3 projCoords){
+float PCSS(vec3 projCoords,sampler2D shadowMap){
     const float weightOfLight = 10.0;
 
     // 取得最近点的深度(使用[0,1]范围下的fragPosLight当坐标)
@@ -145,16 +154,16 @@ float PCSS(vec3 projCoords){
     //PCSS核心算法
     float visibility = 0.0;
     //第一步计算平均遮挡物深度
-    float averBlocker = averageBlockDep(projCoords,texelSize);
+    float averBlocker = averageBlockDep(projCoords,texelSize,shadowMap);
     //第二步，计算半影半径
     float penumbra = (projCoords.z - averBlocker) * weightOfLight / averBlocker;
     //第三步 PCF
-    visibility = PCF(projCoords,int(penumbra));
+    visibility = PCF(projCoords,int(penumbra),shadowMap);
 
     return visibility;
 }
 
-float PCF(vec3 projCoords,int r)
+float PCF(vec3 projCoords,int r,sampler2D shadowMap)
 {
     // 取得最近点的深度(使用[0,1]范围下的fragPosLight当坐标)
     float closestDepth = texture(shadowMap, projCoords.xy).r;
@@ -165,18 +174,7 @@ float PCF(vec3 projCoords,int r)
 
     //PCF
     float shadow = 0.0;
-    //const float lightWidth = 5;
-    //float dis = (currentDepth - closestDepth)/closestDepth * lightWidth;
     vec2 texelSize = 1.0 / textureSize(shadowMap, 0);//每像素偏移距离
-//    for(int x = -r; x <= r; ++x)
-//    {
-//        for(int y = -r; y <= r; ++y)
-//        {
-//            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
-//            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
-//        }
-//    }
-//    shadow /= (2*r+1)*(2*r+1);
 
     poissonDiskSamples(projCoords.xy);
     for(int i=0;i<NUM_SAMPLES;i++){
@@ -184,8 +182,6 @@ float PCF(vec3 projCoords,int r)
         shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
     }
     shadow /= float(NUM_SAMPLES);
-    //float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
-    //float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
 
     //远平面矫正
     if(projCoords.z > 1.0)
@@ -200,11 +196,19 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir){
     vec3 lightDir = normalize(-light.direction);
     //计算cos衰减
     float diff = max(dot(lightDir,normal),0.0);
-
     //反射方向
     vec3 reflectDir = reflect(-lightDir,normal);
     //计算镜面反射系数
-    float spec = pow(max(dot(viewDir,reflectDir),0.0),material.shiness);
+
+    float spec = 0.0;
+    if(blinn){
+        vec3 halfwayDir = normalize(viewDir+lightDir);//半程向量
+        spec = pow(max(dot(normal,halfwayDir),0.0),material.shiness*4);
+    }
+    else{
+        vec3 reflectDir = reflect(-lightDir,normal); //反射方向
+        spec = pow(max(dot(viewDir,reflectDir),0.0),material.shiness);//计算镜面反射系数
+    }
 
     vec3 ambient = light.ambient * material.color;
     vec3 diffuse = light.diffuse * diff * material.color;
@@ -217,8 +221,8 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir){
     // 变换到[0,1]的范围
     projCoords = projCoords * 0.5 + 0.5;
     // 计算阴影
-    //float shadow = PCSS(projCoords);
-    float shadow = PCF(projCoords,20);
+    //float shadow = PCSS(projCoords,sampler2D shadowMap);
+    float shadow = PCF(projCoords,20,light.shadowMap);
     vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular));
 
     return lighting;

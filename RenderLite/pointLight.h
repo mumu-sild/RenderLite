@@ -2,6 +2,9 @@
 #define POINTLIGHT_H
 #include <QVector3D>
 #include <QOpenGLShaderProgram>
+#include <QOpenGLFramebufferObject>
+
+#include "Setting.h"
 
 class PointLight
 {
@@ -16,17 +19,23 @@ public:
 
     QVector3D lightNormal;
     QVector3D color;
+    float width;
 //    bool active;
     QVector3D position;
+    QOpenGLFramebufferObject* depthMapFBO;
+    QMatrix4x4 lightSpaceMatrix;
+
+
 
 
 public:
     PointLight(QVector3D posi,QVector3D c){
         position = posi;
         color = c;
+        depthMapFBO = new QOpenGLFramebufferObject(SHADOW_WIDTH,SHADOW_HEIGHT,QOpenGLFramebufferObject::Depth);
+
     }
 
-//    void setPointLight(QVector<PointLight*>& pointLight, QOpenGLShaderProgram* shader);
     void setPosition(const QVector3D &newPosition);
     QVector3D &getPosition();
     void setPositionX(const float x);
@@ -38,6 +47,8 @@ public:
     void setColorR(const float r);
     void setColorG(const float g);
     void setColorB(const float b);
+
+    QMatrix4x4 getLightMatrix();
 
 };
 

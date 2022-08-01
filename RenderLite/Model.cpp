@@ -240,6 +240,11 @@ QVector3D Model::getlightNormal()
     return QVector3D(0,0,0);//为点光源
 }
 
+float Model::getArea()
+{
+    return 0;
+}
+
 
 
 

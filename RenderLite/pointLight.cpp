@@ -1,21 +1,16 @@
 #include "pointLight.h"
 
-//void PointLight::setPointLight(QVector<PointLight*>& pointLight, QOpenGLShaderProgram *shader)
-//{
-//    LightData* lightData = new LightData(shader);
+QMatrix4x4 PointLight::getLightMatrix()
+{
+    QMatrix4x4 lightProjection, lightView;
 
-
-//    lightData->activatePointLight();
-//    lightData->setPointLightPosition(pointLight);
-//    lightData->setPointLightAmbientColor(pointLight,PointLight::ambient);
-//    lightData->setPointLightDiffuseColor(pointLight,PointLight::diffuse);
-//    lightData->setPointLightSpecularColor(pointLight,PointLight::specular);
-//    lightData->setConstant(constant);
-//    lightData->setLinear(linear);
-//    lightData->setQuadratic(quadratic);
-//    delete lightData;
-//    return;
-//}
+    float near_plane = 0.50f, far_plane = 100.5f;
+    lightProjection.perspective(150.0f,1,near_plane,far_plane);
+    //lightProjection.ortho(-eyeing, eyeing, -eyeing, eyeing, near_plane, far_plane);
+    lightView.lookAt(position, position+lightNormal, QVector3D(0.0, 1.0, 0.0));
+    lightSpaceMatrix = lightProjection * lightView;
+    return lightSpaceMatrix;
+}
 
 void PointLight::setPosition(const QVector3D &newPosition)
 {

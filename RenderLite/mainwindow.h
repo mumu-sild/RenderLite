@@ -88,5 +88,7 @@ private slots:
     void on_pointLightDiffuse_valueChanged(int value);
     void on_pointLightSpecular_valueChanged(int value);
     void on_light_parallel_checkbox_stateChanged(int arg1);
+    void on_Blinn_stateChanged(int arg1);
+    void on_gamma_stateChanged(int arg1);
 };
 #endif // MAINWINDOW_H

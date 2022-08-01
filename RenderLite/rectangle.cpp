@@ -75,6 +75,11 @@ QVector3D rectangle::getlightNormal()
     return transNormal;
 }
 
+float rectangle::getArea()
+{
+    return width*height;
+}
+
 
 void rectangle::setupVAO()
 {

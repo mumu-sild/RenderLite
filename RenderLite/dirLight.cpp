@@ -1,22 +1,6 @@
 #include "dirLight.h"
 
 
-//void DirLight::setDirLight(DirLight *dirlight, QOpenGLShaderProgram* shader)
-//{
-//    LightData* lightData = new LightData(shader);
-//    if(!dirlight->dirLightActivated){
-//        lightData->disableDirLight();
-//        return;
-//    }
-//        lightData->activateDirLight();
-//        lightData->setDirLightDirection(dirlight->getDirection());
-//        lightData->setDirLightAmbientColor(dirlight->getColor(),DirLight::ambient);
-//        lightData->setDirLightDiffuseColor(dirlight->getColor(),DirLight::diffuse);
-//        lightData->setDirLightSpecularColor(dirlight->getColor(),DirLight::specular);
-//        delete lightData;
-//        return;
-//}
-
 QVector3D &DirLight::getDirection()
 {
     return direction;
@@ -55,4 +39,17 @@ void DirLight::setColorG(const float g)
 void DirLight::setColorB(const float b)
 {
     color.setZ(b);
+}
+
+QMatrix4x4 DirLight::getLightMatrix()
+{
+    QVector3D lightPos = -direction.normalized()*50;
+    QMatrix4x4 lightProjection, lightView;
+
+    float near_plane = -50.50f, far_plane = 100.5f;
+    const float eyeing = 100.0f;
+    lightProjection.ortho(-eyeing, eyeing, -eyeing, eyeing, near_plane, far_plane);
+    lightView.lookAt(lightPos, QVector3D(0,0,0), QVector3D(0.0, 1.0, 0.0));
+    lightSpaceMatrix = lightProjection * lightView;
+    return lightSpaceMatrix;
 }

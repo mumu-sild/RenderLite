@@ -1,4 +1,4 @@
-#version 330 core
+#version 450 core
 //in vec2 TexCoords;
 
 uniform vec3 color = vec3(0.5,0.5,0.5);

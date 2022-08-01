@@ -12,7 +12,7 @@
 
 class GLWidget;
 
-class ShaderSelector
+class ShaderSelector : public QOpenGLFunctions
 {
 public:
     QVector<QString> vertexPath{
@@ -34,6 +34,8 @@ public:
     void compileShader(int i);
     void setLightDir(int shader,DirLight* dirlight);
     void setPointDir(int shader,QVector<PointLight*> pointlights);
+
+    void OpenGLFunctionsInit();
 
 private:
     QVector<QOpenGLShaderProgram*> shaderProgram;
