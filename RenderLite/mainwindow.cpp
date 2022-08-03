@@ -690,3 +690,10 @@ void MainWindow::on_gamma_stateChanged(int arg1)
     glWidget->update();
 }
 
+
+void MainWindow::on_toneMappingNumber_valueChanged(double arg1)
+{
+    glWidget->toneMapping = arg1;
+    glWidget->update();
+}
+

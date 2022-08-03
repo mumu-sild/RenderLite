@@ -54,10 +54,14 @@ uniform PointLight pointLights[16];
 uniform int numPointLights;
 
 uniform Material material;
+
+//光照
+uniform bool blinn;
+//色调映射
+uniform float toneMapping;
 //gamma
 uniform bool gamma;
-//光照
-bool blinn;
+
 
 const float PI = 3.141592653589793;
 const float PI2 = 6.283185307179586;
@@ -125,11 +129,19 @@ void main()
        for(int i = 0; i < numPointLights; i++){
             result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
        }
+       //色调映射
+       if(toneMapping>0.0f){
+           //result.rgb = result.rgb /(result.rgb+ vec3(1.0));
+           result.rgb = vec3(1.0) - exp(-result.rgb * toneMapping);
+       }
+
+
        //gamma矫正
        float gamma_ = 2.2;
        if(gamma){
            result.rgb = pow(result.rgb, vec3(1.0/gamma_));
        }
+
        FragColor = vec4(result,1.0);
 }
 
@@ -251,7 +263,6 @@ vec3 CalcPointLight(PointLight light,vec3 normal, vec3 fragPos,vec3 viewDir){
         }
 
         float diff = max(dot(lightDir,normal),0.0);
-        vec3 reflectDir = reflect(-lightDir,normal);
         float spec = 0.0;//反射系数
         if(blinn){
             vec3 halfwayDir = normalize(viewDir+lightDir);//半程向量

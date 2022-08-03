@@ -1197,7 +1197,7 @@
         <x>-10</x>
         <y>270</y>
         <width>261</width>
-        <height>281</height>
+        <height>381</height>
        </rect>
       </property>
       <widget class="QPushButton" name="light_addpointolite_pushbutton">
@@ -1371,32 +1371,60 @@
         <string>阴影</string>
        </property>
       </widget>
-     </widget>
-     <widget class="QCheckBox" name="Blinn">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>560</y>
-        <width>105</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>blinn</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="gamma">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>590</y>
-        <width>105</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>gamma</string>
-      </property>
+      <widget class="QCheckBox" name="Blinn">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>280</y>
+         <width>105</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>blinn</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="gamma">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>300</y>
+         <width>105</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>gamma</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="toneMappingNumber">
+       <property name="geometry">
+        <rect>
+         <x>100</x>
+         <y>330</y>
+         <width>80</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="toneMapping">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>330</y>
+         <width>71</width>
+         <height>18</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>曝光度：</string>
+       </property>
+      </widget>
      </widget>
     </widget>
    </widget>

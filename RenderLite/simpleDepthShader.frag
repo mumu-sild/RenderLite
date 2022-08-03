@@ -23,6 +23,4 @@ void main()
     }
 
     FragColor = vec4(vec3(depth), 1.0f);
-
-
 }

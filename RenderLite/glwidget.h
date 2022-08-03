@@ -92,6 +92,7 @@ public:
     //µ÷²ÎÁ¿
     bool gamma = true;
     bool blinn = true;
+    float toneMapping = 0.0f;
 
 
 private:

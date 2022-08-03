@@ -272,6 +272,7 @@ void GLWidget::paintGL()
             //调试参数
             shaderSelector.getShader(j)->setUniformValue("gamma",gamma);
             shaderSelector.getShader(j)->setUniformValue("blinn",blinn);
+            shaderSelector.getShader(j)->setUniformValue("toneMapping",toneMapping);
         }
     }
 
