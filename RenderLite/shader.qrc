@@ -16,5 +16,8 @@
         <file>simpleDepthShader.frag</file>
         <file>map_depth.vert</file>
         <file>map_depth.frag</file>
+        <file>BloomShader.vert</file>
+        <file>BloomShader.frag</file>
+        <file>GaussianBlur.frag</file>
     </qresource>
 </RCC>

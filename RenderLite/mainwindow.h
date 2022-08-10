@@ -27,7 +27,7 @@ public:
 protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *e);
     virtual void mousePressEvent(QMouseEvent *e);
-     virtual void mouseMoveEvent(QMouseEvent * event);
+    virtual void mouseMoveEvent(QMouseEvent * event);
 
     
 private:
@@ -91,5 +91,6 @@ private slots:
     void on_Blinn_stateChanged(int arg1);
     void on_gamma_stateChanged(int arg1);
     void on_toneMappingNumber_valueChanged(double arg1);
+    void on_HDR_stateChanged(int arg1);
 };
 #endif // MAINWINDOW_H

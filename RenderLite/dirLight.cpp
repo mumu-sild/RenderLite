@@ -1,5 +1,8 @@
 #include "dirLight.h"
 
+float DirLight::ambient = DirLightDefaultAmbient;
+float DirLight::diffuse = DirLightDefaultDiffuse;
+float DirLight::specular = DirLightDefaultSpecular;
 
 QVector3D &DirLight::getDirection()
 {

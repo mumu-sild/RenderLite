@@ -697,3 +697,10 @@ void MainWindow::on_toneMappingNumber_valueChanged(double arg1)
     glWidget->update();
 }
 
+
+void MainWindow::on_HDR_stateChanged(int arg1)
+{
+    glWidget->HDRNUM = (arg1!=0);
+    glWidget->update();
+}
+

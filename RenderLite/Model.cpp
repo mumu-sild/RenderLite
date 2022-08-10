@@ -1,7 +1,7 @@
-﻿#include "Model.h"
-#include <QFile>
+﻿#include <QFile>
 #include <QDir>
 #include <QDialog>
+#include "Model.h"
 
 /*构建path路径下的模型*/
 Model::Model(const QString &path):directory(path)

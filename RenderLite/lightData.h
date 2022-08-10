@@ -37,7 +37,7 @@ private:
 
     //point lights attribs
 //    bool pointLightActivated = false;
-    int numPointLight = -1;
+    //int numPointLight = -1;
     QVector3D* pointLightPosition;
     const static int MAX_POINT_LIGHT = 16;
 

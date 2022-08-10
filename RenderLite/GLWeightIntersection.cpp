@@ -3,13 +3,14 @@
 #include "triangle.h"
 #include "rectangle.h"
 #include <QMessageBox>
+#include "Model.h"
 
 void GLWidget::importModel(QString modelPath)
 {
     makeCurrent();
     scene.Add(new Model(modelPath));
     scene.shaderPrograms.push_back(shaderSelector.getShader(defaultshader));
-    scene.Add(new PointLight(scene.objects.last()->getlightpos(),QVector3D(1,1,1)));
+    scene.Add(new PointLight(scene.objects.last()->getlightpos(),1));
     update();
     doneCurrent();
 }
@@ -19,7 +20,7 @@ void GLWidget::importTriangle()
     makeCurrent();
     scene.Add(new Triangle());
     scene.shaderPrograms.push_back(shaderSelector.getShader(defaultshader));
-    scene.Add(new PointLight(scene.objects.last()->getlightpos(),QVector3D(1,1,1)));
+    scene.Add(new PointLight(scene.objects.last()->getlightpos(),5));
     update();
     doneCurrent();
 }
@@ -29,7 +30,7 @@ void GLWidget::importRectangle()
     makeCurrent();
     scene.Add(new rectangle(10,10));
     scene.shaderPrograms.push_back(shaderSelector.getShader(defaultshader));
-    scene.Add(new PointLight(scene.objects.last()->getlightpos(),QVector3D(1,1,1)));
+    scene.Add(new PointLight(scene.objects.last()->getlightpos(),5));
     update();
     doneCurrent();
 }

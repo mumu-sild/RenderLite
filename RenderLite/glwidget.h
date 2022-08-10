@@ -57,16 +57,15 @@
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLBuffer>
 #include <QMatrix4x4>
+#include <QOpenGLFunctions_3_3_Core>
 
 
-#include "Model.h"//模型载入类
 #include "camera.h"
-#include "lightData.h"
 #include "scene.h"
 #include "shaderSelector.h"
 
 extern QString path;
-#define numPointLight 4
+//#define numPointLight 4
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
@@ -78,21 +77,31 @@ public:
     Scene scene;
     ShaderSelector shaderSelector;
     camera maincamera;
+    QOpenGLFramebufferObject* HDRFBO;
+
+    QOpenGLFunctions_3_3_Core *core;
 
     int objectNumber = 0;//物体号，0为摄像机，1为0号物体
     int mousePressObjNumber = 0;
     double modelMoveCoefficient;
 
-    //-----------------测试参数
+    //-----------------阴影测试
     QOpenGLShaderProgram* simpleDepthShader,*debug_dep;
     bool shadowShow = false;
+    //-----------------HDR测试
+    QOpenGLShaderProgram* BloomShader;
     void renderQuad();
+    //-----------------高斯模糊
+    QOpenGLFramebufferObject* GBHorizontal,*GBVertical;
+    QOpenGLShaderProgram *GaussianBlurShader;
+
 
 
     //调参量
     bool gamma = true;
     bool blinn = true;
     float toneMapping = 0.0f;
+    int HDRNUM = 0;
 
 
 private:

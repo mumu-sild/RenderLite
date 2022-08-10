@@ -1,5 +1,12 @@
 #include "pointLight.h"
 
+float PointLight::ambient = pointLightDefaultAmbient;
+float PointLight::diffuse = PointLightDefaultDiffuse;
+float PointLight::specular = PointLightDefaultSpecular;
+float PointLight::constant = PointLightDefaultConstant;
+float PointLight::linear = PointLightDefaultLinear;
+float PointLight::quadratic=PointLightDefaultQuadratic;
+
 QMatrix4x4 PointLight::getLightMatrix()
 {
     QMatrix4x4 lightProjection, lightView;
@@ -37,9 +44,9 @@ void PointLight::setPositionZ(const float z)
     position.setZ(z);
 }
 
-QVector3D &PointLight::getColor()
+QVector3D PointLight::getColor()
 {
-    return color;
+    return color*intensity;
 }
 
 void PointLight::setColorR(const float r)

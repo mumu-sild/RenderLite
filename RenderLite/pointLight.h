@@ -19,6 +19,7 @@ public:
 
     QVector3D lightNormal;
     QVector3D color;
+    float intensity;
     float width;
 //    bool active;
     QVector3D position;
@@ -29,9 +30,9 @@ public:
 
 
 public:
-    PointLight(QVector3D posi,QVector3D c){
+    PointLight(QVector3D posi,float c){
         position = posi;
-        color = c;
+        intensity = c;
         depthMapFBO = new QOpenGLFramebufferObject(SHADOW_WIDTH,SHADOW_HEIGHT,QOpenGLFramebufferObject::Depth);
 
     }
@@ -43,7 +44,7 @@ public:
     void setPositionZ(const float z);
 
 
-    QVector3D &getColor();
+    QVector3D getColor();
     void setColorR(const float r);
     void setColorG(const float g);
     void setColorB(const float b);

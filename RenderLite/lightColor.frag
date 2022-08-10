@@ -1,5 +1,9 @@
 #version 450 core
 
+//输出
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 BrightColor;
+
 struct Material {
     vec3 color;
     float shiness;
@@ -41,9 +45,6 @@ struct PointLight {
 in vec3 Normal;
 in vec3 FragPos;
 in vec2 TexCoords;
-
-//输出
-out vec4 FragColor;
 
 //视点
 uniform vec3 viewPos;
@@ -140,6 +141,13 @@ void main()
            result.rgb = pow(result.rgb, vec3(1.0/gamma_));
        }
        FragColor = vec4(result,1.0);
+
+       //检查该像素亮度是否高于阈值
+       float brightness = dot(FragColor.rgb, vec3(0.2126, 0.2152, 0.0722));
+       //if(brightness > 1.0) BrightColor = vec4(FragColor.rgb, 1.0);
+       //else
+       BrightColor = vec4(0,0,0, 1.0);
+       //BrightColor = vec4(1.0,1.0,1.0, 1.0);
 }
 
 float averageBlockDep(vec3 projCoords,vec2 texelSize,sampler2D shadowMap){

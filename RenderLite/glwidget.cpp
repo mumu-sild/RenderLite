@@ -57,6 +57,7 @@
 #include <QString>
 #include <iostream>
 #include <QDebug>
+#include <QOpenGLFunctions>
 #include <QOpenGLFunctions_3_3_Core>
 
 #include "Model.h"
@@ -65,19 +66,9 @@
 #include "camera.h"
 #include "triangle.h"
 #include "Setting.h"
-#include "lightData.h"
 #include "rectangle.h"
 
 
-float PointLight::ambient = pointLightDefaultAmbient;
-float PointLight::diffuse = PointLightDefaultDiffuse;
-float PointLight::specular = PointLightDefaultSpecular;
-float PointLight::constant = PointLightDefaultConstant;
-float PointLight::linear = PointLightDefaultLinear;
-float PointLight::quadratic=PointLightDefaultQuadratic;
-float DirLight::ambient = DirLightDefaultAmbient;
-float DirLight::diffuse = DirLightDefaultDiffuse;
-float DirLight::specular = DirLightDefaultSpecular;
 
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent)
@@ -120,6 +111,7 @@ void GLWidget::initializeGL()
 
     initializeOpenGLFunctions();
     shaderSelector.OpenGLFunctionsInit();
+    core = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_3_Core>();
 
     glClearColor(backgroundDefaultColor.x(),
                  backgroundDefaultColor.y(),
@@ -129,7 +121,17 @@ void GLWidget::initializeGL()
     glEnable(GL_CULL_FACE);
     glEnable(GL_STENCIL_TEST);
 
+    //帧缓存
+    HDRFBO = new QOpenGLFramebufferObject(size(),QOpenGLFramebufferObject::CombinedDepthStencil,GL_TEXTURE_2D,GL_RGBA16F);
+    HDRFBO->addColorAttachment(size(),GL_RGBA16F);
+    HDRFBO->bind();
+    GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    core->glDrawBuffers(2, buffers);
+    HDRFBO->release();
 
+    //高斯模糊缓冲
+    GBHorizontal = new QOpenGLFramebufferObject(size(),QOpenGLFramebufferObject::NoAttachment,GL_TEXTURE_2D,GL_RGBA16F);
+    GBVertical = new QOpenGLFramebufferObject(size(),QOpenGLFramebufferObject::NoAttachment,GL_TEXTURE_2D,GL_RGBA16F);
     //shader编译
     for(int i=0;i<shaderSelector.vertexPath.size();++i){
         shaderSelector.compileShader(i);
@@ -144,6 +146,15 @@ void GLWidget::initializeGL()
     debug_dep->addShaderFromSourceFile(QOpenGLShader::Fragment,":/map_depth.frag");
     debug_dep->link();
 
+    BloomShader = new QOpenGLShaderProgram();
+    BloomShader->addShaderFromSourceFile(QOpenGLShader::Vertex,":/BloomShader.vert");
+    BloomShader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/BloomShader.frag");
+    BloomShader->link();
+
+    GaussianBlurShader = new QOpenGLShaderProgram();
+    GaussianBlurShader->addShaderFromSourceFile(QOpenGLShader::Vertex,":/map_depth.vert");
+    GaussianBlurShader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/GaussianBlur.frag");
+    GaussianBlurShader->link();
 
     //-------光照------------------------------------
     scene.dirlight = new DirLight();
@@ -162,14 +173,14 @@ void GLWidget::initializeGL()
     //scene.objects.at(0)->model.translate(QVector3D(0,0,0));
     //scene.objects.at(0)->model.rotate(0,180);
     scene.shaderPrograms.push_back(shaderSelector.getShader(1));
-    scene.Add(new PointLight(scene.objects.last()->getlightpos(),QVector3D(1,1,1)));
+    scene.Add(new PointLight(scene.objects.last()->getlightpos(),1));
 
     scene.Add(new Model("C:/Users/mumu/Desktop/graphics/practicalTraining_2/Picture_source/Tomie/scene/ice.pmx"));
     //scene.objects.at(1)->model.scale(QVector3D(2,2,2));
     //scene.objects.at(1)->model.translate(QVector3D(0,0,0));
     //scene.objects.at(1)->model.rotate(0,180);
     scene.shaderPrograms.push_back(shaderSelector.getShader(1));
-    scene.Add(new PointLight(scene.objects.last()->getlightpos(),QVector3D(1,1,1)));
+    scene.Add(new PointLight(scene.objects.last()->getlightpos(),1));
 
 
     //triangle test
@@ -182,7 +193,7 @@ void GLWidget::initializeGL()
     Triangle* tri = new Triangle(v,color);
     scene.Add(tri);
     scene.shaderPrograms.push_back(shaderSelector.getShader(2));
-    scene.Add(new PointLight(tri->getlightpos(),QVector3D(1,1,1)));
+    scene.Add(new PointLight(tri->getlightpos(),10));
     tri->islight = true;
 
 
@@ -190,7 +201,7 @@ void GLWidget::initializeGL()
     rec->model.translate(QVector3D(0,-14,0));
     scene.Add(rec);
     scene.Add(shaderSelector.getShader(3));
-    scene.Add(new PointLight(rec->getlightpos(),QVector3D(1,1,1)));
+    scene.Add(new PointLight(rec->getlightpos(),1));
 
     qDebug()<<"initialGL";
 }
@@ -199,6 +210,7 @@ void GLWidget::initializeGL()
 
 void GLWidget::showShadow(GLuint ID)
 {
+    //makeCurrent();
     glViewport(0,0,width(),height());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
     debug_dep->bind();//shader
@@ -209,6 +221,8 @@ void GLWidget::showShadow(GLuint ID)
 
     renderQuad();
     debug_dep->release();
+    //doneCurrent();
+
 }
 
 
@@ -250,6 +264,7 @@ void GLWidget::paintGL()
     }
 
 //-----场景渲染----------------------------------------------
+    HDRFBO->bind();
     glViewport(0, 0, width(), height());
     //Render类，来做渲染
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
@@ -285,7 +300,10 @@ void GLWidget::paintGL()
         m_world = scene.objects[i]->model.getmodel();
         scene.shaderPrograms[i]->setUniformValue("model",m_world);
         if(scene.shaderPrograms[i] == shaderSelector.getShader(shaderTypes::SHADER_COLOR)){//2
-            scene.shaderPrograms[i]->setUniformValue("color",scene.objects.at(i)->color);
+            if(scene.objects.at(i)->islight){
+                scene.shaderPrograms[i]->setUniformValue("color",scene.pointlights.at(i)->color*scene.pointlights.at(i)->intensity);
+            }
+            else scene.shaderPrograms[i]->setUniformValue("color",scene.objects.at(i)->color);
         }
         if(scene.shaderPrograms[i] == shaderSelector.getShader(shaderTypes::SHADER_LIGHTCOLOR)){//3
            scene.shaderPrograms[i]->setUniformValue("material.color",scene.objects[i]->color);
@@ -308,6 +326,59 @@ void GLWidget::paintGL()
         scene.objects.at(objectNumber-1)->Draw(*shaderSelector.getShader(2));
         glEnable(GL_CULL_FACE);
     }
+
+    HDRFBO->release();
+
+    //高斯模糊
+    GLboolean horizontal = true, first_iteration = true;
+    GLuint amount = 10;
+    GaussianBlurShader->bind();
+    for (GLuint i = 0; i < amount; i++)
+    {
+        if(horizontal)GBHorizontal->bind();
+        else GBVertical->bind();
+        //glClear(GL_COLOR_BUFFER_BIT);
+        GaussianBlurShader->setUniformValue("horizontal",horizontal);
+        GaussianBlurShader->setUniformValue("image",0);
+        glActiveTexture(GL_TEXTURE0);
+        unsigned int id = 0;
+        if(first_iteration){
+            id = HDRFBO->textures().at(1);
+        }
+        else{
+            if(horizontal)id = GBVertical->texture();
+            else id = GBHorizontal->texture();
+        }
+        glBindTexture(GL_TEXTURE_2D, id);
+        renderQuad();
+        horizontal = !horizontal;
+        if (first_iteration)
+            first_iteration = false;
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    //HDR输出
+    glViewport(0,0,width(),height());
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    BloomShader->bind();//shader
+
+    BloomShader->setUniformValue("RenderResult",0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D,HDRFBO->textures().at(0));
+
+    BloomShader->setUniformValue("bloomBlur",1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D,GBVertical->texture());
+
+    if(HDRNUM==0){
+        BloomShader->setUniformValue("addBloom",false);
+    }
+    else BloomShader->setUniformValue("addBloom",true);
+
+    renderQuad();
+    QOpenGLFramebufferObject::blitFramebuffer(nullptr,HDRFBO,GL_STENCIL_BUFFER_BIT);
+
+    BloomShader->release();
 
 }
 
@@ -343,8 +414,26 @@ void GLWidget::generatePointShadow(int k)
 
 void GLWidget::resizeGL(int w, int h)
 {
+    makeCurrent();
     maincamera.projection.setToIdentity();
     maincamera.projection.perspective(45.0f, GLfloat(w) / h, 0.001f, 1000.0f);
+
+
+    delete HDRFBO;
+    HDRFBO = new QOpenGLFramebufferObject(w,h,QOpenGLFramebufferObject::CombinedDepthStencil,GL_TEXTURE_2D,GL_RGBA16F);
+    HDRFBO->addColorAttachment(w,h,GL_RGBA16F);
+    HDRFBO->bind();
+    GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    core->glDrawBuffers(2, buffers);
+    HDRFBO->release();
+
+    //高斯模糊缓冲
+    delete GBHorizontal;
+    delete GBVertical;
+    GBHorizontal = new QOpenGLFramebufferObject(w,h,QOpenGLFramebufferObject::NoAttachment,GL_TEXTURE_2D,GL_RGBA16F);
+    GBVertical = new QOpenGLFramebufferObject(w,h,QOpenGLFramebufferObject::NoAttachment,GL_TEXTURE_2D,GL_RGBA16F);
+
+    doneCurrent();
 }
 
 void GLWidget::setObjectNumber(int newObjectNumber)

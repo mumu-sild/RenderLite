@@ -1,5 +1,4 @@
 #include "shaderSelector.h"
-#include "lightData.h"
 
 ShaderSelector::ShaderSelector(){
 //    initializeOpenGLFunctions();必须在OpenGLWidget创建时候使用，否则会crash
@@ -75,9 +74,9 @@ void ShaderSelector::setPointDir(int j, QVector<PointLight *> pointlights)
         StringNum.setNum(i);
         QString StringI = structNameFront+StringNum;
         shader->setUniformValue(QString(StringI+"].position").toStdString().c_str(),pointlights[i]->position);
-        shader->setUniformValue(QString(StringI+"].ambient").toStdString().c_str(),pointlights[i]->color * PointLight::ambient);
-        shader->setUniformValue(QString(StringI+"].diffuse").toStdString().c_str(),pointlights[i]->color * PointLight::diffuse);
-        shader->setUniformValue(QString(StringI+"].specular").toStdString().c_str(),pointlights[i]->color * PointLight::specular);
+        shader->setUniformValue(QString(StringI+"].ambient").toStdString().c_str(),pointlights[i]->getColor() * PointLight::ambient);
+        shader->setUniformValue(QString(StringI+"].diffuse").toStdString().c_str(),pointlights[i]->getColor() * PointLight::diffuse);
+        shader->setUniformValue(QString(StringI+"].specular").toStdString().c_str(),pointlights[i]->getColor() * PointLight::specular);
         shader->setUniformValue(QString(StringI+"].lightnormal").toStdString().c_str(),pointlights[i]->lightNormal);
         shader->setUniformValue(QString(StringI+"].constant").toStdString().c_str(),PointLight::constant);
         shader->setUniformValue(QString(StringI+"].linear").toStdString().c_str(),PointLight::linear);
