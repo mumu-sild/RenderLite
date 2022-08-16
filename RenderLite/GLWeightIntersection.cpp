@@ -198,9 +198,9 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             emit yCameraFocusChanged(maincamera.getCameraFocus().y());
             emit zCameraFocusChanged(maincamera.getCameraFocus().z());
 
-            qDebug()<<maincamera.getCameraPos().x();
-            qDebug()<<maincamera.getCameraPos().y();
-            qDebug()<<maincamera.getCameraPos().z();
+//            qDebug()<<maincamera.getCameraPos().x();
+//            qDebug()<<maincamera.getCameraPos().y();
+//            qDebug()<<maincamera.getCameraPos().z();
 
             update();
         }
@@ -217,9 +217,9 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             emit yCameraFocusChanged(maincamera.getCameraFocus().y());
             emit zCameraFocusChanged(maincamera.getCameraFocus().z());
 
-            qDebug()<<maincamera.getCameraPos().x();
-            qDebug()<<maincamera.getCameraPos().y();
-            qDebug()<<maincamera.getCameraPos().z();
+//            qDebug()<<maincamera.getCameraPos().x();
+//            qDebug()<<maincamera.getCameraPos().y();
+//            qDebug()<<maincamera.getCameraPos().z();
 
             update();
         }
@@ -235,9 +235,9 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             emit yCameraFocusChanged(maincamera.getCameraFocus().y());
             emit zCameraFocusChanged(maincamera.getCameraFocus().z());
 
-            qDebug()<<maincamera.getCameraPos().x();
-            qDebug()<<maincamera.getCameraPos().y();
-            qDebug()<<maincamera.getCameraPos().z();
+//            qDebug()<<maincamera.getCameraPos().x();
+//            qDebug()<<maincamera.getCameraPos().y();
+//            qDebug()<<maincamera.getCameraPos().z();
 
             update();
         }
@@ -253,9 +253,9 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             emit yCameraFocusChanged(maincamera.getCameraFocus().y());
             emit zCameraFocusChanged(maincamera.getCameraFocus().z());
 
-            qDebug()<<maincamera.getCameraPos().x();
-            qDebug()<<maincamera.getCameraPos().y();
-            qDebug()<<maincamera.getCameraPos().z();
+//            qDebug()<<maincamera.getCameraPos().x();
+//            qDebug()<<maincamera.getCameraPos().y();
+//            qDebug()<<maincamera.getCameraPos().z();
 
             update();
         }

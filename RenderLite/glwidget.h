@@ -63,6 +63,8 @@
 #include "camera.h"
 #include "scene.h"
 #include "shaderSelector.h"
+#include "gaussianblur.h"
+#include "SSAO.h"
 
 extern QString path;
 //#define numPointLight 4
@@ -77,7 +79,7 @@ public:
     Scene scene;
     ShaderSelector shaderSelector;
     camera maincamera;
-    QOpenGLFramebufferObject* HDRFBO;
+    QOpenGLFramebufferObject*G_Buffer;//* HDRFBO
 
     QOpenGLFunctions_3_3_Core *core;
 
@@ -91,9 +93,14 @@ public:
     //-----------------HDR²âÊÔ
     QOpenGLShaderProgram* BloomShader;
     void renderQuad();
-    //-----------------¸ßË¹Ä£ºý
-    QOpenGLFramebufferObject* GBHorizontal,*GBVertical;
-    QOpenGLShaderProgram *GaussianBlurShader;
+    //gaussBlur
+    GaussianBlur *gaussBlur;
+    //G_Buffer
+    QOpenGLShaderProgram* LightShader;
+    //SSAO
+    SSAO *ssao;
+
+
 
 
 
@@ -143,7 +150,7 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
 private:
-    void showShadow(GLuint ID);
+    void showPicture(GLuint ID);
     void generateDirShadow();
     void generatePointShadow(int k);
 

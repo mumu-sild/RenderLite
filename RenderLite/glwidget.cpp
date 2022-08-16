@@ -112,6 +112,8 @@ void GLWidget::initializeGL()
     initializeOpenGLFunctions();
     shaderSelector.OpenGLFunctionsInit();
     core = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_3_Core>();
+    gaussBlur = new GaussianBlur();
+    ssao = new SSAO(width(),height());
 
     glClearColor(backgroundDefaultColor.x(),
                  backgroundDefaultColor.y(),
@@ -121,17 +123,21 @@ void GLWidget::initializeGL()
     glEnable(GL_CULL_FACE);
     glEnable(GL_STENCIL_TEST);
 
-    //帧缓存
-    HDRFBO = new QOpenGLFramebufferObject(size(),QOpenGLFramebufferObject::CombinedDepthStencil,GL_TEXTURE_2D,GL_RGBA16F);
-    HDRFBO->addColorAttachment(size(),GL_RGBA16F);
-    HDRFBO->bind();
-    GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-    core->glDrawBuffers(2, buffers);
-    HDRFBO->release();
+    //G-Buffer
+    //  位置
+    G_Buffer = new QOpenGLFramebufferObject(size(),QOpenGLFramebufferObject::CombinedDepthStencil,GL_TEXTURE_2D,GL_RGBA);
+    //  法向量
+    G_Buffer->addColorAttachment(size(),GL_RGBA);
+    //  颜色（HDR）+镜面颜色
+    G_Buffer->addColorAttachment(size(),GL_RGBA16F);
+    //  高光图（只计算光源物体）
+    G_Buffer->addColorAttachment(size(),GL_RGBA16F);
+    //  设置着色器渲染纹理路径
+    G_Buffer->bind();
+    GLenum buffers2[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+    core->glDrawBuffers(3, buffers2);
+    G_Buffer->release();
 
-    //高斯模糊缓冲
-    GBHorizontal = new QOpenGLFramebufferObject(size(),QOpenGLFramebufferObject::NoAttachment,GL_TEXTURE_2D,GL_RGBA16F);
-    GBVertical = new QOpenGLFramebufferObject(size(),QOpenGLFramebufferObject::NoAttachment,GL_TEXTURE_2D,GL_RGBA16F);
     //shader编译
     for(int i=0;i<shaderSelector.vertexPath.size();++i){
         shaderSelector.compileShader(i);
@@ -151,10 +157,11 @@ void GLWidget::initializeGL()
     BloomShader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/BloomShader.frag");
     BloomShader->link();
 
-    GaussianBlurShader = new QOpenGLShaderProgram();
-    GaussianBlurShader->addShaderFromSourceFile(QOpenGLShader::Vertex,":/map_depth.vert");
-    GaussianBlurShader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/GaussianBlur.frag");
-    GaussianBlurShader->link();
+    LightShader = new QOpenGLShaderProgram();
+    LightShader->addShaderFromSourceFile(QOpenGLShader::Vertex,":/G_Buffer.vert");
+    LightShader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/G_Buffer.frag");
+    LightShader->link();
+
 
     //-------光照------------------------------------
     scene.dirlight = new DirLight();
@@ -208,11 +215,10 @@ void GLWidget::initializeGL()
 
 
 
-void GLWidget::showShadow(GLuint ID)
+void GLWidget::showPicture(GLuint ID)
 {
     //makeCurrent();
-    glViewport(0,0,width(),height());
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+    //glViewport(0,0,width(),height());
     debug_dep->bind();//shader
     debug_dep->setUniformValue("depthMap",0);
     glActiveTexture(GL_TEXTURE0);
@@ -222,14 +228,13 @@ void GLWidget::showShadow(GLuint ID)
     renderQuad();
     debug_dep->release();
     //doneCurrent();
-
 }
 
 
 
 void GLWidget::paintGL()
 {
-    //第一次层循环，获取光照信息以及shadow map图
+//  第一次层循环，获取光照信息以及shadow map图
     QVector<PointLight*> pointLight;
 
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
@@ -256,15 +261,18 @@ void GLWidget::paintGL()
 
 //   显示shadow map 图
     if(shadowShow){
+        glViewport(0,0,width(),height());
         if(objectNumber&&scene.objects.at(objectNumber-1)->islight){
-            showShadow(scene.pointlights.at(objectNumber-1)->depthMapFBO->texture());
+            showPicture(scene.pointlights.at(objectNumber-1)->depthMapFBO->texture());
         }
-        else showShadow(scene.dirlight->depthMapFBO->texture());
+        else showPicture(scene.dirlight->depthMapFBO->texture());
         return;
     }
 
 //-----场景渲染----------------------------------------------
-    HDRFBO->bind();
+
+//  G-Buffer
+    G_Buffer->bind();
     glViewport(0, 0, width(), height());
     //Render类，来做渲染
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
@@ -278,17 +286,6 @@ void GLWidget::paintGL()
         shaderSelector.getShader(j)->bind();
         shaderSelector.getShader(j)->setUniformValue("view",maincamera.getViewMetrix());
         shaderSelector.getShader(j)->setUniformValue("projection",projection);
-
-        if(j==shaderTypes::SHADER_LIGHT||j==shaderTypes::SHADER_LIGHTCOLOR){//1,3
-            shaderSelector.getShader(j)->setUniformValue("viewPos",maincamera.getCameraPos());
-            shaderSelector.getShader(j)->setUniformValue("material.shiness",64.0f);
-            shaderSelector.setLightDir(j,scene.dirlight);
-            shaderSelector.setPointDir(j,pointLight);
-            //调试参数
-            shaderSelector.getShader(j)->setUniformValue("gamma",gamma);
-            shaderSelector.getShader(j)->setUniformValue("blinn",blinn);
-            shaderSelector.getShader(j)->setUniformValue("toneMapping",toneMapping);
-        }
     }
 
 
@@ -297,8 +294,9 @@ void GLWidget::paintGL()
         glStencilFunc(GL_ALWAYS, i+1, 0xFF);//模板测试始终通过，ref为当前物体编号
 
         scene.shaderPrograms[i]->bind();
-        m_world = scene.objects[i]->model.getmodel();
-        scene.shaderPrograms[i]->setUniformValue("model",m_world);
+        //model
+        scene.shaderPrograms[i]->setUniformValue("model",scene.objects[i]->model.getmodel());
+        //color
         if(scene.shaderPrograms[i] == shaderSelector.getShader(shaderTypes::SHADER_COLOR)){//2
             if(scene.objects.at(i)->islight){
                 scene.shaderPrograms[i]->setUniformValue("color",scene.pointlights.at(i)->color*scene.pointlights.at(i)->intensity);
@@ -306,10 +304,68 @@ void GLWidget::paintGL()
             else scene.shaderPrograms[i]->setUniformValue("color",scene.objects.at(i)->color);
         }
         if(scene.shaderPrograms[i] == shaderSelector.getShader(shaderTypes::SHADER_LIGHTCOLOR)){//3
-           scene.shaderPrograms[i]->setUniformValue("material.color",scene.objects[i]->color);
+           scene.shaderPrograms[i]->setUniformValue("color",scene.objects[i]->color);
         }
+        //islight
+        scene.shaderPrograms[i]->setUniformValue("islight",scene.objects[i]->islight);
         scene.objects.at(i)->Draw(*scene.shaderPrograms[i]);
     }
+    G_Buffer->release();
+
+    //高斯模糊
+    unsigned int ID = gaussBlur->getGaussBlurPhoto(G_Buffer->textures().at(3),width(),height(),15);
+    //unsigned int ID = G_Buffer->textures().at(3);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    //G-Buffer测试
+//    glViewport(0,height()/2,width()/2,height()/2);
+//    showPicture(G_Buffer->textures().at(0));
+//    glViewport(width()/2,height()/2,width()/2,height()/2);
+//    showPicture(G_Buffer->textures().at(1));
+//    glViewport(0,0,width()/2,height()/2);
+//    showPicture(G_Buffer->textures().at(2));
+//    glViewport(width()/2,0,width()/2,height()/2);
+//    showPicture(ID);
+//    return;
+
+//-----SSAO-----------------------------------
+    //ssao test
+    //ssao->generateNoise();
+//    ssao->SSAOPicture(G_Buffer,projection*maincamera.getViewMetrix());//*maincamera.getViewMetrix()
+//    return;
+
+//-----G_Buffer合成
+    LightShader->bind();
+    // G_Buffer输入
+    LightShader->setUniformValue("gPosition",0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D,G_Buffer->textures().at(0));
+    LightShader->setUniformValue("gNormal",1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D,G_Buffer->textures().at(1));
+    LightShader->setUniformValue("gAlbedoSpec",2);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D,G_Buffer->textures().at(2));
+    LightShader->setUniformValue("gBrightColor",3);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D,ID);
+    // 光照信息输入
+    scene.dirlight->setShaderPara(LightShader,4);
+    int numPointLight = pointLight.size();
+    LightShader->setUniformValue("numPointLights",numPointLight);
+    for(int i=0;i<pointLight.length();++i){
+        pointLight.at(i)->setShaderPara(LightShader,5+i,i);
+    }
+    // 其他信息
+    LightShader->setUniformValue("viewPos",maincamera.getCameraPos());
+    LightShader->setUniformValue("shiness",64.0f);
+    // 调试参数
+    LightShader->setUniformValue("gamma",gamma);
+    LightShader->setUniformValue("blinn",blinn);
+    LightShader->setUniformValue("toneMapping",toneMapping);
+    renderQuad();
+    QOpenGLFramebufferObject::blitFramebuffer(nullptr,G_Buffer,GL_STENCIL_BUFFER_BIT);
+    QOpenGLFramebufferObject::blitFramebuffer(nullptr,G_Buffer,GL_DEPTH_BUFFER_BIT);
 
 
     //边框
@@ -318,68 +374,13 @@ void GLWidget::paintGL()
         glStencilFunc(GL_NOTEQUAL,objectNumber,0xFF);
         glStencilOp(GL_KEEP,GL_KEEP,GL_REPLACE);
 
-        shaderSelector.getShader(2)->bind();
+        shaderSelector.getShader(4)->bind();
         m_world = scene.objects[objectNumber-1]->model.getmodel();
         m_world.scale(frameScale);
-        shaderSelector.getShader(2)->setUniformValue("model",m_world);
-        shaderSelector.getShader(2)->setUniformValue("color",QVector3D(1,1,1));
-        scene.objects.at(objectNumber-1)->Draw(*shaderSelector.getShader(2));
+        shaderSelector.getShader(4)->setUniformValue("model",m_world);
+        scene.objects.at(objectNumber-1)->Draw(*shaderSelector.getShader(4));
         glEnable(GL_CULL_FACE);
     }
-
-    HDRFBO->release();
-
-    //高斯模糊
-    GLboolean horizontal = true, first_iteration = true;
-    GLuint amount = 10;
-    GaussianBlurShader->bind();
-    for (GLuint i = 0; i < amount; i++)
-    {
-        if(horizontal)GBHorizontal->bind();
-        else GBVertical->bind();
-        //glClear(GL_COLOR_BUFFER_BIT);
-        GaussianBlurShader->setUniformValue("horizontal",horizontal);
-        GaussianBlurShader->setUniformValue("image",0);
-        glActiveTexture(GL_TEXTURE0);
-        unsigned int id = 0;
-        if(first_iteration){
-            id = HDRFBO->textures().at(1);
-        }
-        else{
-            if(horizontal)id = GBVertical->texture();
-            else id = GBHorizontal->texture();
-        }
-        glBindTexture(GL_TEXTURE_2D, id);
-        renderQuad();
-        horizontal = !horizontal;
-        if (first_iteration)
-            first_iteration = false;
-    }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    //HDR输出
-    glViewport(0,0,width(),height());
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    BloomShader->bind();//shader
-
-    BloomShader->setUniformValue("RenderResult",0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D,HDRFBO->textures().at(0));
-
-    BloomShader->setUniformValue("bloomBlur",1);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D,GBVertical->texture());
-
-    if(HDRNUM==0){
-        BloomShader->setUniformValue("addBloom",false);
-    }
-    else BloomShader->setUniformValue("addBloom",true);
-
-    renderQuad();
-    QOpenGLFramebufferObject::blitFramebuffer(nullptr,HDRFBO,GL_STENCIL_BUFFER_BIT);
-
-    BloomShader->release();
-
 }
 
 void GLWidget::generateDirShadow()
@@ -418,21 +419,25 @@ void GLWidget::resizeGL(int w, int h)
     maincamera.projection.setToIdentity();
     maincamera.projection.perspective(45.0f, GLfloat(w) / h, 0.001f, 1000.0f);
 
+    delete G_Buffer;
+    //G-Buffer
+    //  位置
+    G_Buffer = new QOpenGLFramebufferObject(size(),QOpenGLFramebufferObject::CombinedDepthStencil,GL_TEXTURE_2D,GL_RGBA16F);
+    //  法向量
+    G_Buffer->addColorAttachment(size(),GL_RGBA16F);
+    //  颜色（HDR）+镜面颜色
+    G_Buffer->addColorAttachment(size(),GL_RGBA16F);
+    //  高光图（只计算光源物体）
+    G_Buffer->addColorAttachment(size(),GL_RGBA16F);
+    //  设置着色器渲染纹理路径
+    G_Buffer->bind();
+    GLenum buffers2[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+    core->glDrawBuffers(4, buffers2);
+    G_Buffer->release();
 
-    delete HDRFBO;
-    HDRFBO = new QOpenGLFramebufferObject(w,h,QOpenGLFramebufferObject::CombinedDepthStencil,GL_TEXTURE_2D,GL_RGBA16F);
-    HDRFBO->addColorAttachment(w,h,GL_RGBA16F);
-    HDRFBO->bind();
-    GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-    core->glDrawBuffers(2, buffers);
-    HDRFBO->release();
-
-    //高斯模糊缓冲
-    delete GBHorizontal;
-    delete GBVertical;
-    GBHorizontal = new QOpenGLFramebufferObject(w,h,QOpenGLFramebufferObject::NoAttachment,GL_TEXTURE_2D,GL_RGBA16F);
-    GBVertical = new QOpenGLFramebufferObject(w,h,QOpenGLFramebufferObject::NoAttachment,GL_TEXTURE_2D,GL_RGBA16F);
-
+    //ssao
+    //qDebug()<<"resizeGL";
+    ssao->resizeSSAO(w,h);
     doneCurrent();
 }
 

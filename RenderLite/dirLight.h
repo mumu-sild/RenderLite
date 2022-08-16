@@ -3,10 +3,11 @@
 #include <QVector3D>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFramebufferObject>
+#include <QOpenGLFunctions>
 
 #include "Setting.h"
 
-class DirLight
+class DirLight : public QOpenGLFunctions
 {
 public:
     static float ambient;
@@ -33,6 +34,7 @@ public:
     void setColorB(const float b);
 
     QMatrix4x4 getLightMatrix();
+    void setShaderPara(QOpenGLShaderProgram* shader,int UniformInt);
 
 //    void setDirLight(DirLight* dirlight, QOpenGLShaderProgram* shader);
     DirLight(QVector3D dir = QVector3D(-0.2f,-1.0f,-0.3f),
@@ -40,6 +42,7 @@ public:
         :direction(dir),color(color)
     {
         depthMapFBO = new QOpenGLFramebufferObject(SHADOW_WIDTH,SHADOW_HEIGHT,QOpenGLFramebufferObject::Depth);
+        initializeOpenGLFunctions();
     }
 
     ~DirLight(){

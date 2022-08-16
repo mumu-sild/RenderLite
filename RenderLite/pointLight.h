@@ -3,10 +3,11 @@
 #include <QVector3D>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFramebufferObject>
+#include <QOpenGLFunctions>
 
 #include "Setting.h"
 
-class PointLight
+class PointLight : public QOpenGLFunctions
 {
 public:
     static float ambient;
@@ -34,7 +35,7 @@ public:
         position = posi;
         intensity = c;
         depthMapFBO = new QOpenGLFramebufferObject(SHADOW_WIDTH,SHADOW_HEIGHT,QOpenGLFramebufferObject::Depth);
-
+        initializeOpenGLFunctions();
     }
 
     void setPosition(const QVector3D &newPosition);
@@ -50,6 +51,7 @@ public:
     void setColorB(const float b);
 
     QMatrix4x4 getLightMatrix();
+    void setShaderPara(QOpenGLShaderProgram* shader,int UniformInt,int i);
 
 };
 

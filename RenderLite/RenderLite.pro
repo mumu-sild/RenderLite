@@ -16,8 +16,10 @@ SOURCES += \
     GLWeightIntersection.cpp \
     Mesh.cpp \
     Model.cpp \
+    SSAO.cpp \
     camera.cpp \
     dirLight.cpp \
+    gaussianblur.cpp \
     glwidget.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -36,11 +38,13 @@ HEADERS += \
     Model.h \
     Object.h \
     Objectmodel.h \
+    SSAO.h \
     Setting.h \
     Texture.h \
     Vertex.h \
     camera.h \
     dirLight.h \
+    gaussianblur.h \
     glwidget.h \
     mainwindow.h \
     pointLight.h \

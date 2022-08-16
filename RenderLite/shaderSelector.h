@@ -19,13 +19,15 @@ public:
         ":/texture.vert",
         ":/lightObject.vert",
         ":/color.vert",
-        ":/lightColor.vert"
+        ":/lightColor.vert",
+        ":/frameShader.vert"
     };
     QVector<QString> fragmentPath{
         ":/texture.frag",
         ":/lightObject.frag",
         ":color.frag",
-        ":/lightColor.frag"
+        ":/lightColor.frag",
+        ":/frameShader.frag"
     };
     ShaderSelector();
     ~ShaderSelector();

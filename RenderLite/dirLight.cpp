@@ -56,3 +56,36 @@ QMatrix4x4 DirLight::getLightMatrix()
     lightSpaceMatrix = lightProjection * lightView;
     return lightSpaceMatrix;
 }
+
+void DirLight::setShaderPara(QOpenGLShaderProgram *shader,int UniformInt)
+{
+    //    struct DirLight {
+    //        bool Activated;
+    //        vec3 direction;
+
+    //        vec3 ambient;
+    //        vec3 diffuse;
+    //        vec3 specular;
+    //        //阴影
+    //        sampler2D shadowMap;
+    //        mat4 lightSpaceMatrix;
+    //    };
+    shader->setUniformValue("dirLight.Activated",Activated);
+    shader->setUniformValue("dirLight.direction",getDirection());
+    shader->setUniformValue("dirLight.ambient",getColor()*DirLight::ambient);
+    shader->setUniformValue("dirLight.diffuse",getColor()*DirLight::diffuse);
+    shader->setUniformValue("dirLight.specular",getColor()*DirLight::specular);
+    //注意，对于有纹理的阴影生成，不能将阴影图的绑定点与纹理绑定点相同****
+    shader->setUniformValue("dirLight.shadowMap",UniformInt);
+    shader->setUniformValue("dirLight.lightSpaceMatrix",getLightMatrix());
+
+    glActiveTexture(GL_TEXTURE0+UniformInt);
+    glBindTexture(GL_TEXTURE_2D,depthMapFBO->texture());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+}

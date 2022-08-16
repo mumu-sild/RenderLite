@@ -19,5 +19,11 @@
         <file>BloomShader.vert</file>
         <file>BloomShader.frag</file>
         <file>GaussianBlur.frag</file>
+        <file>G_Buffer.vert</file>
+        <file>G_Buffer.frag</file>
+        <file>frameShader.vert</file>
+        <file>frameShader.frag</file>
+        <file>SSAOShader.vert</file>
+        <file>SSAOShader.frag</file>
     </qresource>
 </RCC>
