@@ -25,5 +25,7 @@
         <file>frameShader.frag</file>
         <file>SSAOShader.vert</file>
         <file>SSAOShader.frag</file>
+        <file>PBR_Shader.vert</file>
+        <file>PBR_Shader.frag</file>
     </qresource>
 </RCC>

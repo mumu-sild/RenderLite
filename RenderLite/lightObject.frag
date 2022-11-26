@@ -1,10 +1,12 @@
 #version 450 core
 
 //输出
-layout (location = 0) out vec4 gPositionDepth;
+layout (location = 0) out vec3 gPosition;
 layout (location = 1) out vec3 gNormal;
 layout (location = 2) out vec4 gAlbedoSpec;
 layout (location = 3) out vec4 BrightColor;
+layout (location = 4) out vec4 gViewPosDepth;
+layout (location = 5) out vec3 gViewNormal;
 
 struct Material {
         sampler2D texture_diffuse1;
@@ -13,8 +15,10 @@ struct Material {
 };
 
 //顶点信息
-in vec3 Normal;
 in vec3 FragPos;//该像素在世界坐标系下的坐标
+in vec3 ViewFragPos;
+in vec3 Normal;
+in vec3 ViewNormal;
 in vec2 TexCoords;
 
 uniform Material material;
@@ -32,11 +36,13 @@ float LinearizeDepth(float depth)
 void main()
 {
     // 存储第一个G缓冲纹理中的片段位置向量
-    gPositionDepth.rgb = FragPos;
-    // View视角深度值
-    gPositionDepth.a = LinearizeDepth(gl_FragCoord.z);
-    // 同样存储对每个逐片段法线到G缓冲中
+    gPosition = FragPos;
+    // View视角位置，深度值
+    gViewPosDepth.xyz = ViewFragPos;
+    gViewPosDepth.a = LinearizeDepth(gl_FragCoord.z);
+     // 同样存储对每个逐片段法线到G缓冲中
     gNormal = normalize(Normal);
+    gViewNormal = normalize(ViewNormal);
     // 和漫反射对每个逐片段颜色
     gAlbedoSpec.rgb = texture(material.texture_diffuse1, TexCoords).rgb;
     // 存储镜面强度到gAlbedoSpec的alpha分量

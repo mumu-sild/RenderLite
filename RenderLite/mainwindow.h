@@ -92,5 +92,6 @@ private slots:
     void on_gamma_stateChanged(int arg1);
     void on_toneMappingNumber_valueChanged(double arg1);
     void on_HDR_stateChanged(int arg1);
+    void on_radioButton_clicked();
 };
 #endif // MAINWINDOW_H

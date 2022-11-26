@@ -20,9 +20,9 @@ private:
 
 
 public:
-    GaussianBlur();
-
-    unsigned int getGaussBlurPhoto(unsigned int BlurId,int w,int h,unsigned int amount = 10);
+    GaussianBlur(int w, int h);
+    void resizeGaussBlurFBO(int w,int h);
+    QOpenGLFramebufferObject* getGaussBlurPhoto(unsigned int BlurId,unsigned int amount = 10);
     void renderQuad();
     ~GaussianBlur();
 };

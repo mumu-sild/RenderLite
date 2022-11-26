@@ -12,6 +12,7 @@ camera::camera() :cameraPosi(camereInitialPosition), cameraFocus(cameraInitialFo
     dirZ = (cameraPosi - cameraFocus).normalized();
     dirX = (QVector3D::crossProduct(dirZ, cameraUp));
     dirY = -(QVector3D::crossProduct(dirZ, dirX)).normalized();
+    //projection.perspective(45.0f, 800 / 1200, 0.001f, 1000.0f);
 }
 
 void camera::moveForBackward(float meters)

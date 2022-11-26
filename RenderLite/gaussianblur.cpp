@@ -1,7 +1,7 @@
 #include "gaussianblur.h"
 
 
-GaussianBlur::GaussianBlur() : quadVBO(QOpenGLBuffer::VertexBuffer)
+GaussianBlur::GaussianBlur(int w, int h) : quadVBO(QOpenGLBuffer::VertexBuffer)
 {
     initializeOpenGLFunctions();
     //shader
@@ -9,6 +9,9 @@ GaussianBlur::GaussianBlur() : quadVBO(QOpenGLBuffer::VertexBuffer)
     GaussianBlurShader->addShaderFromSourceFile(QOpenGLShader::Vertex,":/map_depth.vert");
     GaussianBlurShader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/GaussianBlur.frag");
     GaussianBlurShader->link();
+
+    GaussionBlur[0] = new QOpenGLFramebufferObject(w,h,QOpenGLFramebufferObject::NoAttachment,GL_TEXTURE_2D,GL_RGBA16F);
+    GaussionBlur[1] = new QOpenGLFramebufferObject(w,h,QOpenGLFramebufferObject::NoAttachment,GL_TEXTURE_2D,GL_RGBA16F);
 
     //quadVAO
     const float quadVertices[] = {
@@ -30,17 +33,24 @@ GaussianBlur::GaussianBlur() : quadVBO(QOpenGLBuffer::VertexBuffer)
     quadVAO.release();
 }
 
-unsigned int GaussianBlur::getGaussBlurPhoto(unsigned int BlurId, int w, int h, unsigned int amount)
+void GaussianBlur::resizeGaussBlurFBO(int w, int h)
+{
+    delete GaussionBlur[0];
+    delete GaussionBlur[1];
+    GaussionBlur[0] = new QOpenGLFramebufferObject(w,h,QOpenGLFramebufferObject::NoAttachment,GL_TEXTURE_2D,GL_RGBA16F);
+    GaussionBlur[1] = new QOpenGLFramebufferObject(w,h,QOpenGLFramebufferObject::NoAttachment,GL_TEXTURE_2D,GL_RGBA16F);
+}
+
+QOpenGLFramebufferObject* GaussianBlur::getGaussBlurPhoto(unsigned int BlurId, unsigned int amount)
 {
     bool horizontal = true;
     bool first_iteration = true;
     //¸ßË¹Ä£ºý»º³å
-    GaussionBlur[0] = new QOpenGLFramebufferObject(w,h,QOpenGLFramebufferObject::NoAttachment,GL_TEXTURE_2D,GL_RGBA16F);
-    GaussionBlur[1] = new QOpenGLFramebufferObject(w,h,QOpenGLFramebufferObject::NoAttachment,GL_TEXTURE_2D,GL_RGBA16F);
 
     GaussianBlurShader->bind();
 
-    for (GLuint i = 0; i < amount; i++)
+
+    for (GLuint i = 0; i < amount*2; i++)
     {
         if(horizontal)GaussionBlur[0]->bind();
         else GaussionBlur[1]->bind();
@@ -62,7 +72,7 @@ unsigned int GaussianBlur::getGaussBlurPhoto(unsigned int BlurId, int w, int h, 
         if (first_iteration)
             first_iteration = false;
     }
-    return GaussionBlur[1]->texture();
+    return GaussionBlur[1];
 }
 
 void GaussianBlur::renderQuad()

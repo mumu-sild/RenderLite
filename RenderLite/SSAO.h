@@ -15,13 +15,15 @@ public:
     QVector<QVector3D> SSAOKernel;
     QOpenGLTexture texture;
 
+    bool debug = false;
+
 public:
     SSAO(int w,int h);
 
     void generateKernel();
     void generateNoise();//随机核心转动
-    void setUniform(QOpenGLFramebufferObject* GBuffer,QMatrix4x4 projection);
-    GLuint SSAOPicture(QOpenGLFramebufferObject* GBuffer,QMatrix4x4 projection);
+    void setUniform(QOpenGLFramebufferObject* GBuffer,QMatrix4x4 projection,QMatrix4x4 view);
+    QOpenGLFramebufferObject* SSAOPicture(QOpenGLFramebufferObject* GBuffer,QMatrix4x4 projection,QMatrix4x4 view);
     void renderQuad();
     void resizeSSAO(int w,int h);
 

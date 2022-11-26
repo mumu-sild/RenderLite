@@ -23,7 +23,6 @@ public:
     QVector<Vertex>       vertices; //顶点
     QVector<unsigned int> indices;  //索引
     QVector<Texture*>      textures;//纹理
-    //QMatrix4x4 model;               //模型矩阵
 
 private:
     QOpenGLVertexArrayObject VAO;

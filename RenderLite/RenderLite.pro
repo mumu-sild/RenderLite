@@ -28,6 +28,7 @@ SOURCES += \
     rectangle.cpp \
     scene.cpp \
     shaderSelector.cpp \
+    sphere.cpp \
     triangle.cpp
 
 HEADERS += \
@@ -52,13 +53,14 @@ HEADERS += \
     rectangle.h \
     scene.h \
     shaderSelector.h \
+    sphere.h \
     triangle.h
 
 FORMS += \
     mainwindow.ui
 
-DISTFILES += \
-    #include/assimp/config.h.in
+DISTFILES +=
+     #include/assimp/config.h.in
 
 RESOURCES += \
     shader.qrc

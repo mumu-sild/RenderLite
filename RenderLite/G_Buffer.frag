@@ -8,11 +8,12 @@ uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
 uniform sampler2D gBrightColor;
+uniform sampler2D SSAO;
 
 
 struct DirLight {
     bool Activated;
-    vec3 Direction;
+    vec3 direction;
 
     vec3 ambient;
     vec3 diffuse;
@@ -24,7 +25,7 @@ struct DirLight {
 };
 
 struct PointLight {
-    vec3 Position;
+    vec3 position;
     vec3 lightnormal;
 
     vec3 ambient;
@@ -67,6 +68,7 @@ vec3 FragPos;
 vec3 diffusecolor;
 vec3 specularcolor;
 float depth;
+float ambientOcclusion = 1;
 
 //常量
 const float PI = 3.141592653589793;
@@ -128,6 +130,8 @@ void main()
     Normal = texture2D(gNormal,TexCoords).rgb;
     diffusecolor = texture2D(gAlbedoSpec,TexCoords).rgb;
     specularcolor = diffusecolor * texture2D(gAlbedoSpec,TexCoords).a;
+    ambientOcclusion = 1.0f - texture(SSAO, TexCoords).r;
+
 
     //反gamma矫正
     diffusecolor = pow(diffusecolor, vec3(2.2));
@@ -160,13 +164,6 @@ void main()
     //泛光
     result += texture2D(gBrightColor,TexCoords).rgb;
     FragColor = vec4(result,1.0);
-
-    //       //检查该像素亮度是否高于阈值
-    //       float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
-    //       //if(brightness > 1.0) BrightColor = vec4(FragColor.rgb, 1.0);
-    //       //else
-    //       BrightColor = vec4(0,0,0, 1.0);
-    //       //BrightColor = vec4(1.0,1.0,1.0, 1.0);
 }
 
 float averageBlockDep(vec3 projCoords,vec2 texelSize,sampler2D shadowMap){
@@ -191,9 +188,9 @@ float averageBlockDep(vec3 projCoords,vec2 texelSize,sampler2D shadowMap){
 float PCSS(vec3 projCoords,sampler2D shadowMap,float weightOfLight){
 
     // 取得最近点的深度(使用[0,1]范围下的fragPosLight当坐标)
-    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    //float closestDepth = texture(shadowMap, projCoords.xy).r;
     // 取得当前片段在光源视角下的深度
-    float currentDepth = projCoords.z;
+    //float currentDepth = projCoords.z;
     // 检查当前片段是否在阴影中
     //float bias = max(0.05 * (1.0 - dot(Normal, -dirLight.direction)), 0.005);
     //每像素偏移距离
@@ -214,7 +211,7 @@ float PCSS(vec3 projCoords,sampler2D shadowMap,float weightOfLight){
 float PCF(vec3 projCoords,int r,sampler2D shadowMap)
 {
     // 取得最近点的深度(使用[0,1]范围下的fragPosLight当坐标)
-    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    //float closestDepth = texture(shadowMap, projCoords.xy).r;
     // 取得当前片段在光源视角下的深度
     float currentDepth = projCoords.z;
     // 检查当前片段是否在阴影中
@@ -239,7 +236,7 @@ float PCF(vec3 projCoords,int r,sampler2D shadowMap)
 
 //计算平行光源
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir){
-        vec3 lightDir = -normalize(light.Direction);//平行光反方向
+        vec3 lightDir = -normalize(light.direction);//平行光反方向
         float diff = max(dot(lightDir,normal),0.0);//cos衰减系数
         float spec = 0.0;//反射系数
         if(blinn){
@@ -251,7 +248,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir){
             spec = pow(max(dot(viewDir,reflectDir),0.0),shiness);//计算镜面反射系数
         }
 
-        vec3 ambient = light.ambient * diffusecolor;
+        vec3 ambient = light.ambient * ambientOcclusion * diffusecolor;
         vec3 diffuse = light.diffuse * diff * diffusecolor;
         vec3 specular = light.specular * spec * specularcolor;
 
@@ -274,7 +271,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir){
 }
 
 vec3 CalcPointLight(PointLight light,vec3 normal, vec3 fragPos,vec3 viewDir){
-        vec3 lightDir = normalize(light.Position - fragPos);//片元指向光源
+        vec3 lightDir = normalize(light.position - fragPos);//片元指向光源
 
         float angleDecay = 0.0f;
         if(any(notEqual(light.lightnormal,vec3(0,0,0)))){//不是（0，0，0）
@@ -292,10 +289,10 @@ vec3 CalcPointLight(PointLight light,vec3 normal, vec3 fragPos,vec3 viewDir){
             spec = pow(max(dot(viewDir,reflectDir),0.0),shiness);//计算镜面反射系数
         }
 
-        float distance = length(light.Position - fragPos);
+        float distance = length(light.position - fragPos);
         float attenuation = 1.0/(light.constant + light.linear * distance + light.quadratic * (distance * distance));
 
-        vec3 ambient = light.ambient * diffusecolor;
+        vec3 ambient = light.ambient * ambientOcclusion * diffusecolor;
         vec3 diffuse = light.diffuse * diff * diffusecolor;
         vec3 specular = light.specular * spec * specularcolor;
 

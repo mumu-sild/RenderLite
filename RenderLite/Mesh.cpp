@@ -1,4 +1,4 @@
-#include "Mesh.h"
+﻿#include "Mesh.h"
 
 Mesh::Mesh(QVector<Vertex> vertices, QVector<unsigned int> indices, QVector<Texture*> textures)
     :VEO(QOpenGLBuffer::IndexBuffer),
@@ -43,7 +43,6 @@ void Mesh::Draw(QOpenGLShaderProgram& shader)
         // and finally bind the texture
 
     }
-
 
     // draw mesh
 

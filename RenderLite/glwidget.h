@@ -97,11 +97,19 @@ public:
     GaussianBlur *gaussBlur;
     //G_Buffer
     QOpenGLShaderProgram* LightShader;
+    //PBR
+    QOpenGLShaderProgram* PBR_Shader;
     //SSAO
     SSAO *ssao;
 
 
-
+    //texture load
+    QOpenGLTexture* loadtexture(QString path);
+    QOpenGLTexture* albedoMap;
+    QOpenGLTexture* normalMap;
+    QOpenGLTexture* metallicMap;
+    QOpenGLTexture* roughnessMap;
+    QOpenGLTexture* equirectangularMap;
 
 
     //µ÷²ÎÁ¿

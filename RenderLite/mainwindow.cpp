@@ -704,3 +704,10 @@ void MainWindow::on_HDR_stateChanged(int arg1)
     glWidget->update();
 }
 
+
+void MainWindow::on_radioButton_clicked()
+{
+    glWidget->ssao->debug = !glWidget->ssao->debug;
+    glWidget->update();
+}
+
