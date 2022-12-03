@@ -54,6 +54,7 @@ HEADERS += \
     scene.h \
     shaderSelector.h \
     sphere.h \
+    stb_image.h \
     triangle.h
 
 FORMS += \

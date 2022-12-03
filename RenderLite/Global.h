@@ -39,8 +39,8 @@ inline void initGlobal(){
 //----------------------------------------------------------------------
 //                                  math
 //----------------------------------------------------------------------
+//#define pi 3.1415926535
 
-#define pi 3.1415926535
 
 inline double min(double a,double b){
     return a<b?a:b;
@@ -51,7 +51,7 @@ inline double max(double a,double b){
 }
 
 inline float degree_to_radians(float degree) {
-    return degree * pi / 180.0;
+    return degree * M_PI / 180.0;
 }
 
 //----------------------------------------------------------------------

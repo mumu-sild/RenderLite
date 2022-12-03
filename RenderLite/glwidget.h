@@ -109,7 +109,10 @@ public:
     QOpenGLTexture* normalMap;
     QOpenGLTexture* metallicMap;
     QOpenGLTexture* roughnessMap;
+    //IBL
     QOpenGLTexture* equirectangularMap;
+    QOpenGLFramebufferObject* rectToCubeBuffer;//
+    unsigned int hdrTexture;
 
 
     //µ÷²ÎÁ¿

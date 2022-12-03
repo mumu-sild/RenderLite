@@ -71,6 +71,12 @@
 #include "Model.h"
 #include "sphere.h"
 
+//#ifndef STB__
+//#define STB__
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+//#endif
+
 
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent)
@@ -236,8 +242,68 @@ void GLWidget::initializeGL()
     metallicMap = loadtexture("C:/Users/mumu/Desktop/graphics/RenderLite/RenderLite/RenderLite/Picture_source/PBR/rustediron2_metallic.png");
     roughnessMap = loadtexture("C:/Users/mumu/Desktop/graphics/RenderLite/RenderLite/RenderLite/Picture_source/PBR/rustediron2_roughness.png");
 
-    //IBL
-    equirectangularMap = loadtexture("C:/Users/mumu/Desktop/graphics/RenderLite/RenderLite/RenderLite/Picture_source/ibl_hdr_radiance.png");
+//IBL
+
+    //1. 加载图像  Alexs_Apt_8k.jpg
+    QImage data("C:/Users/mumu/Desktop/graphics/RenderLite/outerFile/Alexs_Apartment/Alexs_Apartment/Alexs_Apt_8k.jpg");
+    if(data.isNull()){
+        qDebug()<<"data is null;";
+    }
+    else{
+        data = data.mirrored();
+        equirectangularMap = new QOpenGLTexture(data);
+        equirectangularMap->create();
+        equirectangularMap->setWrapMode(QOpenGLTexture::DirectionS,QOpenGLTexture::Repeat);
+        equirectangularMap->setWrapMode(QOpenGLTexture::DirectionT,QOpenGLTexture::Repeat);
+        equirectangularMap->setMinMagFilters(QOpenGLTexture::LinearMipMapLinear,QOpenGLTexture::Linear);
+    }
+
+    //          Alexs_Apt_2k.hdr
+    stbi_set_flip_vertically_on_load(true);
+    int width, height, nrComponents;
+    float *data2 = stbi_loadf("C:/Users/mumu/Desktop/graphics/RenderLite/outerFile/Alexs_Apartment/Alexs_Apartment/Alexs_Apt_2k.hdr"\
+                            , &width, &height, &nrComponents, 0);
+    if (data2)
+    {
+        glGenTextures(1, &hdrTexture);
+        glBindTexture(GL_TEXTURE_2D, hdrTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data2);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data2);
+    }
+    else
+    {
+        std::cout << "Failed to load HDR image." << std::endl;
+    }
+
+    unsigned int captureFBO, captureRBO;
+    glGenFramebuffers(1, &captureFBO);
+    glGenRenderbuffers(1, &captureRBO);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
+    glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
+
+    unsigned int envCubemap;
+    glGenTextures(1, &envCubemap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+    for (unsigned int i = 0; i < 6; ++i)
+    {
+        // note that we store each face with 16 bit floating point values
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F,
+                     512, 512, 0, GL_RGB, GL_FLOAT, nullptr);
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 
 
@@ -265,6 +331,18 @@ void GLWidget::showPicture(GLuint ID)
 
 void GLWidget::paintGL()
 {
+    //test
+    //glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+//    glViewport(0,0,width()/2,height());
+    showPicture(hdrTexture);
+//    glViewport(width()/2,0,width(),height());
+//    showPicture(equirectangularMap->textureId());
+
+
+
+    return;
+
+
 //  第一次层循环，获取光照信息以及shadow map图
     QVector<PointLight*> pointLight;
 
