@@ -111,9 +111,15 @@ public:
     QOpenGLTexture* roughnessMap;
     //IBL
     QOpenGLTexture* equirectangularMap;
-    QOpenGLFramebufferObject* rectToCubeBuffer;//
     unsigned int hdrTexture;
-
+        //QOpenGLFramebufferObject* rectToCubeBuffer;//
+    QOpenGLShaderProgram* equirectangularToCubemapShader;
+    unsigned int captureFBO, captureRBO;
+    unsigned int envCubemap;
+    QMatrix4x4 captureProjection;
+    QMatrix4x4 lookatMatrix[6];
+    QOpenGLShaderProgram* skyboxShader;
+    void renderCube();
 
     //调参量
     bool gamma = true;
@@ -121,6 +127,9 @@ public:
     float toneMapping = 0.0f;
     int HDRNUM = 0;
 
+    //test天空图
+    unsigned int cubemapTexture;
+    int Texwidth, Texheight, TexnrComponents;
 
 private:
     //交互参数
@@ -198,6 +207,7 @@ public:
 
 
 
+    unsigned int loadCubemap(vector<std::string> faces);
 public slots:
 
     void setXCameraPosi(double meters);
