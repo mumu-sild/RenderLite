@@ -57,7 +57,7 @@
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLBuffer>
 #include <QMatrix4x4>
-#include <QOpenGLFunctions_3_3_Core>
+#include <QOpenGLFunctions_4_5_Core>
 
 
 #include "camera.h"
@@ -65,6 +65,7 @@
 #include "shaderSelector.h"
 #include "gaussianblur.h"
 #include "SSAO.h"
+#include "cubemap.h" //等距柱状图变换为Cube
 
 extern QString path;
 //#define numPointLight 4
@@ -81,7 +82,7 @@ public:
     camera maincamera;
     QOpenGLFramebufferObject*G_Buffer;//* HDRFBO
 
-    QOpenGLFunctions_3_3_Core *core;
+    QOpenGLFunctions_4_5_Core *core;
 
     int objectNumber = 0;//物体号，0为摄像机，1为0号物体
     int mousePressObjNumber = 0;
@@ -90,6 +91,7 @@ public:
     //-----------------阴影测试
     QOpenGLShaderProgram* simpleDepthShader,*debug_dep;
     bool shadowShow = false;
+
     //-----------------HDR测试
     QOpenGLShaderProgram* BloomShader;
     void renderQuad();
@@ -109,16 +111,17 @@ public:
     QOpenGLTexture* normalMap;
     QOpenGLTexture* metallicMap;
     QOpenGLTexture* roughnessMap;
+
     //IBL
-    QOpenGLTexture* equirectangularMap;
-    unsigned int hdrTexture;
-        //QOpenGLFramebufferObject* rectToCubeBuffer;//
-    QOpenGLShaderProgram* equirectangularToCubemapShader;
-    unsigned int captureFBO, captureRBO;
+    CubeMap* ETC;
+    CubeMap* irradianceCubeMap;
+
     unsigned int envCubemap;
-    QMatrix4x4 captureProjection;
-    QMatrix4x4 lookatMatrix[6];
+    unsigned int irradianceMap;
     QOpenGLShaderProgram* skyboxShader;
+    QOpenGLShaderProgram* irradianceShader;
+    QOpenGLShaderProgram* pbrShader;
+
     void renderCube();
 
     //调参量
@@ -128,8 +131,9 @@ public:
     int HDRNUM = 0;
 
     //test天空图
+    QVector<CubeMap*> CubeMaps;
     unsigned int cubemapTexture;
-    int Texwidth, Texheight, TexnrComponents;
+//    int Texwidth, Texheight, TexnrComponents;
 
 private:
     //交互参数
@@ -160,6 +164,7 @@ public:
     QSize sizeHint() const override;
 
 protected:
+    //重载函数
     void initializeGL() override;
     void paintGL() override;
     void resizeGL(int width, int height) override;
@@ -169,20 +174,25 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
+    void cleanup();
 private:
+    //调试函数
     void showPicture(GLuint ID);
+
+private:
     void generateDirShadow();
     void generatePointShadow(int k);
 
 
 public:
-    //导入模型
+    //导入模型函数
     void importModel(QString modelPath);
     void importTriangle();
     void importRectangle();
 
 
 public:
+    //外部窗口函数
     bool getXrotation() const;
 
     void setXObjRotationSelected(bool booler);
@@ -199,15 +209,14 @@ public:
     void setObjectNumber(int newObjectNumber);
     void calCulateModelMoveCoefficient();
     void objectChangEmitSignal();
-    void cleanup();
     void deleteObject(int objectNumber);
 
 
-
-
-
-
     unsigned int loadCubemap(vector<std::string> faces);
+
+
+
+
 public slots:
 
     void setXCameraPosi(double meters);

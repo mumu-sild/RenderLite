@@ -18,6 +18,7 @@ SOURCES += \
     Model.cpp \
     SSAO.cpp \
     camera.cpp \
+    cubemap.cpp \
     dirLight.cpp \
     gaussianblur.cpp \
     glwidget.cpp \
@@ -44,6 +45,7 @@ HEADERS += \
     Texture.h \
     Vertex.h \
     camera.h \
+    cubemap.h \
     dirLight.h \
     gaussianblur.h \
     glwidget.h \

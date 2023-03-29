@@ -71,6 +71,7 @@
 #include "Model.h"
 #include "sphere.h"
 
+
 //#ifndef STB__
 //#define STB__
 #define STB_IMAGE_IMPLEMENTATION
@@ -115,11 +116,13 @@ void GLWidget::cleanup()
 
 void GLWidget::initializeGL()
 {
-    connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLWidget::cleanup);
+    std::cout<<"init GL"<<endl;
 
+    connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLWidget::cleanup);
     initializeOpenGLFunctions();
+
     shaderSelector.OpenGLFunctionsInit();
-    core = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_3_Core>();
+    core = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_4_5_Core>();
     //gaussBlur = new GaussianBlur(width(),height());
     //ssao = new SSAO(width(),height());
 
@@ -136,6 +139,11 @@ void GLWidget::initializeGL()
     debug_dep->addShaderFromSourceFile(QOpenGLShader::Vertex,":/map_depth.vert");
     debug_dep->addShaderFromSourceFile(QOpenGLShader::Fragment,":/map_depth.frag");
     debug_dep->link();
+    //渲染天空盒的shader
+    skyboxShader = new QOpenGLShaderProgram();
+    skyboxShader->addShaderFromSourceFile(QOpenGLShader::Vertex,":/skybox.vert");
+    skyboxShader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/skybox.frag");
+    skyboxShader->link();
 
     //加载天空盒
     vector<std::string> faces
@@ -147,110 +155,35 @@ void GLWidget::initializeGL()
         "../RenderLite/Picture_source/skybox/front.jpg",
         "../RenderLite/Picture_source/skybox/back.jpg"
     };
-    cubemapTexture = loadCubemap(faces);
+    CubeMaps.push_back(new CubeMap(faces));
+    cubemapTexture = CubeMaps.last()->getCubeMapID();
 
 //IBL
+    //通过等距柱状图获取立方图贴图
+    ETC = new CubeMap();
+    //Alexs_Apt_Env.hdr Alexs_Apt_8k.jpg Alexs_Apt_2k.hdr
+    ETC->RenderToCube("C:/Users/mumu/Desktop/graphics/RenderLite/outerFile/Alexs_Apartment/Alexs_Apartment/Alexs_Apt_2k.hdr");
+    envCubemap = ETC->getCubeMapID();
 
-    //1. 加载图像  Alexs_Apt_8k.jpg
-//    QImage data("C:/Users/mumu/Desktop/graphics/RenderLite/outerFile/Alexs_Apartment/Alexs_Apartment/Alexs_Apt_8k.jpg");
-//    if(data.isNull()){
-//        qDebug()<<"data is null;";
-//    }
-//    else{
-//        data = data.mirrored();
-//        equirectangularMap = new QOpenGLTexture(data);
-//        equirectangularMap->create();
-//        equirectangularMap->setWrapMode(QOpenGLTexture::DirectionS,QOpenGLTexture::Repeat);
-//        equirectangularMap->setWrapMode(QOpenGLTexture::DirectionT,QOpenGLTexture::Repeat);
-//        equirectangularMap->setMinMagFilters(QOpenGLTexture::LinearMipMapLinear,QOpenGLTexture::Linear);
-//    }
+    //通过立方图贴图获取辐照度立方体贴图
+    irradianceCubeMap = new CubeMap(32);
+    irradianceCubeMap->getIrrandianceCubMapFromCube(envCubemap);//envCubemap cubemapTexture
+    irradianceMap = irradianceCubeMap->getCubeMapID();
 
-    //          Alexs_Apt_2k.hdr
-    stbi_set_flip_vertically_on_load(true);
 
-    float *data2 = stbi_loadf("C:/Users/mumu/Desktop/graphics/RenderLite/outerFile/Alexs_Apartment/Alexs_Apartment/Alexs_Apt_8k.jpg"\
-                            , &Texwidth, &Texheight, &TexnrComponents, 0);
-    if (data2)
-    {
-        glGenTextures(1, &hdrTexture);
-        glBindTexture(GL_TEXTURE_2D, hdrTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, Texwidth, Texheight, 0, GL_RGB, GL_FLOAT, data2);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        stbi_image_free(data2);
-    }
-    else
-    {
-        std::cout << "Failed to load HDR image." << std::endl;
-    }
-
-    //FBO 创建帧缓存、绑定深度缓存和模板缓存
-    glGenFramebuffers(1, &captureFBO);
-    glGenRenderbuffers(1, &captureRBO);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
-    glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
-
-    //CubeMap 创建空间图
-    glGenTextures(1, &envCubemap);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
-    for (unsigned int i = 0; i < 6; ++i)
-    {
-        // note that we store each face with 16 bit floating point values
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F,
-                     512, 512, 0, GL_RGB, GL_FLOAT, nullptr);
-    }
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // pbr: set up projection and view matrices for capturing data onto the 6 cubemap face directions
-    //设置空间图生成参数
-   captureProjection.perspective(90.0f, 1.0f, 0.1f, 10.0f);
-   lookatMatrix[0].lookAt(QVector3D(0.0f, 0.0f, 0.0f), QVector3D( 1.0f,  0.0f,  0.0f), QVector3D(0.0f, -1.0f,  0.0f));
-   lookatMatrix[1].lookAt(QVector3D(0.0f, 0.0f, 0.0f), QVector3D(-1.0f,  0.0f,  0.0f), QVector3D(0.0f, -1.0f,  0.0f));
-   lookatMatrix[2].lookAt(QVector3D(0.0f, 0.0f, 0.0f), QVector3D( 0.0f,  1.0f,  0.0f), QVector3D(0.0f,  0.0f,  1.0f));
-   lookatMatrix[3].lookAt(QVector3D(0.0f, 0.0f, 0.0f), QVector3D( 0.0f, -1.0f,  0.0f), QVector3D(0.0f,  0.0f, -1.0f));
-   lookatMatrix[4].lookAt(QVector3D(0.0f, 0.0f, 0.0f), QVector3D( 0.0f,  0.0f,  1.0f), QVector3D(0.0f, -1.0f,  0.0f));
-   lookatMatrix[5].lookAt(QVector3D(0.0f, 0.0f, 0.0f), QVector3D( 0.0f,  0.0f, -1.0f), QVector3D(0.0f, -1.0f,  0.0f));
-
-   // pbr: convert HDR equirectangular environment map to cubemap equivalent
-   // 设置椭圆图映射到空间盒的shader，并渲染
-    equirectangularToCubemapShader = new QOpenGLShaderProgram();
-    equirectangularToCubemapShader->addShaderFromSourceFile(QOpenGLShader::Vertex,":/rectTocube.vert");
-    equirectangularToCubemapShader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/rectTocube.frag");
-    equirectangularToCubemapShader->link();
-
-    equirectangularToCubemapShader->bind();
-    //equirectangularToCubemapShader->setUniformValue("equirectangularMap", 0);
-    equirectangularToCubemapShader->setUniformValue("projection", captureProjection);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, hdrTexture);
-
-    glViewport(0,0,512,512);
-    glBindFramebuffer(GL_FRAMEBUFFER,captureFBO);
-    for (unsigned int i = 0; i < 6; ++i)
-    {
-        equirectangularToCubemapShader->setUniformValue("view", lookatMatrix[i]);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        renderCube();
-    }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    //渲染天空盒的shader
-    skyboxShader = new QOpenGLShaderProgram();
-    skyboxShader->addShaderFromSourceFile(QOpenGLShader::Vertex,":/skybox.vert");
-    skyboxShader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/skybox.frag");
-    skyboxShader->link();
+//PBR
+    //Object
+    Sphere *s = new Sphere();
+    scene.Add(s);
+    //Shader
+    pbrShader = new QOpenGLShaderProgram();
+    pbrShader->addShaderFromSourceFile(QOpenGLShader::Vertex,":/pbr_IBL.vert");
+    pbrShader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/pbr_IBL.frag");
+    pbrShader->link();
+    pbrShader->bind();
+    pbrShader->setUniformValue("irradianceMap", 0);
+    pbrShader->setUniformValue("albedo", 0.5f, 0.5f, 0.5f);
+    pbrShader->setUniformValue("ao", 1.0f);
 
 
 
@@ -262,7 +195,6 @@ void GLWidget::initializeGL()
 void GLWidget::showPicture(GLuint ID)
 {
     //makeCurrent();
-    //glViewport(0,0,width(),height());
     debug_dep->bind();//shader
     debug_dep->setUniformValue("depthMap",0);
     glActiveTexture(GL_TEXTURE0);
@@ -282,45 +214,43 @@ void GLWidget::paintGL()
     //glViewport(0,0,width()/2,height());
     //showPicture(hdrTexture);
 
-    equirectangularToCubemapShader->bind();
-    equirectangularToCubemapShader->setUniformValue("projection", captureProjection);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, hdrTexture);
-    glViewport(0,0,512,512);
-    glBindFramebuffer(GL_FRAMEBUFFER,captureFBO);
-    for (unsigned int i = 0; i < 6; ++i)
-    {
-        equirectangularToCubemapShader->setUniformValue("view", lookatMatrix[i]);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        renderCube();
-    }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 
     glViewport(0, 0, width(), height());
-    //glViewport(0,0,512,512);
-    //return;
-//    glViewport(width()/2,0,width(),height());
-//    showPicture(equirectangularMap->textureId());
-
-//    qDebug()<<"draw";
-//    glViewport(0, 0, 512, 512); // don't forget to configure the viewport to the capture dimensions.
-//    glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
-
-//    for (unsigned int i = 0; i < 6; ++i)
-//    {
-//        equirectangularToCubemapShader->setUniformValue("view", lookatMatrix[i]);
-//        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
-//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-//        renderCube();
-//    }
-//    glDepthFunc(GL_LEQUAL);
-//    glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
 
 
-//    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+
+    int nrRows = 7;//行
+    int nrColumns = 7;//列
+    float spacing = 2.5;
+
+    pbrShader->bind();
+    pbrShader->setUniformValue("projection", maincamera.projection);
+    pbrShader->setUniformValue("view", maincamera.getViewMetrix());
+    pbrShader->setUniformValue("camPos", maincamera.getCameraPos());
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
+    QMatrix4x4 model;
+    for (int row = 0; row < nrRows; ++row)//行
+    {
+        //越向上金属度越高
+        pbrShader->setUniformValue("metallic", (float)row / (float)nrRows);
+        for (int col = 0; col < nrColumns; ++col)//列
+        {
+            // we clamp the roughness to 0.025 - 1.0 as perfectly smooth surfaces (roughness of 0.0) tend to look a bit off
+            // on direct lighting.
+            //越向右粗糙度越高
+            pbrShader->setUniformValue("roughness", clamp((float)col / (float)nrColumns, 0.05f, 1.0f));
+
+            model.setToIdentity();
+            model.translate(QVector3D(
+                (float)(col - (nrColumns / 2)) * spacing,
+                (float)(row - (nrRows / 2)) * spacing,
+                 -2.0f
+            ));
+            pbrShader->setUniformValue("model", model);
+            scene.objects[0]->Draw(*pbrShader);//Draw不应该与Shader绑定
+        }
+    }
 
     glDepthFunc(GL_LEQUAL);
     skyboxShader->bind();
@@ -328,11 +258,11 @@ void GLWidget::paintGL()
     skyboxShader->setUniformValue("view",  maincamera.getViewMetrix());
     skyboxShader->setUniformValue("skybox", 0);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP,envCubemap);//envCubemap cubemapTexture
+    glBindTexture(GL_TEXTURE_CUBE_MAP,envCubemap);//envCubemap cubemapTexture irradianceMap
 
-    //renderQuad();
     renderCube();
     glDepthFunc(GL_LESS);
+
     qDebug()<<"draw";
 
 }

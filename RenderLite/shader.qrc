@@ -29,5 +29,8 @@
         <file>PBR_Shader.frag</file>
         <file>rectTocube.vert</file>
         <file>rectTocube.frag</file>
+        <file>irradiance_convolution.frag</file>
+        <file>pbr_IBL.vert</file>
+        <file>pbr_IBL.frag</file>
     </qresource>
 </RCC>
