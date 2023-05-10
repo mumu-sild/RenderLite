@@ -14,6 +14,7 @@ CONFIG += c++17
 
 SOURCES += \
     GLWeightIntersection.cpp \
+    IBL.cpp \
     Mesh.cpp \
     Model.cpp \
     SSAO.cpp \
@@ -30,11 +31,13 @@ SOURCES += \
     scene.cpp \
     shaderSelector.cpp \
     sphere.cpp \
+    texture2d.cpp \
     triangle.cpp
 
 HEADERS += \
     Bounds3.h \
     Global.h \
+    IBL.h \
     Intersection.h \
     Mesh.h \
     Model.h \
@@ -57,6 +60,7 @@ HEADERS += \
     shaderSelector.h \
     sphere.h \
     stb_image.h \
+    texture2d.h \
     triangle.h
 
 FORMS += \

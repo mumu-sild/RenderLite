@@ -63,7 +63,7 @@ void camera::rotateCamera(float xRotate, float yRotate)
 
 }
 
-QMatrix4x4 camera::getViewMetrix()
+QMatrix4x4 camera::getViewMetrix() const
 {
     QMatrix4x4 lookatMatrix;
     lookatMatrix.lookAt(cameraPosi,cameraFocus,dirY);
@@ -77,13 +77,13 @@ void camera::resetDirXYZ()
     dirX = (QVector3D::crossProduct(dirZ, dirY)).normalized();
 }
 
-QVector3D camera::getCameraPos()
+QVector3D camera::getCameraPos() const
 {
     return cameraPosi;
 }
 
 
-QVector3D camera::getCameraFocus()
+QVector3D camera::getCameraFocus() const
 {
     return cameraFocus;
 }
@@ -119,12 +119,13 @@ void camera::setZCameraFocus(double meters)
     cameraFocus.setZ(meters);
 }
 
-QVector3D camera::getcameraX()
+QVector3D camera::getcameraX() const
 {
     return dirX;
 }
 
-QVector3D camera::getcameraY(){
+QVector3D camera::getcameraY() const
+{
     return dirY;
 }
 

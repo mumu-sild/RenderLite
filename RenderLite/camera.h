@@ -40,14 +40,14 @@ public:
     void setZCameraFocus(double meters);
 
     //获取lookat矩阵
-    QMatrix4x4 getViewMetrix();
+    QMatrix4x4 getViewMetrix() const;
     //获取摄像机位置
-    QVector3D getCameraPos();
+    QVector3D getCameraPos() const;
     //获取摄像机焦点
-    QVector3D getCameraFocus();
+    QVector3D getCameraFocus() const;
 
-    QVector3D getcameraX();
-    QVector3D getcameraY();
+    QVector3D getcameraX() const;
+    QVector3D getcameraY() const;
 
 
     //重设xyz轴

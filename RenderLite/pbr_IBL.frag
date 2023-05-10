@@ -12,6 +12,10 @@ uniform float ao;
 
 // IBL
 uniform samplerCube irradianceMap;
+uniform samplerCube prefilterMap;
+uniform int maxMipmapLevels;
+
+uniform sampler2D LUT;
 
 // lights
 uniform vec3 lightPositions[4];
@@ -60,6 +64,12 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
+
+// ----------------------------------------------------------------------------
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
 // ----------------------------------------------------------------------------
 void main()
 {
@@ -72,7 +82,7 @@ void main()
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallic);
 
-    // reflectance equation
+    // 反射方程，点光源计算
     vec3 Lo = vec3(0.0);
     for(int i = 0; i < 4; ++i)
     {
@@ -110,16 +120,22 @@ void main()
         Lo += (kD * albedo / PI + specular) * radiance * NdotL; // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
     }
 
-    // ambient lighting (we now use IBL as the ambient term)
+    //环境光镜面反射 specular
+    //vec3 kS = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
     vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
+    vec3 prefilterColor = textureCubeLod(prefilterMap,R,roughness * maxMipmapLevels).rgb;
+    vec2 brdf = texture2D( LUT, vec2( max(dot(N,V),0.0) , roughness )).rg;
+    vec3 specular = prefilterColor * (kS * brdf.x + brdf.y);
+
+    //环境光漫反射  ambient
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - metallic;
     vec3 irradiance = texture(irradianceMap, N).rgb;
     vec3 diffuse      = irradiance * albedo;
     vec3 ambient = (kD * diffuse) * ao;
-    // vec3 ambient = vec3(0.002);
 
-    vec3 color = ambient + Lo;
+    //合计最终值
+    vec3 color = ambient + specular + Lo;
 
     // HDR tonemapping
     color = color / (color + vec3(1.0));

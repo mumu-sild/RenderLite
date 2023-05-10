@@ -27,10 +27,13 @@
         <file>SSAOShader.frag</file>
         <file>PBR_Shader.vert</file>
         <file>PBR_Shader.frag</file>
-        <file>rectTocube.vert</file>
+        <file>cubemap.vert</file>
         <file>rectTocube.frag</file>
         <file>irradiance_convolution.frag</file>
         <file>pbr_IBL.vert</file>
         <file>pbr_IBL.frag</file>
+        <file>prefilterMap.frag</file>
+        <file>brdf_LUT.vert</file>
+        <file>brdf_LUT.frag</file>
     </qresource>
 </RCC>

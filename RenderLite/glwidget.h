@@ -65,7 +65,9 @@
 #include "shaderSelector.h"
 #include "gaussianblur.h"
 #include "SSAO.h"
-#include "cubemap.h" //µÈ¾àÖù×´Í¼±ä»»ÎªCube
+#include "cubemap.h"
+#include "texture2d.h"
+#include "IBL.h"
 
 extern QString path;
 //#define numPointLight 4
@@ -113,14 +115,18 @@ public:
     QOpenGLTexture* roughnessMap;
 
     //IBL
-    CubeMap* ETC;
-    CubeMap* irradianceCubeMap;
+    IBL *ibl;
+//    CubeMap* ETC;
+//    CubeMap* irradianceCubeMap;
+//    CubeMap* prefilterMap;
 
-    unsigned int envCubemap;
-    unsigned int irradianceMap;
-    QOpenGLShaderProgram* skyboxShader;
-    QOpenGLShaderProgram* irradianceShader;
+//    unsigned int envCubemap;
+//    unsigned int irradianceMap;
+//    QOpenGLShaderProgram* skyboxShader;
+//    QOpenGLShaderProgram* irradianceShader;
     QOpenGLShaderProgram* pbrShader;
+
+//    Texture2D* LUT;
 
     void renderCube();
 

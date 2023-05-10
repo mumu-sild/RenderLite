@@ -131,21 +131,25 @@ void GLWidget::initializeGL()
                  backgroundDefaultColor.z(), 1);
 
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);     //注：使用天空图采样一定要取消面剔除
     glEnable(GL_STENCIL_TEST);
     glDepthFunc(GL_LEQUAL);
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+    //glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS)，在边界采样时，会对边界像素颜色值进行插值。
 
     debug_dep = new QOpenGLShaderProgram();
     debug_dep->addShaderFromSourceFile(QOpenGLShader::Vertex,":/map_depth.vert");
     debug_dep->addShaderFromSourceFile(QOpenGLShader::Fragment,":/map_depth.frag");
     debug_dep->link();
-    //渲染天空盒的shader
-    skyboxShader = new QOpenGLShaderProgram();
-    skyboxShader->addShaderFromSourceFile(QOpenGLShader::Vertex,":/skybox.vert");
-    skyboxShader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/skybox.frag");
-    skyboxShader->link();
 
-    //加载天空盒
+//    //渲染天空盒的shader
+//    skyboxShader = new QOpenGLShaderProgram();
+//    skyboxShader->addShaderFromSourceFile(QOpenGLShader::Vertex,":/skybox.vert");
+//    skyboxShader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/skybox.frag");
+//    skyboxShader->link();
+
+
+//加载天空盒
     vector<std::string> faces
     {
         "../RenderLite/Picture_source/skybox/right.jpg",
@@ -158,17 +162,34 @@ void GLWidget::initializeGL()
     CubeMaps.push_back(new CubeMap(faces));
     cubemapTexture = CubeMaps.last()->getCubeMapID();
 
-//IBL
-    //通过等距柱状图获取立方图贴图
-    ETC = new CubeMap();
-    //Alexs_Apt_Env.hdr Alexs_Apt_8k.jpg Alexs_Apt_2k.hdr
-    ETC->RenderToCube("C:/Users/mumu/Desktop/graphics/RenderLite/outerFile/Alexs_Apartment/Alexs_Apartment/Alexs_Apt_2k.hdr");
-    envCubemap = ETC->getCubeMapID();
 
-    //通过立方图贴图获取辐照度立方体贴图
-    irradianceCubeMap = new CubeMap(32);
-    irradianceCubeMap->getIrrandianceCubMapFromCube(envCubemap);//envCubemap cubemapTexture
-    irradianceMap = irradianceCubeMap->getCubeMapID();
+    //立方图贴图
+    CubeMaps.push_back(new CubeMap(1024,true));
+    //Alexs_Apt_Env.hdr Alexs_Apt_8k.jpg Alexs_Apt_2k.hdr
+    CubeMaps.last()->renderHDRTextureToCube("C:/Users/mumu/Desktop/graphics/RenderLite/outerFile/Alexs_Apartment/Alexs_Apartment/Alexs_Apt_2k.hdr");
+    //envCubemap = CubeMaps.last()->getCubeMapID();
+    glBindTexture(GL_TEXTURE_CUBE_MAP,CubeMaps.last()->getCubeMapID());
+    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+//IBL
+    ibl = new IBL(CubeMaps[0]);
+    ibl->getIrrandianceCubeMap(32);
+    ibl->getPrefilterMap(128,5,1024);
+
+    //辐照度立方体贴图
+//    irradianceCubeMap = new CubeMap(32);
+//    irradianceCubeMap->getIrrandianceCubMapFromCube(envCubemap);//envCubemap cubemapTexture
+//    irradianceMap = irradianceCubeMap->getCubeMapID();
+
+    //预滤波图
+//    prefilterMap = new CubeMap(128,true);
+//    prefilterMap->getIBLprefilterMapFromEnvCubeMap(envCubemap,5,1024);
+
+    //BRDF Look Up Texture(LUT)
+//    LUT = new Texture2D(512,512,GL_RG16F,false);
+//    LUT->generateTextureLUT();
+
+
 
 
 //PBR
@@ -182,10 +203,28 @@ void GLWidget::initializeGL()
     pbrShader->link();
     pbrShader->bind();
     pbrShader->setUniformValue("irradianceMap", 0);
-    pbrShader->setUniformValue("albedo", 0.5f, 0.5f, 0.5f);
+    pbrShader->setUniformValue("prefilterMap", 1);
+    pbrShader->setUniformValue("LUT",2);
+    pbrShader->setUniformValue("albedo", 1.0f, 1.0f, 1.0f);
     pbrShader->setUniformValue("ao", 1.0f);
 
+    //内存释放测试
+//    unsigned int captureFBO;
+//    glGenFramebuffers(1, &captureFBO);
+//    glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
 
+//    unsigned int captureRBO[1024];
+//    glGenRenderbuffers(1024, captureRBO);
+//    for(int i=0;i<1024;++i){
+//        //unsigned int captureRBO;
+//        //glGenRenderbuffers(1, &captureRBO);
+//        //glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
+//        glBindRenderbuffer(GL_RENDERBUFFER, captureRBO[i]);
+//        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 1024, 1024);
+//        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
+//        glDeleteRenderbuffers(1, captureRBO + i);
+
+//    }
 
     qDebug()<<"initialGL";
 }
@@ -228,7 +267,12 @@ void GLWidget::paintGL()
     pbrShader->setUniformValue("view", maincamera.getViewMetrix());
     pbrShader->setUniformValue("camPos", maincamera.getCameraPos());
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, ibl->irradianceCubeMap->getCubeMapID());
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_CUBE_MAP,ibl->prefilterMap->getCubeMapID());
+    pbrShader->setUniformValue("maxMipmapLevels",ibl->prefilterMap->mipmap);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D,ibl->LUT->Texture2D_ID);
     QMatrix4x4 model;
     for (int row = 0; row < nrRows; ++row)//行
     {
@@ -252,18 +296,14 @@ void GLWidget::paintGL()
         }
     }
 
-    glDepthFunc(GL_LEQUAL);
-    skyboxShader->bind();
-    skyboxShader->setUniformValue("projection", maincamera.projection);
-    skyboxShader->setUniformValue("view",  maincamera.getViewMetrix());
-    skyboxShader->setUniformValue("skybox", 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP,envCubemap);//envCubemap cubemapTexture irradianceMap
+    ibl->envCubeMap->renderToSkyBox(maincamera);
 
-    renderCube();
-    glDepthFunc(GL_LESS);
+    //LUT显示
+    //glViewport(0,0,512,512);
+    //showPicture(LUT->Texture2D_ID);
 
-    qDebug()<<"draw";
+
+    //qDebug()<<"draw";
 
 }
 
@@ -520,34 +560,34 @@ void GLWidget::renderCube()
 
 }
 
-unsigned int GLWidget::loadCubemap(vector<std::string> faces)
-{
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+//unsigned int GLWidget::loadCubemap(vector<std::string> faces)
+//{
+//    unsigned int textureID;
+//    glGenTextures(1, &textureID);
+//    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 
-    int width, height, nrChannels;
-    for (unsigned int i = 0; i < faces.size(); i++)
-    {
-        unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
-        if (data)
-        {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                         0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
-            );
-            stbi_image_free(data);
-        }
-        else
-        {
-            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
-            stbi_image_free(data);
-        }
-    }
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+//    int width, height, nrChannels;
+//    for (unsigned int i = 0; i < faces.size(); i++)
+//    {
+//        unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+//        if (data)
+//        {
+//            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+//                         0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+//            );
+//            stbi_image_free(data);
+//        }
+//        else
+//        {
+//            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+//            stbi_image_free(data);
+//        }
+//    }
+//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    return textureID;
-}
+//    return textureID;
+//}
